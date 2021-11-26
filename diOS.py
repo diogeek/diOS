@@ -1,4 +1,9 @@
-import os,datetime,webbrowser,sys,subprocess,time,string
+import os,datetime,webbrowser,sys,subprocess,platform,string
+
+available_drives=[]
+for d in string.ascii_uppercase:
+    if os.path.exists('{}:'.format(d)):
+        available_drives.append('{}:'.format(d))
 
 #change terminal size (in rows and columns) before putting it in fullscreen mode
 sys.stdout.write("\x1b[8;{rows};{cols}t".format(rows=50, cols=170))
@@ -205,7 +210,6 @@ def directories(path):
             if selected=="0":
                 bar()
                 ii=1
-                available_drives = ['%s:' % d for d in string.ascii_uppercase if os.path.exists('%s:' % d)]
                 spaces=len(str(len(available_drives)))
                 for drive in available_drives:
                     print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(drive))
@@ -316,7 +320,7 @@ def bar():
 
     print(f"{bcolors.WHITE}\u018A\u0131\u0298\u054F"+f"\n    {barcolor}"+datetime.date.today().strftime("%d/%m/%Y")+
           " "+datetime.datetime.now().strftime("%H:%M")+
-          " - [H]ome - [B]ack - [S]ettings - [F]ile System - [C]hatrum - [E]xit"+
+          " - [H]ome - [B]ack - [S]ettings - [F]ile System - [C]hatrum - [E]xit diOS"+
           f"{bcolors.WHITE}")
     
     #separator (COMMENT THIS LINE OUT IF YOU WANT TO RUN IN YOU IDE, OTHERWISE YOU'LL NEED TO OPEN IN TERMINAL)
