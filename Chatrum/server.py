@@ -28,7 +28,7 @@ try:
 except socket.error as e:
     print(str(e))
 
-print('Le Socket écoute.\nMot de passe : {}'.format(password))
+print('Socket is listening.\nPassword : {}'.format(password))
 ServerSideSocket.listen(5)
 
 client_recu=0
@@ -75,12 +75,12 @@ def multi_threaded_client(connection):
                 for joueurs in liste_joueurs:
                     if joueurs.ip == data[1]:
                         data[0]=joueurs.pseudo
-                        print(str(joueurs.pseudo)+" écoute.")
+                        print(str(joueurs.pseudo)+" is listening.")
                         break
             else:
-                print(str(data[0])+" s'est connecté(e).")
-                message_a_tous(Trad_code.detect_chiffres(str(data[0])+" s'est connecté."))
-            print("\njoueurs connectés :")
+                print(str(data[0])+" connected.")
+                message_a_tous(Trad_code.detect_chiffres(str(data[0])+" connected."))
+            print("\nConnected :")
             for joueurs in liste_joueurs:
                 #if not "Ω" in joueurs.pseudo:
                     print(str(joueurs.pseudo)+" - "+str(joueurs.ip))

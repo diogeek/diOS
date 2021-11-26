@@ -5,23 +5,23 @@ import sys
 
 hostname = socket.gethostname()
 ip_client = socket.gethostbyname(hostname)
-print('Ton Adresse IP : {}'.format(ip_client))
+print('Your IP Address : {}'.format(ip_client))
 
 ClientMultiSocket = socket.socket()
 
 pseudo=0
 while any(char.isdigit() for char in str(pseudo)):
-    pseudo=str(input("\nPseudo : "))
+    pseudo=str(input("\nUsername : "))
     if any(char.isdigit() for char in str(pseudo)):
-        print("pas de nombres")
-ip=input("IP de l'hôte : ")
-password=str(input("Mot de passe : "))
+        print("no numbers")
+ip=input("Host IP : ")
+password=str(input("Password : "))
 if ip == "":
     ip="localhost"
     ip_client="localhost"
 elif ip == "dev":
     ip="localhost"
-    ip_client=input("IP du client : ")
+    ip_client=input("client IP : ")
 score=0
 
 #print(pseudo,ip)
@@ -52,7 +52,7 @@ elif res.decode('utf-8').startswith("passed"):
     res = ClientMultiSocket.recv(2048)
     res=res.decode('utf-8')
     alphabet=res
-    print('connecté.')
+    print('connected.')
 
 
 from Trad_code import detect_chiffres,chiffrage

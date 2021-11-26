@@ -6,19 +6,19 @@ from random import randint
 
 hostname = socket.gethostname()
 ip_client = socket.gethostbyname(hostname)
-print('Ton Adresse IP : {}'.format(ip_client))
+print('You IP Address : {}'.format(ip_client))
 
 ClientMultiSocket = socket.socket()
 
 pseudo=str(randint(111111,999999))+"Ω"
-ip=input("IP de l'hôte : ")
-password=str(input("Mot de passe : "))
+ip=input("Host IP : ")
+password=str(input("Password : "))
 if ip == "":
     ip="localhost"
     ip_client="localhost"
 elif ip == "dev":
     ip="localhost"
-    ip_client=input("IP du client : ")
+    ip_client=input("client IP : ")
 score=0
 pseudo_avant=""
 
@@ -46,7 +46,7 @@ elif res.decode('utf-8').startswith("passed"):
     res = ClientMultiSocket.recv(2048)
     res=res.decode('utf-8')
     alphabet=res
-    print('connecté.')
+    print('connected.')
 
 from Trad_code import detect_chiffres,chiffrage,dechiffrage
 Dicochiffrage={}
@@ -66,7 +66,7 @@ while True:
     #print(data)
     try:
         if data[1]==ip_client:
-            data[0]="Vous"
+            data[0]="You"
         if str(data[0])!=pseudo_avant:
             print("\n"+data[0]+": "+data[2])
         else:

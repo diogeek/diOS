@@ -60,10 +60,11 @@ path,barcolor,color,list_settings=reset()
 
 if os.path.isfile('dios_settings.txt'):
     settings_file=open('dios_settings.txt','r')
-    settings_lines=settings_file.readlines()    
-    if settings_lines[0].startswith('keyboard_installed=') and not settings_lines[0].endswith('YES\n'):
+    settings_lines=settings_file.readlines()
+    if 'keyboard_installed=' in settings_lines[0] and not settings_lines[0].endswith('YES\n'):
         install('keyboard')
     for line in range(1,len(settings_lines)):
+        #list_settings[line-{number} WHERE NUMBER IS NUMBER OF NON-SETTINGS LINES IN DIOS_SETTINGS
         list_settings[line-1][2]=settings_lines[line].split("=",1)[-1].replace('\n','')
     os.system('color '+list_settings[0][2]+'f')
     barcolor=changecolor(list_settings[1][2])
@@ -81,7 +82,7 @@ show_hidden=YES')
     settings_file.close()
 
 #fullscreen (it's ugly but it does the job), plus blocks the fullscreen key combinations
-import keyboard
+import keyboard#,_thread
 keyboard.press('f11')
 keyboard.release('f11')
 keyboard.block_key('f11')
@@ -92,30 +93,35 @@ keyboard.add_hotkey("alt + f4", lambda: None, suppress =True)
 keyboard.add_hotkey("alt + tab", lambda: None, suppress =True)
 keyboard.add_hotkey("ctrl + c", lambda: None, suppress =True)
 #pages (home, directories, settings)
-currentpage="dir"
 
-#logo
-print("                                                                                \n\
-         @@@  @@            "+f"{bcolors.CYAN}"+".,,,,,,,,,,,,, ."+f"{bcolors.WHITE}"+"                                     \n\
-    @@@@@@@  @@.       "+f"{bcolors.CYAN}"+",,,,,,   ,,,,,,,,,,  ,,,,"+f"{bcolors.WHITE}"+"                                 \n\
-  .@@  /@@  @@@     "+f"{bcolors.CYAN}"+",,,,,,,,,,,,    ,,,,,,, ,,,,,,"+f"{bcolors.WHITE}"+",                              \n\
-  @@   @@  @@@    "+f"{bcolors.CYAN}"+",,,,,,,,,,,,,,,,     ,,,,  ,,,,,,,*"+f"{bcolors.WHITE}"+"                            \n\
- @@#  @@* (@@    "+f"{bcolors.CYAN}"+",,,,                        ,,,,,,,,"+f"{bcolors.WHITE}"+"                            \n\
-  @@@@@@  @@       "+f"{bcolors.CYAN}"+",,,,,,,                    ,,,,,  ,,"+f"{bcolors.WHITE}"+"     @@@@@@@@@@@@@@@@@@@@,\n\
-               "+f"{bcolors.CYAN}"+",,,,,,,,,                      ,,,.  ,,,,"+f"{bcolors.WHITE}"+"   @@@@@@@@@@@@@@@@@@@@@ \n\
-               "+f"{bcolors.CYAN}"+",,,,,,,,                        ,  ,,,,,,"+f"{bcolors.WHITE}"+"  @@@@@@@@               \n\
-               "+f"{bcolors.CYAN}"+",,,,,,  ,                        ,,,,,,,,"+f"{bcolors.WHITE}"+"  @@@@@@@                \n\
-               "+f"{bcolors.CYAN}"+",,,,,  ,,,                      ,,,,,,,,,"+f"{bcolors.WHITE}"+" /@@@@@@@************    \n\
-               "+f"{bcolors.CYAN}"+".,,  ,,,,,                    ,,,,,,,,,,"+f"{bcolors.WHITE}"+"  @@@@@@@@@@@@@@@@@@@@@.  \n\
-                  "+f"{bcolors.CYAN}"+"*,,,,,,                            ,"+f"{bcolors.WHITE}"+"    (@@@@@@@@@@@@@@@@@@@   \n\
-                  "+f"{bcolors.CYAN}"+",,,,,,,,  ,,/         /,,,,,,,,,,,,"+f"{bcolors.WHITE}"+"                  #@@@@@@   \n\
-                   "+f"{bcolors.CYAN}"+",,,,,,,  ,,,,,,   .,,,,,,,,,,,,,"+f"{bcolors.WHITE}"+"                    @@@@@@    \n\
-                      "+f"{bcolors.CYAN}"+",,,,,  ,,,,,,,,,   ,,,,,,,,"+f"{bcolors.WHITE}"+"      .@@@@@@@@@@@@@@@@@@@@@    \n\
-                         "+f"{bcolors.CYAN}"+",,  ,,,,,,,,,,,,    ."+f"{bcolors.WHITE}"+"         @@@@@@@@@@@@@@@@@@@@@     \n\
-                                "+f"{bcolors.CYAN}"+",,,,,,."+f"{bcolors.WHITE}"+"                @@@@@@@@@@@@@@@@@@@       \n\
-")
+#title screen
+def title():
+    import getpass
+    os.system('cls')
+    getpass.getpass("\n\n\n\n\n\n\n\n\n\n\n\n\n\
+                                                     @@@  @@            "+f"{bcolors.CYAN}"+".,,,,,,,,,,,,, ."+f"{bcolors.WHITE}"+"                                     \n\
+                                                @@@@@@@  @@.       "+f"{bcolors.CYAN}"+",,,,,,   ,,,,,,,,,,  ,,,,"+f"{bcolors.WHITE}"+"                                 \n\
+                                              .@@  /@@  @@@     "+f"{bcolors.CYAN}"+",,,,,,,,,,,,    ,,,,,,, ,,,,,,"+f"{bcolors.WHITE}"+",                              \n\
+                                              @@   @@  @@@    "+f"{bcolors.CYAN}"+",,,,,,,,,,,,,,,,     ,,,,  ,,,,,,,*"+f"{bcolors.WHITE}"+"                            \n\
+                                             @@#  @@* (@@    "+f"{bcolors.CYAN}"+",,,,                        ,,,,,,,,"+f"{bcolors.WHITE}"+"                            \n\
+                                              @@@@@@  @@       "+f"{bcolors.CYAN}"+",,,,,,,                    ,,,,,  ,,"+f"{bcolors.WHITE}"+"     @@@@@@@@@@@@@@@@@@@@,\n\
+                                                           "+f"{bcolors.CYAN}"+",,,,,,,,,                      ,,,.  ,,,,"+f"{bcolors.WHITE}"+"   @@@@@@@@@@@@@@@@@@@@@ \n\
+                                                           "+f"{bcolors.CYAN}"+",,,,,,,,                        ,  ,,,,,,"+f"{bcolors.WHITE}"+"  @@@@@@@@               \n\
+                                                           "+f"{bcolors.CYAN}"+",,,,,,  ,                        ,,,,,,,,"+f"{bcolors.WHITE}"+"  @@@@@@@                \n\
+                                                           "+f"{bcolors.CYAN}"+",,,,,  ,,,                      ,,,,,,,,,"+f"{bcolors.WHITE}"+" /@@@@@@@************    \n\
+                                                           "+f"{bcolors.CYAN}"+".,,  ,,,,,                    ,,,,,,,,,,"+f"{bcolors.WHITE}"+"  @@@@@@@@@@@@@@@@@@@@@.  \n\
+                                                              "+f"{bcolors.CYAN}"+"*,,,,,,                            ,"+f"{bcolors.WHITE}"+"    (@@@@@@@@@@@@@@@@@@@   \n\
+                                                              "+f"{bcolors.CYAN}"+",,,,,,,,  ,,/         /,,,,,,,,,,,,"+f"{bcolors.WHITE}"+"                  #@@@@@@   \n\
+                                                               "+f"{bcolors.CYAN}"+",,,,,,,  ,,,,,,   .,,,,,,,,,,,,,"+f"{bcolors.WHITE}"+"                    @@@@@@    \n\
+                                                                  "+f"{bcolors.CYAN}"+",,,,,  ,,,,,,,,,   ,,,,,,,,"+f"{bcolors.WHITE}"+"      .@@@@@@@@@@@@@@@@@@@@@    \n\
+                                                                     "+f"{bcolors.CYAN}"+",,  ,,,,,,,,,,,,    ."+f"{bcolors.WHITE}"+"         @@@@@@@@@@@@@@@@@@@@@     \n\
+                                                                            "+f"{bcolors.CYAN}"+",,,,,,."+f"{bcolors.WHITE}"+"                @@@@@@@@@@@@@@@@@@@       \n\
+\n\n\n\n\n\n\n\n\n\n\
+                                                                      PRESS ENTER")
+    return("home")
+    
 
-def settings(currentpage):
+def settings():
     global barcolor,color,list_settings
     while 1:
         bar()
@@ -163,16 +169,17 @@ def settings(currentpage):
                 elif selected=="E":
                     os.system('color')
                     exit()
-                
+        elif selected=="H" or selected=="B":
+            return("home")
         elif selected=="F":
             return("dir")
-        elif selected=="B":
-            return("set")
+        elif selected=="C":
+            return("chat")
         elif selected=="E":
             os.system('color')
             exit()
 
-def directories(currentpage,path):
+def directories(path):
     while 1:
         bar()
         #show path
@@ -212,14 +219,94 @@ def directories(currentpage,path):
                     path+=selected+"\\"
                 elif os.path.isfile(path+selected):
                     webbrowser.open(path+selected)
+        elif selected=="H":
+            return("home")
         elif selected=="S":
             return("set")
-        elif selected=="B" and path.count("\\")>1:
-            path=path.rsplit('\\',2)[0]+str("\\")
+        elif selected=="B":
+            if path.count("\\")>1:
+                path=path.rsplit('\\',2)[0]+str("\\")
+            else:
+                return("home")
+        elif selected=="C":
+            return("chat")
         elif selected=="E":
             os.system('color')
             exit()
-            
+
+list_chatrum=["Host a Chatrum Server","Join a Chatrum Server"]
+       
+def chatrum():
+    while 1:
+        bar()
+        ii=1
+        spaces=len(str(len(list_chatrum)))
+        for items in list_chatrum:
+            print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(items))
+            ii+=1
+        selected=str(input("\n    ")).upper()
+        if selected.isnumeric():
+            if selected=="1":
+                webbrowser.open('chatrum\server.py')
+            webbrowser.open('chatrum\client.py')
+            webbrowser.open('chatrum\client_recv.py')
+            input()
+            return("home")
+        elif selected=="H" or selected=="B":
+            return("home")
+        elif selected=="S":
+            return("set")
+        elif selected=="F":
+            return("dir")
+        elif selected=="E":
+            os.system('color')
+            exit()
+
+def home():
+    while 1:
+        list_home=["title","dir","set","chat"]
+        bar()
+        print("\n\n\n\n\
+    "+f"{bcolors.CYAN}"+"        ,   ,,,,,,,, ,,            "+f"{bcolors.BLUE}"+"                                "+f"{bcolors.PURPLE}"+"                @@@@@            \n\
+    "+f"{bcolors.CYAN}"+"     ,,,,,,,,  ,,,,,  ,,,,         "+f"{bcolors.BLUE}"+"    *//////*                    "+f"{bcolors.PURPLE}"+"              (@@@@@@@      ,    \n\
+    "+f"{bcolors.CYAN}"+"   ,,,,,,,,        ,, ,,,,,,       "+f"{bcolors.BLUE}"+"    /,,,,,,,,,,,,,,,,,,,,,.     "+f"{bcolors.PURPLE}"+"     @@@@@@@@@@@@@@@@@@@@@@@@@@/ \n\
+    "+f"{bcolors.CYAN}"+"     ,,,,             ,,,,  ,      "+f"{bcolors.BLUE}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"      *@@@@@@@@@@@@( @@@@@@@@@@@@@.\n\
+    "+f"{bcolors.CYAN}"+" ,,,,,,                ,, ,,,      "+f"{bcolors.BLUE}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"      .@@@@@@@         @@@@@@@   \n\
+    "+f"{bcolors.CYAN}"+" ,,,,,                   ,,,,,     "+f"{bcolors.BLUE}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"        &@@@@          @@@@@*    \n\
+    "+f"{bcolors.CYAN}"+" ,,, .,,               ,,,,,,      "+f"{bcolors.BLUE}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"      #@@@@@@@         @@@@@@@,  \n\
+    "+f"{bcolors.CYAN}"+"    ,,,,             ,,,           "+f"{bcolors.BLUE}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"    %@@@@@@@@@@@@@@@@@@@@@@@@@@@ \n\
+    "+f"{bcolors.CYAN}"+"   ,,,,,, ,,     .,,,,,,,,,        "+f"{bcolors.BLUE}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"     *@@@@@@@@@@@@@@@@@@@@@@@@@/ \n\
+    "+f"{bcolors.CYAN}"+"     ,,,, ,,,,,,  ,,,,,,,,         "+f"{bcolors.BLUE}"+"    ,/////////////////////      "+f"{bcolors.PURPLE}"+"              .@@@@@@@           \n\
+    "+f"{bcolors.CYAN}"+"        ,, ,,,,,,,,.               "+f"{bcolors.BLUE}"+"                                "+f"{bcolors.PURPLE}"+"                @@@@@            \n\
+    \n\
+    "+f"{bcolors.WHITE}"+"       1.TITLE SCREEN                      2.FILE SYSTEM                       3.SETTINGS           \n\
+    \n\
+    "+f"{bcolors.GREEN}"+"                              \n\
+    "+f"{bcolors.GREEN}"+"         @@@@@@@@@@@@@        \n\
+    "+f"{bcolors.GREEN}"+"      @@@@@@@@@@@@@@@@@@/     \n\
+    "+f"{bcolors.GREEN}"+"    .@@@@@@@@@@@@@@@@@@@@@    \n\
+    "+f"{bcolors.GREEN}"+"    @@@@@@@@@@@@@@@@@@@@@@@   \n\
+    "+f"{bcolors.GREEN}"+"    @@@@@@@@@@@@@@@@@@@@@@@   \n\
+    "+f"{bcolors.GREEN}"+"    @@@@@@@@@@@@@@@@@@@@@@@   \n\
+    "+f"{bcolors.GREEN}"+"     @@@@@@@@@@@@@@@@@@@@@    \n\
+    "+f"{bcolors.GREEN}"+"      @@@@@@@@@@@@@@@@@@      \n\
+    "+f"{bcolors.GREEN}"+"     @@@@*@@@@@@@@@@*         \n\
+    "+f"{bcolors.GREEN}"+"    @@                        \n\
+    \n\
+    "+f"{bcolors.WHITE}"+"          4.CHATRUM           \n\
+    ")
+        selected=str(input("\n    ")).upper()
+        if selected.isnumeric():
+            return(list_home[int(selected)-1])
+        elif selected=="B":
+            return("title")
+        elif selected=="S":
+            return("set")
+        elif selected=="F":
+            return("dir")
+        elif selected=="E":
+            os.system('color')
+            exit()
 
 def bar():
     os.system("cls")
@@ -229,22 +316,30 @@ def bar():
 
     print(f"{bcolors.WHITE}\u018A\u0131\u0298\u054F"+f"\n    {barcolor}"+datetime.date.today().strftime("%d/%m/%Y")+
           " "+datetime.datetime.now().strftime("%H:%M")+
-          " - [B]ack - [S]ettings - [F]ile System - [E]xit"+
+          " - [H]ome - [B]ack - [S]ettings - [F]ile System - [C]hatrum - [E]xit"+
           f"{bcolors.WHITE}")
     
     #separator (COMMENT THIS LINE OUT IF YOU WANT TO RUN IN YOU IDE, OTHERWISE YOU'LL NEED TO OPEN IN TERMINAL)
     print("_"*os.get_terminal_size()[0]+f"{color}")
 
+#setting initial page (SET THIS ONE TO "home" IF YOU WANT TO RUN IN YOUR IDE, OTHERWISE YOU'LL NEED TO OPEN IN TERMINAL)
+currentpage="title"
+
 #main loop, sleep for logo
-time.sleep(3)
+#time.sleep(3)
 while 1:
     #show page
-    if currentpage=="dir":
-        currentpage=directories(currentpage,path)
+    if currentpage=="title":
+        currentpage=title()
+    elif currentpage=="home":
+        currentpage=home()
+    elif currentpage=="dir":
+        currentpage=directories(path)
     elif currentpage=="set":
-        currentpage=settings(currentpage)
-        
-#home page
+        currentpage=settings()
+    elif currentpage=="chat":
+        currentpage=chatrum()
+
 #trier différent (type, nom, date de modif)
 #montrer fichiers cachés ou pas
-#changer couleur texte, et couleur Barre d'Info
+#modifier fichier settings pour sauvegarder entre chaque utilisation
