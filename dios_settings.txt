@@ -1,6 +1,6 @@
-keyboard_installed=YES
 background_color=0
 barcolor=WHITE
 color=WHITE
 sorting=BY_NAME
 show_hidden=YES
+type_to_show=BOTH

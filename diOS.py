@@ -1,12 +1,29 @@
 import os,datetime,webbrowser,sys,subprocess,platform,string
 
+def get_size_screen():
+    import ctypes
+    user32=ctypes.windll.user32
+    return(user32.GetSystemMetrics(0), user32.GetSystemMetrics(1))
+
+def check_installed(pkg):
+    try:
+        __import__("keyboard")
+        return(True)
+    except ModuleNotFoundError:
+        return(False)
+
+#1 character=8 pixels wide, 16 pixels tall
+screen_width,screen_height=get_size_screen()
+cols=screen_width//8
+rows=screen_height//16
+
 available_drives=[]
 for d in string.ascii_uppercase:
     if os.path.exists('{}:'.format(d)):
         available_drives.append('{}:'.format(d))
 
 #change terminal size (in rows and columns) before putting it in fullscreen mode
-sys.stdout.write("\x1b[8;{rows};{cols}t".format(rows=50, cols=170))
+os.system("mode con cols={cols} lines={rows}".format(cols=screen_width//8, rows=200))
 
 #install package, here for keyboard package
 def install(package):
@@ -56,38 +73,39 @@ def reset():
         ["Background Color",["Black","Blue","Green","Aqua","Red","Purple","Yellow","White","Grey","Light Blue","Light Green","Cyan","Light Red","Light Purple","Light Yellow","Bright White"],"0"],
         ["Info Bar Color",["Purple","Blue","Cyan","Green","Yellow","Red","White","Bold","Underline"],"WHITE"],
         ["Text Color",["Purple","Blue","Cyan","Green","Yellow","Red","White","Bold","Underline"],"WHITE"],
-        ["Sorting",["By Name","By Type","By Editing Date","Non-Hidden Files First"],"BY_NAME"],
+        ["Sorting Files",["By Name","By Type","By Creation Date","Non-Hidden Files First"],"BY_NAME"],
         ["Show Hidden Files",["Yes","No"],"YES"],
+        ["Type to Show",["Files Only","Directories Only","Both"],"BOTH"]
          ]
     return(path,barcolor,color,list_settings)
 
 path,barcolor,color,list_settings=reset()
 
+if not check_installed('keyboard'):
+    install('keyboard')
+
 if os.path.isfile('dios_settings.txt'):
     settings_file=open('dios_settings.txt','r')
     settings_lines=settings_file.readlines()
-    if 'keyboard_installed=' in settings_lines[0] and not settings_lines[0].endswith('YES\n'):
-        install('keyboard')
-    for line in range(1,len(settings_lines)):
+    for line in range(0,len(settings_lines)):
         #list_settings[line-{number} WHERE NUMBER IS NUMBER OF NON-SETTINGS LINES IN DIOS_SETTINGS
-        list_settings[line-1][2]=settings_lines[line].split("=",1)[-1].replace('\n','')
+        list_settings[line][2]=settings_lines[line].split("=",1)[-1].replace('\n','')
     os.system('color '+list_settings[0][2]+'f')
     barcolor=changecolor(list_settings[1][2])
     color=changecolor(list_settings[2][2])
     settings_file.close()
 else:
-    install('keyboard')
     settings_file=open('dios_settings.txt','w')
-    settings_file.write('background_color=BLACK\n\
-keyboard_installed=YES\n\
+    settings_file.write('background_color=0\n\
 barcolor=WHITE\n\
 color=WHITE\n\
 sorting=BY_NAME\n\
-show_hidden=YES')
+show_hidden=YES\n\
+type_to_show=BOTH')
     settings_file.close()
 
 #fullscreen (it's ugly but it does the job), plus blocks the fullscreen key combinations
-import keyboard#,_thread
+import keyboard
 keyboard.press('f11')
 keyboard.release('f11')
 keyboard.block_key('f11')
@@ -101,28 +119,29 @@ keyboard.add_hotkey("ctrl + c", lambda: None, suppress =True)
 
 #title screen
 def title():
+    shift=40
     import getpass
     os.system('cls')
-    getpass.getpass("\n\n\n\n\n\n\n\n\n\n\n\n\n\
-                                                     @@@  @@            "+f"{bcolors.CYAN}"+".,,,,,,,,,,,,, ."+f"{bcolors.WHITE}"+"                                     \n\
-                                                @@@@@@@  @@.       "+f"{bcolors.CYAN}"+",,,,,,   ,,,,,,,,,,  ,,,,"+f"{bcolors.WHITE}"+"                                 \n\
-                                              .@@  /@@  @@@     "+f"{bcolors.CYAN}"+",,,,,,,,,,,,    ,,,,,,, ,,,,,,"+f"{bcolors.WHITE}"+",                              \n\
-                                              @@   @@  @@@    "+f"{bcolors.CYAN}"+",,,,,,,,,,,,,,,,     ,,,,  ,,,,,,,*"+f"{bcolors.WHITE}"+"                            \n\
-                                             @@#  @@* (@@    "+f"{bcolors.CYAN}"+",,,,                        ,,,,,,,,"+f"{bcolors.WHITE}"+"                            \n\
-                                              @@@@@@  @@       "+f"{bcolors.CYAN}"+",,,,,,,                    ,,,,,  ,,"+f"{bcolors.WHITE}"+"     @@@@@@@@@@@@@@@@@@@@,\n\
-                                                           "+f"{bcolors.CYAN}"+",,,,,,,,,                      ,,,.  ,,,,"+f"{bcolors.WHITE}"+"   @@@@@@@@@@@@@@@@@@@@@ \n\
-                                                           "+f"{bcolors.CYAN}"+",,,,,,,,                        ,  ,,,,,,"+f"{bcolors.WHITE}"+"  @@@@@@@@               \n\
-                                                           "+f"{bcolors.CYAN}"+",,,,,,  ,                        ,,,,,,,,"+f"{bcolors.WHITE}"+"  @@@@@@@                \n\
-                                                           "+f"{bcolors.CYAN}"+",,,,,  ,,,                      ,,,,,,,,,"+f"{bcolors.WHITE}"+" /@@@@@@@************    \n\
-                                                           "+f"{bcolors.CYAN}"+".,,  ,,,,,                    ,,,,,,,,,,"+f"{bcolors.WHITE}"+"  @@@@@@@@@@@@@@@@@@@@@.  \n\
-                                                              "+f"{bcolors.CYAN}"+"*,,,,,,                            ,"+f"{bcolors.WHITE}"+"    (@@@@@@@@@@@@@@@@@@@   \n\
-                                                              "+f"{bcolors.CYAN}"+",,,,,,,,  ,,/         /,,,,,,,,,,,,"+f"{bcolors.WHITE}"+"                  #@@@@@@   \n\
-                                                               "+f"{bcolors.CYAN}"+",,,,,,,  ,,,,,,   .,,,,,,,,,,,,,"+f"{bcolors.WHITE}"+"                    @@@@@@    \n\
-                                                                  "+f"{bcolors.CYAN}"+",,,,,  ,,,,,,,,,   ,,,,,,,,"+f"{bcolors.WHITE}"+"      .@@@@@@@@@@@@@@@@@@@@@    \n\
-                                                                     "+f"{bcolors.CYAN}"+",,  ,,,,,,,,,,,,    ."+f"{bcolors.WHITE}"+"         @@@@@@@@@@@@@@@@@@@@@     \n\
-                                                                            "+f"{bcolors.CYAN}"+",,,,,,."+f"{bcolors.WHITE}"+"                @@@@@@@@@@@@@@@@@@@       \n\
-\n\n\n\n\n\n\n\n\n\n\
-                                                                      PRESS ENTER")
+    getpass.getpass("\n"*((rows//2)-16)+"\
+"+" "*((cols//2)-shift)+"        @@@  @@@            "+f"{bcolors.CYAN}"+".,,,,,,,,,,,,, ."+f"{bcolors.WHITE}"+"                                    \n\
+"+" "*((cols//2)-shift)+"   @@@@@@@  ' .       "+f"{bcolors.CYAN}"+",,,,,,   ,,,,,,,,,,  ,,,,"+f"{bcolors.WHITE}"+"                                 \n\
+"+" "*((cols//2)-shift)+" .@@  /@@  @@@     "+f"{bcolors.CYAN}"+",,,,,,,,,,,,    ,,,,,,, ,,,,,,"+f"{bcolors.WHITE}"+",                              \n\
+"+" "*((cols//2)-shift)+" @@   @@  @@@    "+f"{bcolors.CYAN}"+",,,,,,,,,,,,,,,,     ,,,,  ,,,,,,,*"+f"{bcolors.WHITE}"+"                            \n\
+"+" "*((cols//2)-shift)+"@@#  @@* (@@    "+f"{bcolors.CYAN}"+",,,,                        ,,,,,,,,"+f"{bcolors.WHITE}"+"                            \n\
+"+" "*((cols//2)-shift)+" @@@@@@  @@       "+f"{bcolors.CYAN}"+",,,,,,,                    ,,,,,  ,,"+f"{bcolors.WHITE}"+"     @@@@@@@@@@@@@@@@@@@@,\n\
+"+" "*((cols//2)-shift)+"              "+f"{bcolors.CYAN}"+",,,,,,,,,                      ,,,.  ,,,,"+f"{bcolors.WHITE}"+"   @@@@@@@@@@@@@@@@@@@@@ \n\
+"+" "*((cols//2)-shift)+"              "+f"{bcolors.CYAN}"+",,,,,,,,                        ,  ,,,,,,"+f"{bcolors.WHITE}"+"  @@@@@@@@               \n\
+"+" "*((cols//2)-shift)+"              "+f"{bcolors.CYAN}"+",,,,,,  ,                        ,,,,,,,,"+f"{bcolors.WHITE}"+"  @@@@@@@                \n\
+"+" "*((cols//2)-shift)+"              "+f"{bcolors.CYAN}"+",,,,,  ,,,                      ,,,,,,,,,"+f"{bcolors.WHITE}"+" /@@@@@@@************    \n\
+"+" "*((cols//2)-shift)+"              "+f"{bcolors.CYAN}"+".,,  ,,,,,                    ,,,,,,,,,,"+f"{bcolors.WHITE}"+"  @@@@@@@@@@@@@@@@@@@@@.  \n\
+"+" "*((cols//2)-shift)+"                 "+f"{bcolors.CYAN}"+"*,,,,,,                            ,"+f"{bcolors.WHITE}"+"    (@@@@@@@@@@@@@@@@@@@   \n\
+"+" "*((cols//2)-shift)+"                 "+f"{bcolors.CYAN}"+",,,,,,,,  ,,/         /,,,,,,,,,,,,"+f"{bcolors.WHITE}"+"                  #@@@@@@   \n\
+"+" "*((cols//2)-shift)+"                  "+f"{bcolors.CYAN}"+",,,,,,,  ,,,,,,   .,,,,,,,,,,,,,"+f"{bcolors.WHITE}"+"                    @@@@@@    \n\
+"+" "*((cols//2)-shift)+"                     "+f"{bcolors.CYAN}"+",,,,,  ,,,,,,,,,   ,,,,,,,,"+f"{bcolors.WHITE}"+"      .@@@@@@@@@@@@@@@@@@@@@    \n\
+"+" "*((cols//2)-shift)+"                        "+f"{bcolors.CYAN}"+",,  ,,,,,,,,,,,,    ."+f"{bcolors.WHITE}"+"         @@@@@@@@@@@@@@@@@@@@@     \n\
+"+" "*((cols//2)-shift)+"                               "+f"{bcolors.CYAN}"+",,,,,,."+f"{bcolors.WHITE}"+"                @@@@@@@@@@@@@@@@@@@       \n\
+"+"\n"*(rows-((rows//2)+1)-10)+"\
+"+" "*((cols//2)-7)+"PRESS ENTER")
     return("home")
     
 
@@ -184,6 +203,11 @@ def settings():
             os.system('color')
             exit()
 
+def sort_by_creation_date(dirpath):
+    a = [s for s in os.listdir(dirpath)]
+    a.sort(key=lambda s: os.path.getmtime(os.path.join(dirpath, s)))
+    return a
+
 def directories(path):
     while 1:
         bar()
@@ -198,8 +222,10 @@ def directories(path):
         elif list_settings[4][2]=="NO":
             liste=[f for f in os.listdir(path) if not f.startswith('.')]
         #sort files by setting
-        if list_settings[3][2]==["BY_NAME"]:
+        if list_settings[3][2]=="BY_NAME":
             liste=liste.sort()
+        elif list_settings[3][2]=="BY_CREATION_DATE":
+            liste=sort_by_creation_date(path)
         #show files
         print((" "*(spaces-1))+"0. Switch Drive\n")
         for items in liste:
@@ -325,12 +351,11 @@ def bar():
     
     #separator (COMMENT THIS LINE OUT IF YOU WANT TO RUN IN YOU IDE, OTHERWISE YOU'LL NEED TO OPEN IN TERMINAL)
     print("_"*os.get_terminal_size()[0]+f"{color}")
+    print(list_settings)
 
 #setting initial page (SET THIS ONE TO "home" IF YOU WANT TO RUN IN YOUR IDE, OTHERWISE YOU'LL NEED TO OPEN IN TERMINAL)
 currentpage="title"
 
-#main loop, sleep for logo
-#time.sleep(3)
 while 1:
     #show page
     if currentpage=="title":
@@ -344,6 +369,8 @@ while 1:
     elif currentpage=="chat":
         currentpage=chatrum()
 
+#charger settings from file
+#montrer que fichiers ou que dossiers
 #trier différent (type, nom, date de modif)
 #montrer fichiers cachés ou pas
 #modifier fichier settings pour sauvegarder entre chaque utilisation
