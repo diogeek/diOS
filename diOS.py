@@ -49,7 +49,6 @@ class bcolors:
     BRIGHT_WHITE = '\u001b[37;1m'
     BRIGHT_BLACK = '\u001b[30;1m'
     BOLD = '\033[1m'
-    ITALIC = '\x1B[3m'
     UNDERLINE = '\033[4m'
     #text background
     BACKGROUND_BLACK = '\u001b[40m'
@@ -110,8 +109,6 @@ def changecolor(color):
         return bcolors.BRIGHT_BLACK
     elif color=="BOLD":
         return bcolors.BOLD
-    elif color=="ITALIC":
-        return bcolors.ITALIC
     elif color=="UNDERLINE":
         return bcolors.UNDERLINE
 
@@ -170,8 +167,8 @@ def reset():
     textbackcolor=bcolors.BACKGROUND_BLACK
     list_settings=[
         ["Console Background Color",["Black","Blue","Green","Aqua","Red","Purple","Yellow","White","Grey","Light Blue","Light Green","Cyan","Light Red","Light Purple","Light Yellow","Bright White"],"0"],
-        ["Info Bar Text Color",["Purple","Blue","Cyan","Green","Yellow","Red","White","Black","Bright Purple","Bright Blue","Bright Cyan","Bright Green","Bright Yellow","Bright Red","Bright White","Bright Black","Background Purple","Background Blue","Background Cyan","Background Green","Background Yellow","Background Red","Background White","Background Black","Background Bright Purple","Background Bright Blue","Background Bright Cyan","Background Bright Green","Background Bright Yellow","Background Bright Red","Background Bright White","Background Bright Black","Bold","Italic","Underline"],"WHITE"],
-        ["Text Color",["Purple","Blue","Cyan","Green","Yellow","Red","White","Black","Bright Purple","Bright Blue","Bright Cyan","Bright Green","Bright Yellow","Bright Red","Bright White","Bright Black","Background Purple","Background Blue","Background Cyan","Background Green","Background Yellow","Background Red","Background White","Background Black","Background Bright Purple","Background Bright Blue","Background Bright Cyan","Background Bright Green","Background Bright Yellow","Background Bright Red","Background Bright White","Background Bright Black","Bold","Italic","Underline"],"WHITE"],
+        ["Info Bar Style",["Purple","Blue","Cyan","Green","Yellow","Red","White","Black","Bright Purple","Bright Blue","Bright Cyan","Bright Green","Bright Yellow","Bright Red","Bright White","Bright Black","Background Purple","Background Blue","Background Cyan","Background Green","Background Yellow","Background Red","Background White","Background Black","Background Bright Purple","Background Bright Blue","Background Bright Cyan","Background Bright Green","Background Bright Yellow","Background Bright Red","Background Bright White","Background Bright Black","Bold","Italic","Underline"],"WHITE"],
+        ["UI Style",["Purple","Blue","Cyan","Green","Yellow","Red","White","Black","Bright Purple","Bright Blue","Bright Cyan","Bright Green","Bright Yellow","Bright Red","Bright White","Bright Black","Background Purple","Background Blue","Background Cyan","Background Green","Background Yellow","Background Red","Background White","Background Black","Background Bright Purple","Background Bright Blue","Background Bright Cyan","Background Bright Green","Background Bright Yellow","Background Bright Red","Background Bright White","Background Bright Black","Bold","Italic","Underline"],"WHITE"],
         ["Sorting Files",["By Name","By Type","By Creation Date","Non-Hidden Files First"],"BY_NAME"],
         ["Show Hidden Files",["Yes","No"],"YES"],
         ["Type to Show",["Files Only","Directories Only","Both"],"BOTH"]
@@ -182,6 +179,8 @@ path,barcolor,color,list_settings=reset()
 
 if not check_installed('keyboard'):
     install('keyboard')
+if not check_installed('googlesearch'):
+    install('google')
 
 #loading settings from file
 if os.path.isfile('dios_settings.txt'):
@@ -270,6 +269,16 @@ def settings():
                 choice=int(selected)-1
                 #choice = which setting you're changing
                 for items in list_settings[choice][1]:
+                    if (choice==2 or choice==3) and items=="Purple":
+                        print("- TEXT COLORS\n")
+                    elif (choice==2 or choice==3) and items=="Bright Purple":
+                        print("\n- BRIGHT TEXT COLORS\n")
+                    elif (choice==2 or choice==3) and items=="Background Purple":
+                        print("\n- TEXT BACKGROUND COLORS\n")
+                    elif (choice==2 or choice==3) and items=="Background Bright Purple":
+                        print("\n- BRIGHT TEXT BACKGROUND COLORS\n")
+                    elif (choice==2 or choice==3) and items=="Bold":
+                        print("\n- TEXT STYLE\n")
                     print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(items))
                     ii+=1
                 selected=str(input("\n    ")).upper()
@@ -286,6 +295,10 @@ def settings():
                         elif choice==2:
                             print(f"{bcolors.RESET}")
                             color=changecolor(list_settings[2][2])
+                elif selected=="G":
+                    return("google")
+                elif selected=="H":
+                    return("home")
                 elif selected=="F":
                     return("dir")
                 elif selected=="B":
@@ -295,6 +308,8 @@ def settings():
                     exit()
             elif int(selected)-1==len(list_settings):
                 save()
+        elif selected=="G":
+            return("google")
         elif selected=="H" or selected=="B":
             return("home")
         elif selected=="F":
@@ -361,6 +376,8 @@ def create_file():
             except:
                 print('Error Creating Directory. Please Try Again')
                 return(False)
+    elif selected=="G":
+        return("google")
     elif selected=="H":
         return("home")
     elif selected=="S":
@@ -464,6 +481,8 @@ def directories(path):
                         break
         elif selected=="H":
             return("home")
+        elif selected=="G":
+            return("google")
         elif selected=="S":
             return("set")
         elif selected=="B":
@@ -495,6 +514,8 @@ def chatrum():
             webbrowser.open('chatrum\client_recv.py')
             input()
             return("home")
+        elif selected=="G":
+            return("google")
         elif selected=="H" or selected=="B":
             return("home")
         elif selected=="S":
@@ -505,43 +526,98 @@ def chatrum():
             os.system('color')
             exit()
 
+def show_results(query,page):
+    import googlesearch
+    ii=1
+    liste=[]
+    for results in googlesearch.search(query, tld='com', lang='en', tbs="0", safe='off', num=10, start=(page-1)*10-1, stop=10, pause=2.0, country='', extra_params=None, user_agent=None, verify_ssl=True):
+        print((" "*(2-len(str(ii))))+str(ii)+". "+str(results))
+        ii+=1
+        liste.append(results)
+    return(liste)
+
+google_page=1
+query=""
+
+def google_search():
+    global google_page,query
+    bar()
+    print("Search Google:")
+    if query=="":
+        query =str(input("\n    "))
+        google_page=1
+    bar()
+    print("Results For \""+query+"\" On https://google.com/en/ :\n")
+    liste=show_results(query,google_page)
+    if google_page>1:
+        print("\nPage : "+str(google_page)+" - [P]revious Page - [N]ext Page\n")
+    else:
+        print("\n[N]ext Page\n")
+    selected=str(input("\n    ")).upper()
+    if selected.isnumeric():
+        webbrowser.open(liste[int(selected)-1])
+        return("google")
+    elif selected=="P" and google_page>1:
+        google_page-=1
+        return("google")
+    elif selected=="N":
+        google_page+=1
+        return("google")
+    elif selected=="G":
+        query=""
+        return("google")
+    elif selected=="H" or selected=="B" or selected=="":
+        query=""
+        return("home")
+    elif selected=="S":
+        query=""
+        return("set")
+    elif selected=="F":
+        query=""
+        return("dir")
+    elif selected=="E":
+        os.system('color')
+        exit()
+
 def home():
-    #home page, with colored icons
+    #home page, with colored icons (all icons are 11 lines tall and 30 charactrs wide)
     while 1:
-        list_home=["title","dir","set","chat"]
+        list_home=["title","dir","set","chat","google"]
         bar()
         print(f"{bcolors.RESET}"+"\n\n\n\n\
-    "+f"{bcolors.CYAN}"+"        ,   ,,,,,,,, ,,            "+f"{bcolors.BRIGHT_YELLOW}"+"                                "+f"{bcolors.PURPLE}"+"               ,@@@@@,           \n\
-    "+f"{bcolors.CYAN}"+"     ,,,,,,,,  ,,,,,  ,,,,         "+f"{bcolors.BRIGHT_YELLOW}"+"    *//////*                    "+f"{bcolors.PURPLE}"+"       @@@,,, (@@@@@@@  ,@@@@,   \n\
-    "+f"{bcolors.CYAN}"+"   ,,,,,,,,        ,, ,,,,,,       "+f"{bcolors.BRIGHT_YELLOW}"+"    /,,,,,,,,,,,,,,,,,,,,,.     "+f"{bcolors.PURPLE}"+"     @@@@@@@@@@@@@@@@@@@@@@@@@@/ \n\
-    "+f"{bcolors.CYAN}"+"     ,,,,             ,,,,  ,      "+f"{bcolors.BRIGHT_YELLOW}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"      *@@@@@@@@@@@@( @@@@@@@@@@@ \n\
-    "+f"{bcolors.CYAN}"+" ,,,,,,                ,, ,,,      "+f"{bcolors.BRIGHT_YELLOW}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"      .@@@@@@@         @@@@@@@   \n\
-    "+f"{bcolors.CYAN}"+" ,,,,,                   ,,,,,     "+f"{bcolors.BRIGHT_YELLOW}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"        &@@@@          @@@@@*    \n\
-    "+f"{bcolors.CYAN}"+" ,,, .,,               ,,,,,,      "+f"{bcolors.BRIGHT_YELLOW}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"      #@@@@@@@         @@@@@@@,  \n\
-    "+f"{bcolors.CYAN}"+"    ,,,,             ,,,           "+f"{bcolors.BRIGHT_YELLOW}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"    %@@@@@@@@@@@@@@@@@@@@@@@@@@@ \n\
-    "+f"{bcolors.CYAN}"+"   ,,,,,, ,,     .,,,,,,,,,        "+f"{bcolors.BRIGHT_YELLOW}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"     *@@@@@@@@@@@@@@@@@@@@@@@@@/ \n\
-    "+f"{bcolors.CYAN}"+"     ,,,, ,,,,,,  ,,,,,,,,         "+f"{bcolors.BRIGHT_YELLOW}"+"    ,/////////////////////      "+f"{bcolors.PURPLE}"+"       '@@@@' .@@@@@@@'  @@@@'   \n\
-    "+f"{bcolors.CYAN}"+"        ,, ,,,,,,,,.               "+f"{bcolors.BRIGHT_YELLOW}"+"                                "+f"{bcolors.PURPLE}"+"               '@@@@@'           \n\
+    "+f"{bcolors.CYAN}"+"        #.  #######, ##            "+f"{bcolors.BRIGHT_YELLOW}"+"                                "+f"{bcolors.PURPLE}"+"               ,@@@@@,           \n\
+    "+f"{bcolors.CYAN}"+"     ######,   (####  ####         "+f"{bcolors.BRIGHT_YELLOW}"+"    *//////*                    "+f"{bcolors.PURPLE}"+"       @@@,,, (@@@@@@@  ,@@@@,   \n\
+    "+f"{bcolors.CYAN}"+"   #########       ## ######       "+f"{bcolors.BRIGHT_YELLOW}"+"    /,,,,,,,,,,,,,,,,,,,,,.     "+f"{bcolors.PURPLE}"+"     @@@@@@@@@@@@@@@@@@@@@@@@@@/ \n\
+    "+f"{bcolors.CYAN}"+"      ,,               ###  ,      "+f"{bcolors.BRIGHT_YELLOW}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"      *@@@@@@@@@@@@( @@@@@@@@@@@ \n\
+    "+f"{bcolors.CYAN}"+" #######               #'  ###     "+f"{bcolors.BRIGHT_YELLOW}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"      .@@@@@@@         @@@@@@@   \n\
+    "+f"{bcolors.CYAN}"+" ####                    #####     "+f"{bcolors.BRIGHT_YELLOW}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"        &@@@@          @@@@@*    \n\
+    "+f"{bcolors.CYAN}"+" ##   ##                ######     "+f"{bcolors.BRIGHT_YELLOW}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"      #@@@@@@@         @@@@@@@,  \n\
+    "+f"{bcolors.CYAN}"+"    ####              #.,,         "+f"{bcolors.BRIGHT_YELLOW}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"    %@@@@@@@@@@@@@@@@@@@@@@@@@@@ \n\
+    "+f"{bcolors.CYAN}"+"   #####  #          .######       "+f"{bcolors.BRIGHT_YELLOW}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"     *@@@@@@@@@@@@@@@@@@@@@@@@@/ \n\
+    "+f"{bcolors.CYAN}"+"    ##### #####    #######(        "+f"{bcolors.BRIGHT_YELLOW}"+"    ,/////////////////////      "+f"{bcolors.PURPLE}"+"       '@@@@' .@@@@@@@'  @@@@'   \n\
+    "+f"{bcolors.CYAN}"+"       ##  #######.  ###           "+f"{bcolors.BRIGHT_YELLOW}"+"                                "+f"{bcolors.PURPLE}"+"               '@@@@@'           \n\
     \n\
     "+f"{bcolors.WHITE}"+"       1.TITLE SCREEN                      2.FILE SYSTEM                       3.SETTINGS           \n\
     \n\
-    "+f"{bcolors.GREEN}"+"                              \n\
-    "+f"{bcolors.GREEN}"+"         @@@@@@@@@@@@@        \n\
-    "+f"{bcolors.GREEN}"+"      @@@@@@@@@@@@@@@@@@/     \n\
-    "+f"{bcolors.GREEN}"+"    .@@@@@@@@@@@@@@@@@@@@@    \n\
-    "+f"{bcolors.GREEN}"+"    @@@@@@@@@@@@@@@@@@@@@@@   \n\
-    "+f"{bcolors.GREEN}"+"    @@@@@@@@@@@@@@@@@@@@@@@   \n\
-    "+f"{bcolors.GREEN}"+"    @@@@@@@@@@@@@@@@@@@@@@@   \n\
-    "+f"{bcolors.GREEN}"+"     @@@@@@@@@@@@@@@@@@@@@    \n\
-    "+f"{bcolors.GREEN}"+"      @@@@@@@@@@@@@@@@@@      \n\
-    "+f"{bcolors.GREEN}"+"     @@@@*@@@@@@@@@@*         \n\
-    "+f"{bcolors.GREEN}"+"    @@                        \n\
+    "+f"{bcolors.GREEN}"+"                                  "+f"{bcolors.RED}"+"          ,(((((((((((         \n\
+    "+f"{bcolors.GREEN}"+"         @@@@@@@@@@@@@            "+f"{bcolors.RED}"+"       ((((((((((((((((((      \n\
+    "+f"{bcolors.GREEN}"+"      @@@@@@@@@@@@@@@@@@/         "+f"{bcolors.RED}"+"     ((((((((       ((/        \n\
+    "+f"{bcolors.GREEN}"+"    .@@@@@@@@@@@@@@@@@@@@@        "+f"{bcolors.BRIGHT_YELLOW}"+"    //"+f"{bcolors.RED}"+"((((                     \n\
+    "+f"{bcolors.GREEN}"+"    @@@@@@@@@@@@@@@@@@@@@@@       "+f"{bcolors.BRIGHT_YELLOW}"+"   //////       "+f"{bcolors.BRIGHT_BLUE}"+",************  \n\
+    "+f"{bcolors.GREEN}"+"    @@@@@@@@@@@@@@@@@@@@@@@       "+f"{bcolors.BRIGHT_YELLOW}"+"   /////        "+f"{bcolors.BRIGHT_BLUE}"+"*///////////// \n\
+    "+f"{bcolors.GREEN}"+"    @@@@@@@@@@@@@@@@@@@@@@@       "+f"{bcolors.BRIGHT_YELLOW}"+"   //////       "+f"{bcolors.BRIGHT_BLUE}"+"*////////////  \n\
+    "+f"{bcolors.GREEN}"+"     @@@@@@@@@@@@@@@@@@@@@        "+f"{bcolors.BRIGHT_YELLOW}"+"    /"+f"{bcolors.BRIGHT_GREEN}"+"#####             "+f"{bcolors.BRIGHT_BLUE}"+"//////  \n\
+    "+f"{bcolors.GREEN}"+"      @@@@@@@@@@@@@@@@@@          "+f"{bcolors.BRIGHT_GREEN}"+"    ########,      ##"+f"{bcolors.BRIGHT_BLUE}"+"//////   \n\
+    "+f"{bcolors.GREEN}"+"     @@@@*@@@@@@@@@@*             "+f"{bcolors.BRIGHT_GREEN}"+"       ##################"+f"{bcolors.BRIGHT_BLUE}"+"/     \n\
+    "+f"{bcolors.GREEN}"+"    @@                            "+f"{bcolors.BRIGHT_GREEN}"+"           ###########         \n\
     \n\
-    "+f"{bcolors.WHITE}"+"          4.CHATRUM           \n\
+    "+f"{bcolors.WHITE}"+"          4.CHATRUM                       5.GOOGLE SEARCH                       \n\
     ")
         selected=str(input("\n    ")).upper()
         if selected.isnumeric():
             return(list_home[int(selected)-1])
+        elif selected=="G":
+            return("google")
         elif selected=="B":
             return("title")
         elif selected=="S":
@@ -560,7 +636,7 @@ def bar():
 
     print(f"{bcolors.RESET}\u018A\u0131\u0298\u054F"+f"\n{barcolor}    "+datetime.date.today().strftime("%d/%m/%Y")+
           " "+datetime.datetime.now().strftime("%H:%M")+
-          " - [H]ome - [B]ack - [S]ettings - [F]ile System - [C]hatrum - [E]xit diOS"+
+          " - [H]ome - [B]ack - [S]ettings - [F]ile System - [C]hatrum - [G]oogle Search - [E]xit diOS"+
           f"{bcolors.RESET}")
     
     #separator (COMMENT THIS LINE OUT IF YOU WANT TO RUN IN YOU IDE, OTHERWISE YOU'LL NEED TO OPEN IN TERMINAL)
@@ -581,4 +657,6 @@ while 1:
         currentpage=settings()
     elif currentpage=="chat":
         currentpage=chatrum()
+    elif currentpage=="google":
+        currentpage=google_search()
 
