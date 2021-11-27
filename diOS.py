@@ -295,12 +295,8 @@ def settings():
                         elif choice==2:
                             print(f"{bcolors.RESET}")
                             color=changecolor(list_settings[2][2])
-                elif selected=="G":
-                    return("google")
                 elif selected=="H":
                     return("home")
-                elif selected=="F":
-                    return("dir")
                 elif selected=="B":
                     return("set")
                 elif selected=="E":
@@ -308,14 +304,10 @@ def settings():
                     exit()
             elif int(selected)-1==len(list_settings):
                 save()
-        elif selected=="G":
-            return("google")
         elif selected=="H" or selected=="B":
             return("home")
         elif selected=="F":
             return("dir")
-        elif selected=="C":
-            return("chat")
         elif selected=="E":
             os.system('color')
             exit()
@@ -376,16 +368,12 @@ def create_file():
             except:
                 print('Error Creating Directory. Please Try Again')
                 return(False)
-    elif selected=="G":
-        return("google")
     elif selected=="H":
         return("home")
     elif selected=="S":
         return("set")
     elif selected=="B":
         return("dir")
-    elif selected=="C":
-        return("chat")
     elif selected=="E":
         os.system('color')
         exit()
@@ -481,8 +469,6 @@ def directories(path):
                         break
         elif selected=="H":
             return("home")
-        elif selected=="G":
-            return("google")
         elif selected=="S":
             return("set")
         elif selected=="B":
@@ -490,8 +476,6 @@ def directories(path):
                 path=path.rsplit('\\',2)[0]+str("\\")
             else:
                 return("home")
-        elif selected=="C":
-            return("chat")
         elif selected=="E":
             os.system('color')
             exit()
@@ -514,14 +498,10 @@ def chatrum():
             webbrowser.open('chatrum\client_recv.py')
             input()
             return("home")
-        elif selected=="G":
-            return("google")
         elif selected=="H" or selected=="B":
             return("home")
         elif selected=="S":
             return("set")
-        elif selected=="F":
-            return("dir")
         elif selected=="E":
             os.system('color')
             exit()
@@ -563,26 +543,33 @@ def google_search():
     elif selected=="N":
         google_page+=1
         return("google")
-    elif selected=="G":
-        query=""
-        return("google")
     elif selected=="H" or selected=="B" or selected=="":
         query=""
         return("home")
     elif selected=="S":
         query=""
         return("set")
-    elif selected=="F":
-        query=""
-        return("dir")
     elif selected=="E":
         os.system('color')
         exit()
 
+def calendar():
+    bar()
+    list_months=["January","February","March","April","May","June","July","August","September","October","November","December"]
+    today=datetime.date.today().strftime("%m/%Y")
+    month=list_months[int(today.split("/")[0])-1]
+    year=today.split("/")[1]
+    print("\u250F\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2513\n\
+\u2503 "+month+" "*(20-len(month+" "+year))+year+" "+"\u2503\n\
+\u2521\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2529\n\
+")
+    input()
+    return("home")
+    
 def home():
     #home page, with colored icons (all icons are 11 lines tall and 30 charactrs wide)
     while 1:
-        list_home=["title","dir","set","chat","google"]
+        list_home=["title","dir","set","chat","google","calendar"]
         bar()
         print(f"{bcolors.RESET}"+"\n\n\n\n\
     "+f"{bcolors.CYAN}"+"        #.  #######, ##            "+f"{bcolors.BRIGHT_YELLOW}"+"                                "+f"{bcolors.PURPLE}"+"               ,@@@@@,           \n\
@@ -599,31 +586,27 @@ def home():
     \n\
     "+f"{bcolors.WHITE}"+"       1.TITLE SCREEN                      2.FILE SYSTEM                       3.SETTINGS           \n\
     \n\
-    "+f"{bcolors.GREEN}"+"                                  "+f"{bcolors.RED}"+"          ,(((((((((((         \n\
-    "+f"{bcolors.GREEN}"+"         @@@@@@@@@@@@@            "+f"{bcolors.RED}"+"       ((((((((((((((((((      \n\
-    "+f"{bcolors.GREEN}"+"      @@@@@@@@@@@@@@@@@@/         "+f"{bcolors.RED}"+"     ((((((((       ((/        \n\
-    "+f"{bcolors.GREEN}"+"    .@@@@@@@@@@@@@@@@@@@@@        "+f"{bcolors.BRIGHT_YELLOW}"+"    //"+f"{bcolors.RED}"+"((((                     \n\
-    "+f"{bcolors.GREEN}"+"    @@@@@@@@@@@@@@@@@@@@@@@       "+f"{bcolors.BRIGHT_YELLOW}"+"   //////       "+f"{bcolors.BRIGHT_BLUE}"+",************  \n\
-    "+f"{bcolors.GREEN}"+"    @@@@@@@@@@@@@@@@@@@@@@@       "+f"{bcolors.BRIGHT_YELLOW}"+"   /////        "+f"{bcolors.BRIGHT_BLUE}"+"*///////////// \n\
-    "+f"{bcolors.GREEN}"+"    @@@@@@@@@@@@@@@@@@@@@@@       "+f"{bcolors.BRIGHT_YELLOW}"+"   //////       "+f"{bcolors.BRIGHT_BLUE}"+"*////////////  \n\
-    "+f"{bcolors.GREEN}"+"     @@@@@@@@@@@@@@@@@@@@@        "+f"{bcolors.BRIGHT_YELLOW}"+"    /"+f"{bcolors.BRIGHT_GREEN}"+"#####             "+f"{bcolors.BRIGHT_BLUE}"+"//////  \n\
-    "+f"{bcolors.GREEN}"+"      @@@@@@@@@@@@@@@@@@          "+f"{bcolors.BRIGHT_GREEN}"+"    ########,      ##"+f"{bcolors.BRIGHT_BLUE}"+"//////   \n\
-    "+f"{bcolors.GREEN}"+"     @@@@*@@@@@@@@@@*             "+f"{bcolors.BRIGHT_GREEN}"+"       ##################"+f"{bcolors.BRIGHT_BLUE}"+"/     \n\
-    "+f"{bcolors.GREEN}"+"    @@                            "+f"{bcolors.BRIGHT_GREEN}"+"           ###########         \n\
+    "+f"{bcolors.GREEN}"+"                                  "+f"{bcolors.RED}"+"          ,(((((((((((                 "                                                           +f"{bcolors.RED}"+"                              \n\
+    "+f"{bcolors.GREEN}"+"         @@@@@@@@@@@@@            "+f"{bcolors.RED}"+"       ((((((((((((((((((           "                                                              +f"{bcolors.RED}"+"        *###       (##        \n\
+    "+f"{bcolors.GREEN}"+"      @@@@@@@@@@@@@@@@@@/         "+f"{bcolors.RED}"+"     ((((((((       ((/             "                                                              +f"{bcolors.RED}"+"     #(#*############# ###    \n\
+    "+f"{bcolors.GREEN}"+"    .@@@@@@@@@@@@@@@@@@@@@        "+f"{bcolors.BRIGHT_YELLOW}"+"    //"+f"{bcolors.RED}"+"((((                          "                                +f"{bcolors.RED}"+"     ##(##(##########(####    \n\
+    "+f"{bcolors.GREEN}"+"    @@@@@@@@@@@@@@@@@@@@@@@       "+f"{bcolors.BRIGHT_YELLOW}"+"   //////       "+f"{bcolors.BRIGHT_BLUE}"+",************       "                      +f"{bcolors.WHITE}"+"     #######  ###  ##(  ##    \n\
+    "+f"{bcolors.GREEN}"+"    @@@@@@@@@@@@@@@@@@@@@@@       "+f"{bcolors.BRIGHT_YELLOW}"+"   /////        "+f"{bcolors.BRIGHT_BLUE}"+"*/////////////      "                      +f"{bcolors.WHITE}"+"     #######  ###  (##  ##    \n\
+    "+f"{bcolors.GREEN}"+"    @@@@@@@@@@@@@@@@@@@@@@@       "+f"{bcolors.BRIGHT_YELLOW}"+"   //////       "+f"{bcolors.BRIGHT_BLUE}"+"*////////////       "                      +f"{bcolors.WHITE}"+"     #*  ###  ###  ###  ##    \n\
+    "+f"{bcolors.GREEN}"+"     @@@@@@@@@@@@@@@@@@@@@        "+f"{bcolors.BRIGHT_YELLOW}"+"    /"+f"{bcolors.GREEN}"+"#####             "+f"{bcolors.BRIGHT_BLUE}"+"//////       "+f"{bcolors.WHITE}"+"     #####################    \n\
+    "+f"{bcolors.GREEN}"+"      @@@@@@@@@@@@@@@@@@          "+f"{bcolors.GREEN}"+"    ########,      ##"+f"{bcolors.BRIGHT_BLUE}"+"//////         "                              +f"{bcolors.WHITE}"+"     #*  ###  ###  #######    \n\
+    "+f"{bcolors.GREEN}"+"     @@@@*@@@@@@@@@@*             "+f"{bcolors.GREEN}"+"       ##################"+f"{bcolors.BRIGHT_BLUE}"+"/          "                              +f"{bcolors.WHITE}"+"     ####################(    \n\
+    "+f"{bcolors.GREEN}"+"    @@                            "+f"{bcolors.GREEN}"+"           ###########              "                                                          +f"{bcolors.WHITE}"+"                              \n\
     \n\
-    "+f"{bcolors.WHITE}"+"          4.CHATRUM                       5.GOOGLE SEARCH                       \n\
+    "+f"{bcolors.WHITE}"+"          4.CHATRUM                       5.GOOGLE SEARCH              "                                                                          +"         6.CALENDAR\n\
     ")
         selected=str(input("\n    ")).upper()
         if selected.isnumeric():
             return(list_home[int(selected)-1])
-        elif selected=="G":
-            return("google")
         elif selected=="B":
             return("title")
         elif selected=="S":
             return("set")
-        elif selected=="F":
-            return("dir")
         elif selected=="E":
             os.system('color')
             exit()
@@ -636,11 +619,11 @@ def bar():
 
     print(f"{bcolors.RESET}\u018A\u0131\u0298\u054F"+f"\n{barcolor}    "+datetime.date.today().strftime("%d/%m/%Y")+
           " "+datetime.datetime.now().strftime("%H:%M")+
-          " - [H]ome - [B]ack - [S]ettings - [F]ile System - [C]hatrum - [G]oogle Search - [E]xit diOS"+
+          " - [H]ome - [B]ack - [S]ettings - [E]xit diOS"+
           f"{bcolors.RESET}")
     
     #separator (COMMENT THIS LINE OUT IF YOU WANT TO RUN IN YOU IDE, OTHERWISE YOU'LL NEED TO OPEN IN TERMINAL)
-    print("_"*os.get_terminal_size()[0]+f"{color}")
+    #print("_"*os.get_terminal_size()[0]+f"{color}")
 
 #setting initial page (SET THIS ONE TO "home" IF YOU WANT TO RUN IN YOUR IDE, OTHERWISE YOU'LL NEED TO OPEN IN TERMINAL)
 currentpage="title"
@@ -659,4 +642,10 @@ while 1:
         currentpage=chatrum()
     elif currentpage=="google":
         currentpage=google_search()
+    elif currentpage=="calendar":
+        currentpage=calendar()
 
+#calendar
+#calculator
+#snake
+#tetris
