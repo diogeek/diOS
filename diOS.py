@@ -31,6 +31,7 @@ def install(package):
 
 #text colors
 class bcolors:
+    #text
     PURPLE = '\033[95m'
     BLUE = '\033[94m'
     CYAN = '\033[96m'
@@ -38,13 +39,43 @@ class bcolors:
     YELLOW = '\033[93m'
     RED = '\033[91m'
     WHITE = '\033[0m'
+    BLACK = '\u001b[30m'
+    BRIGHT_PURPLE = '\u001b[35;1m'
+    BRIGHT_BLUE = '\u001b[34;1m'
+    BRIGHT_CYAN = '\u001b[36;1m'
+    BRIGHT_GREEN = '\u001b[32;1m'
+    BRIGHT_YELLOW = '\u001b[33;1m'
+    BRIGHT_RED = '\u001b[31;1m'
+    BRIGHT_WHITE = '\u001b[37;1m'
+    BRIGHT_BLACK = '\u001b[30;1m'
     BOLD = '\033[1m'
+    ITALIC = '\x1B[3m'
     UNDERLINE = '\033[4m'
+    #text background
+    BACKGROUND_BLACK = '\u001b[40m'
+    BACKGROUND_RED = '\u001b[41m'
+    BACKGROUND_GREEN = '\u001b[42m'
+    BACKGROUND_YELLOW = '\u001b[43m'
+    BACKGROUND_BLUE = '\u001b[44m'
+    BACKGROUND_PURPLE = '\u001b[45m'
+    BACKGROUND_CYAN = '\u001b[46m'
+    BACKGROUND_WHITE = '\u001b[47m'
+    BACKGROUND_BRIGHT_BLACK = '\u001b[40;1m'
+    BACKGROUND_BRIGHT_RED = '\u001b[41;1m'
+    BACKGROUND_BRIGHT_GREEN = '\u001b[42;1m'
+    BACKGROUND_BRIGHT_YELLOW = '\u001b[43;1m'
+    BACKGROUND_BRIGHT_BLUE = '\u001b[44;1m'
+    BACKGROUND_BRIGHT_PURPLE = '\u001b[45;1m'
+    BACKGROUND_BRIGHT_CYAN = '\u001b[46;1m'
+    BACKGROUND_BRIGHT_WHITE = '\u001b[47;1m'
+    #reset
+    RESET='\u001b[0m'
 
 def uppercase(text):
     return(text.upper().replace(' ','_'))
 
 def changecolor(color):
+    #text
     if color=="PURPLE":
         return bcolors.PURPLE
     elif color=="BLUE":
@@ -59,10 +90,64 @@ def changecolor(color):
         return bcolors.RED
     elif color=="WHITE":
         return bcolors.WHITE
+    elif color=="BLACK":
+        return bcolors.BLACK
+    elif color=="BRIGHT_PURPLE":
+        return bcolors.BRIGHT_PURPLE
+    elif color=="BRIGHT_BLUE":
+        return bcolors.BRIGHT_BLUE
+    elif color=="BRIGHT_CYAN":
+        return bcolors.BRIGHT_CYAN
+    elif color=="BRIGHT_GREEN":
+        return bcolors.BRIGHT_GREEN
+    elif color=="BRIGHT_YELLOW":
+        return bcolors.BRIGHT_YELLOW
+    elif color=="BRIGHT_RED":
+        return bcolors.BRIGHT_RED
+    elif color=="BRIGHT_WHITE":
+        return bcolors.BRIGHT_WHITE
+    elif color=="BRIGHT_BLACK":
+        return bcolors.BRIGHT_BLACK
     elif color=="BOLD":
         return bcolors.BOLD
+    elif color=="ITALIC":
+        return bcolors.ITALIC
     elif color=="UNDERLINE":
         return bcolors.UNDERLINE
+
+    #text background
+    elif color=="BACKGROUND_PURPLE":
+        return bcolors.BACKGROUND_PURPLE
+    elif color=="BACKGROUND_BLUE":
+        return bcolors.BACKGROUND_BLUE
+    elif color=="BACKGROUND_CYAN":
+        return bcolors.BACKGROUND_CYAN
+    elif color=="BACKGROUND_GREEN":
+        return bcolors.BACKGROUND_GREEN
+    elif color=="BACKGROUND_YELLOW":
+        return bcolors.BACKGROUND_YELLOW
+    elif color=="BACKGROUND_RED":
+        return bcolors.BACKGROUND_RED
+    elif color=="BACKGROUND_WHITE":
+        return bcolors.BACKGROUND_WHITE
+    elif color=="BACKGROUND_BLACK":
+        return bcolors.BACKGROUND_BLACK
+    elif color=="BACKGROUND_BRIGHT_PURPLE":
+        return bcolors.BACKGROUND_BRIGHT_PURPLE
+    elif color=="BACKGROUND_BRIGHT_BLUE":
+        return bcolors.BACKGROUND_BRIGHT_BLUE
+    elif color=="BACKGROUND_BRIGHT_CYAN":
+        return bcolors.BACKGROUND_BRIGHT_CYAN
+    elif color=="BACKGROUND_BRIGHT_GREEN":
+        return bcolors.BACKGROUND_BRIGHT_GREEN
+    elif color=="BACKGROUND_BRIGHT_YELLOW":
+        return bcolors.BACKGROUND_BRIGHT_YELLOW
+    elif color=="BACKGROUND_BRIGHT_RED":
+        return bcolors.BACKGROUND_BRIGHT_RED
+    elif color=="BACKGROUND_BRIGHT_WHITE":
+        return bcolors.BACKGROUND_BRIGHT_WHITE
+    elif color=="BACKGROUND_BRIGHT_BLACK":
+        return bcolors.BACKGROUND_BRIGHT_BLACK
 
 #function to save settings in text file
 def save():
@@ -80,11 +165,13 @@ type_to_show='+str(list_settings[5][2])+'')
 def reset():
     path="C:\\"
     barcolor=bcolors.WHITE
+    barbackcolor=bcolors.BACKGROUND_BLACK
     color=bcolors.WHITE
+    textbackcolor=bcolors.BACKGROUND_BLACK
     list_settings=[
-        ["Background Color",["Black","Blue","Green","Aqua","Red","Purple","Yellow","White","Grey","Light Blue","Light Green","Cyan","Light Red","Light Purple","Light Yellow","Bright White"],"0"],
-        ["Info Bar Color",["Purple","Blue","Cyan","Green","Yellow","Red","White","Bold","Underline"],"WHITE"],
-        ["Text Color",["Purple","Blue","Cyan","Green","Yellow","Red","White","Bold","Underline"],"WHITE"],
+        ["Console Background Color",["Black","Blue","Green","Aqua","Red","Purple","Yellow","White","Grey","Light Blue","Light Green","Cyan","Light Red","Light Purple","Light Yellow","Bright White"],"0"],
+        ["Info Bar Text Color",["Purple","Blue","Cyan","Green","Yellow","Red","White","Black","Bright Purple","Bright Blue","Bright Cyan","Bright Green","Bright Yellow","Bright Red","Bright White","Bright Black","Background Purple","Background Blue","Background Cyan","Background Green","Background Yellow","Background Red","Background White","Background Black","Background Bright Purple","Background Bright Blue","Background Bright Cyan","Background Bright Green","Background Bright Yellow","Background Bright Red","Background Bright White","Background Bright Black","Bold","Italic","Underline"],"WHITE"],
+        ["Text Color",["Purple","Blue","Cyan","Green","Yellow","Red","White","Black","Bright Purple","Bright Blue","Bright Cyan","Bright Green","Bright Yellow","Bright Red","Bright White","Bright Black","Background Purple","Background Blue","Background Cyan","Background Green","Background Yellow","Background Red","Background White","Background Black","Background Bright Purple","Background Bright Blue","Background Bright Cyan","Background Bright Green","Background Bright Yellow","Background Bright Red","Background Bright White","Background Bright Black","Bold","Italic","Underline"],"WHITE"],
         ["Sorting Files",["By Name","By Type","By Creation Date","Non-Hidden Files First"],"BY_NAME"],
         ["Show Hidden Files",["Yes","No"],"YES"],
         ["Type to Show",["Files Only","Directories Only","Both"],"BOTH"]
@@ -96,6 +183,7 @@ path,barcolor,color,list_settings=reset()
 if not check_installed('keyboard'):
     install('keyboard')
 
+#loading settings from file
 if os.path.isfile('dios_settings.txt'):
     settings_file=open('dios_settings.txt','r')
     settings_lines=settings_file.readlines()
@@ -193,10 +281,10 @@ def settings():
                             os.system('color '+str(int(selected)-1)+'f')
                             list_settings[0][2]=hex(int(selected)-1).replace('0x','')
                         elif choice==1:
-                            print(f"{bcolors.WHITE}")
+                            print(f"{bcolors.RESET}")
                             barcolor=changecolor(list_settings[1][2])
                         elif choice==2:
-                            print(f"{bcolors.WHITE}")
+                            print(f"{bcolors.RESET}")
                             color=changecolor(list_settings[2][2])
                 elif selected=="F":
                     return("dir")
@@ -224,7 +312,10 @@ def sort_by_creation_date(dirpath):
 
 def folder_is_hidden(filepath):
     import stat
-    return bool(os.stat(filepath).st_file_attributes & stat.FILE_ATTRIBUTE_HIDDEN)
+    try:
+        return bool(os.stat(filepath).st_file_attributes & stat.FILE_ATTRIBUTE_HIDDEN)
+    except FileNotFoundError:
+        return(None)
 
 def listdir_nohidden(path):
     return([f for f in os.listdir(path) if not folder_is_hidden(path+f)])
@@ -236,10 +327,51 @@ def sort_by_type(liste):
     return(listefinal)
     
 def non_hidden_first(liste):
-    listefinal=[f for f in liste if not folder_is_hidden(path+f)]
+    listefinal=[f for f in liste if folder_is_hidden(path+f)==False]
     listefinal.append(" ")
     listefinal+=[f for f in liste if folder_is_hidden(path+f)]
     return(listefinal)
+
+def create_file():
+    bar()
+    print(path+"‖\n"+"═"*len(path)+"╝")
+    ii=1
+    for items in ["Create A File Here","Create A Directory Here"]:
+        print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(items))
+        ii+=1
+    selected=str(input(f"\n    ")).upper()
+    if selected.isnumeric():
+        if int(selected)==1:
+            bar()
+            print(path+"‖\n"+"═"*len(path)+"╝")
+            print("Name The File. A Name With No Extension Will Result In A Text File (.txt)")
+            try:
+                f=open(str(input(f"\n    ")),"w").close()
+                return(True)
+            except:
+                print('Error Creating File. Please Try Again')
+                return(False)
+        elif int(selected)==2:
+            bar()
+            print(path+"‖\n"+"═"*len(path)+"╝")
+            print("Name The Directory:")
+            try:
+                os.mkdir(path+str(input(f"\n    ")))
+                return(True)
+            except:
+                print('Error Creating Directory. Please Try Again')
+                return(False)
+    elif selected=="H":
+        return("home")
+    elif selected=="S":
+        return("set")
+    elif selected=="B":
+        return("dir")
+    elif selected=="C":
+        return("chat")
+    elif selected=="E":
+        os.system('color')
+        exit()
 
 def directories(path):
     while 1:
@@ -248,7 +380,15 @@ def directories(path):
         print(path+"‖\n"+"═"*len(path)+"╝")
         
         ii=1
-        spaces=len(str(len(os.listdir(path))))
+        try:
+            spaces=len(str(len(os.listdir(path))))
+        except PermissionError:
+            import time
+            print('Access To This Directory Has Been Denied.')
+            time.sleep(1)
+            path=path[:path.rfind('\\')]
+            return('dir')
+            
         #show hidden files or not
         if list_settings[4][2]=="YES":
             liste=os.listdir(path)
@@ -265,32 +405,39 @@ def directories(path):
             liste=non_hidden_first(liste)
         #show only wanted type
         if list_settings[5][2]=="FILES_ONLY":
-            liste=[f for f in liste if os.path.isfile(path+f)]
+            liste=list(filter(os.path.isfile, os.listdir(path)))
         elif list_settings[5][2]=="DIRECTORIES_ONLY":
-            liste=[d for d in liste if os.path.isdir(path+d)]
+            liste=list(filter(os.path.isdir, os.listdir(path)))
         #show files
-        print((" "*(spaces-1))+"0. Switch Drive\n")
-        print(list_settings[3][2])
-        if list_settings[3][2]=="BY_TYPE":
-            print("- FILES:\n")
-            for items in liste:
-                if items==" ":
-                    print("\n- DIRECTORIES:\n")
-                else:
-                    print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(items))
-                    ii+=1
-        elif list_settings[3][2]=="NON-HIDDEN_FILES_FIRST":
-            print("- VISIBLE:\n")
-            for items in liste:
-                if items==" ":
-                    print("\n- HIDDEN:\n")
-                else:
-                    print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(items))
-                    ii+=1
+        if not liste or liste==[' ']:
+            print("Files Are Protected Or The Directory Is Empty.")
+            liste=[]
         else:
-            for items in liste:
+            print((" "*(spaces-1))+"0. Switch Drive\n")
+            if list_settings[3][2]=="BY_TYPE":
+                print("- FILES:\n")
+                for items in liste:
+                    if items==" ":
+                        print("\n- DIRECTORIES:\n")
+                    else:
+                        print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(items))
+                        ii+=1
+            elif list_settings[3][2]=="NON-HIDDEN_FILES_FIRST":
+                print("- VISIBLE:\n")
+                for items in liste:
+                    if items==" ":
+                        print("\n- HIDDEN:\n")
+                    else:
+                        print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(items))
+                        ii+=1
+            else:
+                for items in liste:
                     print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(items))
                     ii+=1
+        try:
+            liste.pop(liste.index(' '))
+        except:None
+        print(("\n"+" "*(spaces-len(str(ii))))+str(len(liste)+1)+". Create File Or Directory\n")
         selected=str(input(f"\n    ")).upper()
         if selected.isnumeric():
             if selected=="0":
@@ -303,12 +450,18 @@ def directories(path):
                 selected=str(input(f"\n    ")).upper()
                 if int(selected)-1<len(available_drives) and int(selected)>0:
                     path=available_drives[int(selected)-1]+'\\'
-            elif int(selected)-1<len(os.listdir(path)) and int(selected)>0:
-                selected=os.listdir(path)[int(selected)-1]
+            elif int(selected)-1<len(liste) and int(selected)>0:
+                selected=liste[int(selected)-1]
                 if os.path.isdir(path+selected):
                     path+=selected+"\\"
                 elif os.path.isfile(path+selected):
                     webbrowser.open(path+selected)
+            elif int(selected)-1==len(liste):
+                while 1:
+                    if not create_file():
+                        create_file()
+                    else :
+                        break
         elif selected=="H":
             return("home")
         elif selected=="S":
@@ -357,18 +510,18 @@ def home():
     while 1:
         list_home=["title","dir","set","chat"]
         bar()
-        print("\n\n\n\n\
-    "+f"{bcolors.CYAN}"+"        ,   ,,,,,,,, ,,            "+f"{bcolors.BLUE}"+"                                "+f"{bcolors.PURPLE}"+"               ,@@@@@,           \n\
-    "+f"{bcolors.CYAN}"+"     ,,,,,,,,  ,,,,,  ,,,,         "+f"{bcolors.BLUE}"+"    *//////*                    "+f"{bcolors.PURPLE}"+"       @@@,,, (@@@@@@@  ,@@@@,   \n\
-    "+f"{bcolors.CYAN}"+"   ,,,,,,,,        ,, ,,,,,,       "+f"{bcolors.BLUE}"+"    /,,,,,,,,,,,,,,,,,,,,,.     "+f"{bcolors.PURPLE}"+"     @@@@@@@@@@@@@@@@@@@@@@@@@@/ \n\
-    "+f"{bcolors.CYAN}"+"     ,,,,             ,,,,  ,      "+f"{bcolors.BLUE}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"      *@@@@@@@@@@@@( @@@@@@@@@@@ \n\
-    "+f"{bcolors.CYAN}"+" ,,,,,,                ,, ,,,      "+f"{bcolors.BLUE}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"      .@@@@@@@         @@@@@@@   \n\
-    "+f"{bcolors.CYAN}"+" ,,,,,                   ,,,,,     "+f"{bcolors.BLUE}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"        &@@@@          @@@@@*    \n\
-    "+f"{bcolors.CYAN}"+" ,,, .,,               ,,,,,,      "+f"{bcolors.BLUE}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"      #@@@@@@@         @@@@@@@,  \n\
-    "+f"{bcolors.CYAN}"+"    ,,,,             ,,,           "+f"{bcolors.BLUE}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"    %@@@@@@@@@@@@@@@@@@@@@@@@@@@ \n\
-    "+f"{bcolors.CYAN}"+"   ,,,,,, ,,     .,,,,,,,,,        "+f"{bcolors.BLUE}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"     *@@@@@@@@@@@@@@@@@@@@@@@@@/ \n\
-    "+f"{bcolors.CYAN}"+"     ,,,, ,,,,,,  ,,,,,,,,         "+f"{bcolors.BLUE}"+"    ,/////////////////////      "+f"{bcolors.PURPLE}"+"       '@@@@' .@@@@@@@'  @@@@'   \n\
-    "+f"{bcolors.CYAN}"+"        ,, ,,,,,,,,.               "+f"{bcolors.BLUE}"+"                                "+f"{bcolors.PURPLE}"+"               '@@@@@'           \n\
+        print(f"{bcolors.RESET}"+"\n\n\n\n\
+    "+f"{bcolors.CYAN}"+"        ,   ,,,,,,,, ,,            "+f"{bcolors.BRIGHT_YELLOW}"+"                                "+f"{bcolors.PURPLE}"+"               ,@@@@@,           \n\
+    "+f"{bcolors.CYAN}"+"     ,,,,,,,,  ,,,,,  ,,,,         "+f"{bcolors.BRIGHT_YELLOW}"+"    *//////*                    "+f"{bcolors.PURPLE}"+"       @@@,,, (@@@@@@@  ,@@@@,   \n\
+    "+f"{bcolors.CYAN}"+"   ,,,,,,,,        ,, ,,,,,,       "+f"{bcolors.BRIGHT_YELLOW}"+"    /,,,,,,,,,,,,,,,,,,,,,.     "+f"{bcolors.PURPLE}"+"     @@@@@@@@@@@@@@@@@@@@@@@@@@/ \n\
+    "+f"{bcolors.CYAN}"+"     ,,,,             ,,,,  ,      "+f"{bcolors.BRIGHT_YELLOW}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"      *@@@@@@@@@@@@( @@@@@@@@@@@ \n\
+    "+f"{bcolors.CYAN}"+" ,,,,,,                ,, ,,,      "+f"{bcolors.BRIGHT_YELLOW}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"      .@@@@@@@         @@@@@@@   \n\
+    "+f"{bcolors.CYAN}"+" ,,,,,                   ,,,,,     "+f"{bcolors.BRIGHT_YELLOW}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"        &@@@@          @@@@@*    \n\
+    "+f"{bcolors.CYAN}"+" ,,, .,,               ,,,,,,      "+f"{bcolors.BRIGHT_YELLOW}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"      #@@@@@@@         @@@@@@@,  \n\
+    "+f"{bcolors.CYAN}"+"    ,,,,             ,,,           "+f"{bcolors.BRIGHT_YELLOW}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"    %@@@@@@@@@@@@@@@@@@@@@@@@@@@ \n\
+    "+f"{bcolors.CYAN}"+"   ,,,,,, ,,     .,,,,,,,,,        "+f"{bcolors.BRIGHT_YELLOW}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"     *@@@@@@@@@@@@@@@@@@@@@@@@@/ \n\
+    "+f"{bcolors.CYAN}"+"     ,,,, ,,,,,,  ,,,,,,,,         "+f"{bcolors.BRIGHT_YELLOW}"+"    ,/////////////////////      "+f"{bcolors.PURPLE}"+"       '@@@@' .@@@@@@@'  @@@@'   \n\
+    "+f"{bcolors.CYAN}"+"        ,, ,,,,,,,,.               "+f"{bcolors.BRIGHT_YELLOW}"+"                                "+f"{bcolors.PURPLE}"+"               '@@@@@'           \n\
     \n\
     "+f"{bcolors.WHITE}"+"       1.TITLE SCREEN                      2.FILE SYSTEM                       3.SETTINGS           \n\
     \n\
@@ -405,13 +558,13 @@ def bar():
     os.system('color '+list_settings[0][2]+'f')
     #show info
 
-    print(f"{bcolors.WHITE}\u018A\u0131\u0298\u054F"+f"\n    {barcolor}"+datetime.date.today().strftime("%d/%m/%Y")+
+    print(f"{bcolors.RESET}\u018A\u0131\u0298\u054F"+f"\n{barcolor}    "+datetime.date.today().strftime("%d/%m/%Y")+
           " "+datetime.datetime.now().strftime("%H:%M")+
           " - [H]ome - [B]ack - [S]ettings - [F]ile System - [C]hatrum - [E]xit diOS"+
-          f"{bcolors.WHITE}")
+          f"{bcolors.RESET}")
     
     #separator (COMMENT THIS LINE OUT IF YOU WANT TO RUN IN YOU IDE, OTHERWISE YOU'LL NEED TO OPEN IN TERMINAL)
-    print("_"*os.get_terminal_size()[0]+f"{color}") 
+    print("_"*os.get_terminal_size()[0]+f"{color}")
 
 #setting initial page (SET THIS ONE TO "home" IF YOU WANT TO RUN IN YOUR IDE, OTHERWISE YOU'LL NEED TO OPEN IN TERMINAL)
 currentpage="title"

@@ -1,6 +1,6 @@
 background_color=0
-barcolor=WHITE
-color=WHITE
-sorting=NON-HIDDEN_FILES_FIRST
+barcolor=BACKGROUND_BLUE
+color=BACKGROUND_BLUE
+sorting=BY_NAME
 show_hidden=YES
 type_to_show=BOTH
