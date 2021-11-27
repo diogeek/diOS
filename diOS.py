@@ -496,7 +496,7 @@ def directories(path):
             os.system('color')
             exit()
 
-list_chatrum=["Host a Chatrum Server","Join a Chatrum Server"]
+list_chatrum=["Host a Local Chatrum Server","Join a Local Chatrum Server"]
        
 def chatrum():
     while 1:
