@@ -7,7 +7,7 @@ def get_size_screen():
 
 def check_installed(pkg):
     try:
-        __import__("keyboard")
+        __import__(pkg)
         return(True)
     except ModuleNotFoundError:
         return(False)
@@ -64,7 +64,19 @@ def changecolor(color):
     elif color=="UNDERLINE":
         return bcolors.UNDERLINE
 
+#function to save settings in text file
+def save():
+    settings_file=open('dios_settings.txt','w')
+    settings_file.write('background_color=0\n\
+barcolor='+str(list_settings[1][2])+'\n\
+color='+str(list_settings[2][2])+'\n\
+sorting='+str(list_settings[3][2])+'\n\
+show_hidden='+str(list_settings[4][2])+'\n\
+type_to_show='+str(list_settings[5][2])+'')
+    settings_file.close()
+    
 #initial settings setup
+
 def reset():
     path="C:\\"
     barcolor=bcolors.WHITE
@@ -155,15 +167,15 @@ def settings():
         for items in list_settings:
             print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(items[0]))
             ii+=1
+        print(("\n"+" "*(spaces-1))+str(len(list_settings)+1)+". Save Settings\n")
         selected=str(input("\n    ")).upper()
         if selected.isnumeric():
             if selected=="0":
                 path,barcolor,color,list_settings=reset()
+                save()
                 bar()
-                print("Settings have been reset.")
-                time.sleep(1)
                 return("set")
-            if int(selected)-1<len(list_settings) and int(selected)>=0:
+            elif int(selected)-1<len(list_settings) and int(selected)>=0:
                 bar()
                 ii=1
                 spaces=len(str(len(list_settings)))
@@ -193,6 +205,8 @@ def settings():
                 elif selected=="E":
                     os.system('color')
                     exit()
+            elif int(selected)-1==len(list_settings):
+                save()
         elif selected=="H" or selected=="B":
             return("home")
         elif selected=="F":
@@ -208,6 +222,25 @@ def sort_by_creation_date(dirpath):
     a.sort(key=lambda s: os.path.getmtime(os.path.join(dirpath, s)))
     return a
 
+def folder_is_hidden(filepath):
+    import stat
+    return bool(os.stat(filepath).st_file_attributes & stat.FILE_ATTRIBUTE_HIDDEN)
+
+def listdir_nohidden(path):
+    return([f for f in os.listdir(path) if not folder_is_hidden(path+f)])
+
+def sort_by_type(liste):
+    listefinal=[f for f in liste if os.path.isfile(path+f)]
+    listefinal.append(" ")
+    listefinal+=[d for d in liste if os.path.isdir(path+d)]
+    return(listefinal)
+    
+def non_hidden_first(liste):
+    listefinal=[f for f in liste if not folder_is_hidden(path+f)]
+    listefinal.append(" ")
+    listefinal+=[f for f in liste if folder_is_hidden(path+f)]
+    return(listefinal)
+
 def directories(path):
     while 1:
         bar()
@@ -220,17 +253,44 @@ def directories(path):
         if list_settings[4][2]=="YES":
             liste=os.listdir(path)
         elif list_settings[4][2]=="NO":
-            liste=[f for f in os.listdir(path) if not f.startswith('.')]
+            liste=listdir_nohidden(path)
         #sort files by setting
         if list_settings[3][2]=="BY_NAME":
-            liste=liste.sort()
+            liste.sort()
         elif list_settings[3][2]=="BY_CREATION_DATE":
             liste=sort_by_creation_date(path)
+        elif list_settings[3][2]=="BY_TYPE" and list_settings[5][2]=="BOTH":
+            liste=sort_by_type(liste)
+        elif list_settings[3][2]=="NON-HIDDEN_FILES_FIRST" and list_settings[4][2]=="YES":
+            liste=non_hidden_first(liste)
+        #show only wanted type
+        if list_settings[5][2]=="FILES_ONLY":
+            liste=[f for f in liste if os.path.isfile(path+f)]
+        elif list_settings[5][2]=="DIRECTORIES_ONLY":
+            liste=[d for d in liste if os.path.isdir(path+d)]
         #show files
         print((" "*(spaces-1))+"0. Switch Drive\n")
-        for items in liste:
-                print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(items))
-                ii+=1
+        print(list_settings[3][2])
+        if list_settings[3][2]=="BY_TYPE":
+            print("- FILES:\n")
+            for items in liste:
+                if items==" ":
+                    print("\n- DIRECTORIES:\n")
+                else:
+                    print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(items))
+                    ii+=1
+        elif list_settings[3][2]=="NON-HIDDEN_FILES_FIRST":
+            print("- VISIBLE:\n")
+            for items in liste:
+                if items==" ":
+                    print("\n- HIDDEN:\n")
+                else:
+                    print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(items))
+                    ii+=1
+        else:
+            for items in liste:
+                    print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(items))
+                    ii+=1
         selected=str(input(f"\n    ")).upper()
         if selected.isnumeric():
             if selected=="0":
@@ -293,21 +353,22 @@ def chatrum():
             exit()
 
 def home():
+    #home page, with colored icons
     while 1:
         list_home=["title","dir","set","chat"]
         bar()
         print("\n\n\n\n\
-    "+f"{bcolors.CYAN}"+"        ,   ,,,,,,,, ,,            "+f"{bcolors.BLUE}"+"                                "+f"{bcolors.PURPLE}"+"                @@@@@            \n\
-    "+f"{bcolors.CYAN}"+"     ,,,,,,,,  ,,,,,  ,,,,         "+f"{bcolors.BLUE}"+"    *//////*                    "+f"{bcolors.PURPLE}"+"              (@@@@@@@      ,    \n\
+    "+f"{bcolors.CYAN}"+"        ,   ,,,,,,,, ,,            "+f"{bcolors.BLUE}"+"                                "+f"{bcolors.PURPLE}"+"               ,@@@@@,           \n\
+    "+f"{bcolors.CYAN}"+"     ,,,,,,,,  ,,,,,  ,,,,         "+f"{bcolors.BLUE}"+"    *//////*                    "+f"{bcolors.PURPLE}"+"       @@@,,, (@@@@@@@  ,@@@@,   \n\
     "+f"{bcolors.CYAN}"+"   ,,,,,,,,        ,, ,,,,,,       "+f"{bcolors.BLUE}"+"    /,,,,,,,,,,,,,,,,,,,,,.     "+f"{bcolors.PURPLE}"+"     @@@@@@@@@@@@@@@@@@@@@@@@@@/ \n\
-    "+f"{bcolors.CYAN}"+"     ,,,,             ,,,,  ,      "+f"{bcolors.BLUE}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"      *@@@@@@@@@@@@( @@@@@@@@@@@@@.\n\
+    "+f"{bcolors.CYAN}"+"     ,,,,             ,,,,  ,      "+f"{bcolors.BLUE}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"      *@@@@@@@@@@@@( @@@@@@@@@@@ \n\
     "+f"{bcolors.CYAN}"+" ,,,,,,                ,, ,,,      "+f"{bcolors.BLUE}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"      .@@@@@@@         @@@@@@@   \n\
     "+f"{bcolors.CYAN}"+" ,,,,,                   ,,,,,     "+f"{bcolors.BLUE}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"        &@@@@          @@@@@*    \n\
     "+f"{bcolors.CYAN}"+" ,,, .,,               ,,,,,,      "+f"{bcolors.BLUE}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"      #@@@@@@@         @@@@@@@,  \n\
     "+f"{bcolors.CYAN}"+"    ,,,,             ,,,           "+f"{bcolors.BLUE}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"    %@@@@@@@@@@@@@@@@@@@@@@@@@@@ \n\
     "+f"{bcolors.CYAN}"+"   ,,,,,, ,,     .,,,,,,,,,        "+f"{bcolors.BLUE}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"     *@@@@@@@@@@@@@@@@@@@@@@@@@/ \n\
-    "+f"{bcolors.CYAN}"+"     ,,,, ,,,,,,  ,,,,,,,,         "+f"{bcolors.BLUE}"+"    ,/////////////////////      "+f"{bcolors.PURPLE}"+"              .@@@@@@@           \n\
-    "+f"{bcolors.CYAN}"+"        ,, ,,,,,,,,.               "+f"{bcolors.BLUE}"+"                                "+f"{bcolors.PURPLE}"+"                @@@@@            \n\
+    "+f"{bcolors.CYAN}"+"     ,,,, ,,,,,,  ,,,,,,,,         "+f"{bcolors.BLUE}"+"    ,/////////////////////      "+f"{bcolors.PURPLE}"+"       '@@@@' .@@@@@@@'  @@@@'   \n\
+    "+f"{bcolors.CYAN}"+"        ,, ,,,,,,,,.               "+f"{bcolors.BLUE}"+"                                "+f"{bcolors.PURPLE}"+"               '@@@@@'           \n\
     \n\
     "+f"{bcolors.WHITE}"+"       1.TITLE SCREEN                      2.FILE SYSTEM                       3.SETTINGS           \n\
     \n\
@@ -350,8 +411,7 @@ def bar():
           f"{bcolors.WHITE}")
     
     #separator (COMMENT THIS LINE OUT IF YOU WANT TO RUN IN YOU IDE, OTHERWISE YOU'LL NEED TO OPEN IN TERMINAL)
-    print("_"*os.get_terminal_size()[0]+f"{color}")
-    print(list_settings)
+    print("_"*os.get_terminal_size()[0]+f"{color}") 
 
 #setting initial page (SET THIS ONE TO "home" IF YOU WANT TO RUN IN YOUR IDE, OTHERWISE YOU'LL NEED TO OPEN IN TERMINAL)
 currentpage="title"
@@ -369,8 +429,3 @@ while 1:
     elif currentpage=="chat":
         currentpage=chatrum()
 
-#charger settings from file
-#montrer que fichiers ou que dossiers
-#trier différent (type, nom, date de modif)
-#montrer fichiers cachés ou pas
-#modifier fichier settings pour sauvegarder entre chaque utilisation
