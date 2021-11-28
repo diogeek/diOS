@@ -520,51 +520,63 @@ google_page=1
 query=""
 
 def google_search():
-    global google_page,query
-    bar()
-    print("Search Google:")
-    if query=="":
-        query =str(input("\n    "))
-        google_page=1
-    bar()
-    print("Results For \""+query+"\" On https://google.com/en/ :\n")
-    liste=show_results(query,google_page)
-    if google_page>1:
-        print("\nPage : "+str(google_page)+" - [P]revious Page - [N]ext Page\n")
-    else:
-        print("\n[N]ext Page\n")
-    selected=str(input("\n    ")).upper()
-    if selected.isnumeric():
-        webbrowser.open(liste[int(selected)-1])
-        return("google")
-    elif selected=="P" and google_page>1:
-        google_page-=1
-        return("google")
-    elif selected=="N":
-        google_page+=1
-        return("google")
-    elif selected=="H" or selected=="B" or selected=="":
-        query=""
-        return("home")
-    elif selected=="S":
-        query=""
-        return("set")
-    elif selected=="E":
-        os.system('color')
-        exit()
+    while 1:
+        global google_page,query
+        while query=="":
+            nobar()
+            print("Search Google:")
+            query =str(input("\n    "))
+            google_page=1
+        bar()
+        print("Results For \""+query+"\" On https://google.com/en/ :\n")
+        liste=show_results(query,google_page)
+        if google_page>1:
+            print("\nPage : "+str(google_page)+" - [P]revious Page - [N]ext Page\n")
+        else:
+            print("\n[N]ext Page\n")
+        selected=str(input("\n    ")).upper()
+        if selected.isnumeric():
+            webbrowser.open(liste[int(selected)-1])
+            return("google")
+        elif selected=="P" and google_page>1:
+            google_page-=1
+            return("google")
+        elif selected=="N":
+            google_page+=1
+            return("google")
+        elif selected=="H" or selected=="B" or selected=="":
+            query=""
+            return("home")
+        elif selected=="S":
+            query=""
+            return("set")
+        elif selected=="E":
+            os.system('color')
+            exit()
 
 def calendar():
-    bar()
-    list_months=["January","February","March","April","May","June","July","August","September","October","November","December"]
-    today=datetime.date.today().strftime("%m/%Y")
-    month=list_months[int(today.split("/")[0])-1]
-    year=today.split("/")[1]
-    print("\u250F\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2513\n\
-\u2503 "+month+" "*(20-len(month+" "+year))+year+" "+"\u2503\n\
-\u2521\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2529\n\
-")
-    input()
-    return("home")
+    while 1:
+        bar()
+        list_months=["January","February","March","April","May","June","July","August","September","October","November","December"]
+        today=datetime.date.today().strftime("%m/%Y")
+        month=list_months[int(today.split("/")[0])-1]
+        year=today.split("/")[1]
+        print("\u250F\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2513\n\
+    \u2503 "+month+" "*(25-len(month+" "+year))+year+" "+"\u2503\n\
+    \u2521\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2529\n\
+    ")
+        selected=str(input("\n    ")).upper()
+        if selected.isnumeric():
+            None
+        elif selected=="H" or selected=="B" or selected=="":
+            query=""
+            return("home")
+        elif selected=="S":
+            query=""
+            return("set")
+        elif selected=="E":
+            os.system('color')
+            exit()
     
 def home():
     #home page, with colored icons (all icons are 11 lines tall and 30 charactrs wide)
@@ -623,7 +635,21 @@ def bar():
           f"{bcolors.RESET}")
     
     #separator (COMMENT THIS LINE OUT IF YOU WANT TO RUN IN YOU IDE, OTHERWISE YOU'LL NEED TO OPEN IN TERMINAL)
-    #print("_"*os.get_terminal_size()[0]+f"{color}")
+    print("_"*os.get_terminal_size()[0]+f"{color}")
+
+def nobar():
+    os.system("cls")
+    #BACKGROUND COLOR
+    os.system('color '+list_settings[0][2]+'f')
+    #show info
+
+    print(f"{bcolors.RESET}\u018A\u0131\u0298\u054F"+f"\n{barcolor}    "+datetime.date.today().strftime("%d/%m/%Y")+
+          " "+datetime.datetime.now().strftime("%H:%M")+
+          f"{bcolors.RESET}")
+    
+    #separator (COMMENT THIS LINE OUT IF YOU WANT TO RUN IN YOU IDE, OTHERWISE YOU'LL NEED TO OPEN IN TERMINAL)
+    print("_"*os.get_terminal_size()[0]+f"{color}")
+
 
 #setting initial page (SET THIS ONE TO "home" IF YOU WANT TO RUN IN YOUR IDE, OTHERWISE YOU'LL NEED TO OPEN IN TERMINAL)
 currentpage="title"
