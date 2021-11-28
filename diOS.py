@@ -245,7 +245,8 @@ def title():
     
 
 def settings():
-    global barcolor,color,list_settings
+    global barcolor,color,list_settings,query
+    query=""
     while 1:
         bar()
         ii=1
@@ -523,7 +524,7 @@ def google_search():
     while 1:
         global google_page,query
         while query=="":
-            nobar()
+            bar()
             print("Search Google:")
             query =str(input("\n    "))
             google_page=1
@@ -544,41 +545,115 @@ def google_search():
         elif selected=="N":
             google_page+=1
             return("google")
-        elif selected=="H" or selected=="B" or selected=="":
-            query=""
+        elif selected=="H" or selected=="B":
             return("home")
         elif selected=="S":
-            query=""
             return("set")
         elif selected=="E":
             os.system('color')
             exit()
 
-def calendar():
+month=int(datetime.date.today().strftime("%m/%Y").split("/")[0])
+year=int(datetime.date.today().strftime("%m/%Y").split("/")[1])
+
+def create_event(date):
+    import sqlite3
+    db=sqlite3.connect('dios_events.db')
+    cursor=db.cursor()
+    cursor.execute("""
+CREATE TABLE IF NOT EXISTS dates(
+     id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,
+     date TEXT,
+)
+""")
+    db.commit()
+    db.close()
+
+def calendar(month,year):
+    from math import floor
+    list_months=["January","February","March","April","May","June","July","August","September","October","November","December"]
+    list_weekdays=["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
     while 1:
         bar()
-        list_months=["January","February","March","April","May","June","July","August","September","October","November","December"]
-        today=datetime.date.today().strftime("%m/%Y")
-        month=list_months[int(today.split("/")[0])-1]
-        year=today.split("/")[1]
-        print("\u250F\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2513\n\
-    \u2503 "+month+" "*(25-len(month+" "+year))+year+" "+"\u2503\n\
-    \u2521\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2529\n\
-    ")
+
+        #math for dates
+        first_day=datetime.date(year, month, 1).weekday()
+        week="     \u2502"*first_day
+        day_count=1
+        while day_count<8-first_day:
+            week+=("  "+str(day_count)+"  \u2502")
+            day_count+=1
+        #choices
+        list_choices=["Change Month","Change Year"]
+        
+        #show calendar
+        print(f"\n    {bcolors.BRIGHT_RED}\u250F"+"\u2501"*41+"\u2513\n\
+    \u2503 "+f"{bcolors.RESET}"+str(list_months[month-1])+" ("+str(month)+")"+" "*(40-len(str(list_months[month-1])+" ("+str(month)+")"+" "+str(year)))+str(year)+" "+f"{bcolors.BRIGHT_RED}"+"\u2503\n\
+    \u2521"+("\u2501"*5+"\u252F")*6+"\u2501"*5+"\u2529"+f"{bcolors.RESET}"+"\n\
+    \u2502"+week)
+        next_month=month+1
+        next_year=year
+        if month==12:
+            next_month=1
+            next_year=year+1
+        days_in_month=[i for i in range(day_count,(datetime.date(next_year, next_month, 1) - datetime.date(year, month, 1)).days+1)]
+        days_in_month=[days_in_month[i:i+7] for i in range(0,len(days_in_month),7)]
+        for lines in days_in_month:
+            print("    \u251C"+("\u2500"*5+"\u253C")*6+"\u2500"*5+"\u2524")
+            if len(lines)<7:
+                lines.extend([" " for i in range(7-len(lines))])
+            week=""
+            for day in lines:
+                day=str(day)
+                if len(day)==2:
+                    day=day[0]+" "+day[1]
+                else:
+                    day=" "+day+" "
+                week+=" "+day+" \u2502"
+            print("    \u2502"+week)
+        print("    \u2570"+("\u2500"*5+"\u2534")*6+"\u2500"*5+"\u256F\n")
+        #selection
+        ii=1
+        for items in list_choices:
+            print((" "*(2-len(str(ii))))+str(ii)+". "+str(items))
+            ii+=1
         selected=str(input("\n    ")).upper()
         if selected.isnumeric():
-            None
-        elif selected=="H" or selected=="B" or selected=="":
-            query=""
-            return("home")
+            import time
+            selected=int(selected)
+            if selected==1:
+                selected=0
+                print("Enter Month Number:")
+                while selected>12 or selected<1:
+                    try :
+                        selected=int(input("\n    "))
+                    except ValueError:
+                        print("\nEnter A Numeric Value Between 1 And 12.")
+                        time.sleep(1.5)
+                        return("calendar",month,year)
+                return("calendar",selected,year)
+            elif selected==2:
+                selected=0
+                print("Enter Year:")
+                while selected<1 or selected>9999:
+                    try:
+                        selected=int(input("\n    "))
+                    except ValueError :
+                        print("\nEnter A Numeric Value Between 1 and 9999.")
+                        time.sleep(1.5)
+                        return("calendar",month,year)
+                return("calendar",month,selected)
+        elif selected=="H" or selected=="B":
+            return("home",month,year)
         elif selected=="S":
-            query=""
-            return("set")
+            return("set",month,year)
         elif selected=="E":
             os.system('color')
             exit()
     
 def home():
+    global query
+    query=""
     #home page, with colored icons (all icons are 11 lines tall and 30 charactrs wide)
     while 1:
         list_home=["title","dir","set","chat","google","calendar"]
@@ -624,32 +699,24 @@ def home():
             exit()
 
 def bar():
+    global currentpage,query
     os.system("cls")
     #BACKGROUND COLOR
     os.system('color '+list_settings[0][2]+'f')
+    
     #show info
-
-    print(f"{bcolors.RESET}\u018A\u0131\u0298\u054F"+f"\n{barcolor}    "+datetime.date.today().strftime("%d/%m/%Y")+
+    if currentpage=="google" and query=="":
+        print(f"{bcolors.RESET}\u018A\u0131\u0298\u054F"+f"\n{barcolor}    "+datetime.date.today().strftime("%d/%m/%Y")+
+          " "+datetime.datetime.now().strftime("%H:%M")+
+          f"{bcolors.RESET}")
+    else:
+        print(f"{bcolors.RESET}\u018A\u0131\u0298\u054F"+f"\n{barcolor}    "+datetime.date.today().strftime("%d/%m/%Y")+
           " "+datetime.datetime.now().strftime("%H:%M")+
           " - [H]ome - [B]ack - [S]ettings - [E]xit diOS"+
           f"{bcolors.RESET}")
     
     #separator (COMMENT THIS LINE OUT IF YOU WANT TO RUN IN YOU IDE, OTHERWISE YOU'LL NEED TO OPEN IN TERMINAL)
-    print("_"*os.get_terminal_size()[0]+f"{color}")
-
-def nobar():
-    os.system("cls")
-    #BACKGROUND COLOR
-    os.system('color '+list_settings[0][2]+'f')
-    #show info
-
-    print(f"{bcolors.RESET}\u018A\u0131\u0298\u054F"+f"\n{barcolor}    "+datetime.date.today().strftime("%d/%m/%Y")+
-          " "+datetime.datetime.now().strftime("%H:%M")+
-          f"{bcolors.RESET}")
-    
-    #separator (COMMENT THIS LINE OUT IF YOU WANT TO RUN IN YOU IDE, OTHERWISE YOU'LL NEED TO OPEN IN TERMINAL)
-    print("_"*os.get_terminal_size()[0]+f"{color}")
-
+    print("\u2501"*os.get_terminal_size()[0]+f"{color}")
 
 #setting initial page (SET THIS ONE TO "home" IF YOU WANT TO RUN IN YOUR IDE, OTHERWISE YOU'LL NEED TO OPEN IN TERMINAL)
 currentpage="title"
@@ -669,7 +736,7 @@ while 1:
     elif currentpage=="google":
         currentpage=google_search()
     elif currentpage=="calendar":
-        currentpage=calendar()
+        currentpage,month,year=calendar(month,year)
 
 #calendar
 #calculator
