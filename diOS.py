@@ -1,4 +1,18 @@
-import os,datetime,webbrowser,sys,subprocess,platform,string
+import os,datetime,webbrowser,sys,subprocess,platform,string,sqlite3
+
+db=sqlite3.connect('dios_events.db')
+cursor=db.cursor()
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS dates(
+     id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,
+     date TEXT,
+     event TEXT,
+     desc TEXT
+)
+""")
+cursor.close()
+db.commit()
+db.close()
 
 def get_size_screen():
     import ctypes
@@ -160,7 +174,8 @@ color='+str(list_settings[2][2])+'\n\
 sorting='+str(list_settings[3][2])+'\n\
 show_hidden='+str(list_settings[4][2])+'\n\
 type_to_show='+str(list_settings[5][2])+'\n\
-lang_google='+str(list_settings[6][1])+'')
+lang_google='+str(list_settings[6][1])+'\n\
+date_format='+str(list_settings[7][2])+'')
     settings_file.close()
     
 #initial settings setup
@@ -171,6 +186,7 @@ def reset():
     barbackcolor=bcolors.BACKGROUND_BLACK
     color=bcolors.WHITE
     textbackcolor=bcolors.BACKGROUND_BLACK
+    date_format="dd/mm/YYYY"
     list_settings=[
         ["Console Background Color",["Black","Blue","Green","Aqua","Red","Purple","Yellow","White","Grey","Light Blue","Light Green","Cyan","Light Red","Light Purple","Light Yellow","Bright White"],"0"],
         ["Info Bar Style",["Purple","Blue","Cyan","Green","Yellow","Red","Gold","White","Light Gray","Dark Gray","Black","Bright Purple","Bright Blue","Bright Cyan","Bright Green","Bright Yellow","Bright Red","Bright Black","Background Purple","Background Blue","Background Cyan","Background Green","Background Yellow","Background Red","Background White","Background Black","Background Bright Purple","Background Bright Blue","Background Bright Cyan","Background Bright Green","Background Bright Yellow","Background Bright Red","Background Bright White","Background Bright Black","Bold","Italic","Underline"],"WHITE"],
@@ -178,11 +194,12 @@ def reset():
         ["Sorting Files",["By Name","By Type","By Creation Date","Non-Hidden Files First"],"BY_NAME"],
         ["Show Hidden Files",["Yes","No"],"YES"],
         ["Type to Show",["Files Only","Directories Only","Both"],"BOTH"],
-        ["Google Search Language","en"]
+        ["Google Search Language","en"],
+        ["Date Format",["dd/mm/YYYY","mm/dd/YYYY","YYYY/mm/dd"],"dd/mm/YYYY"]
          ]
-    return(path,barcolor,color,list_settings)
+    return(path,barcolor,color,list_settings,date_format)
 
-path,barcolor,color,list_settings=reset()
+path,barcolor,color,list_settings,date_format=reset()
 
 if not check_installed('keyboard'):
     install('keyboard')
@@ -211,7 +228,8 @@ color=WHITE\n\
 sorting=BY_NAME\n\
 show_hidden=YES\n\
 type_to_show=BOTH\n\
-lang_google=en')
+lang_google=en\n\
+date_format=dd/mm/YYYY')
     settings_file.close()
 
 #fullscreen (it's ugly but it does the job), plus blocks the fullscreen key combinations
@@ -256,7 +274,7 @@ def title():
     
 
 def settings():
-    global barcolor,color,list_settings,query,lang_google
+    global barcolor,color,list_settings,query,lang_google,date_format
     query=""
     while 1:
         bar()
@@ -270,7 +288,7 @@ def settings():
         selected=str(input("\n    ")).upper()
         if selected.isnumeric():
             if selected=="0":
-                path,barcolor,color,list_settings=reset()
+                path,barcolor,color,list_settings,date_format=reset()
                 save()
                 bar()
                 return("set")
@@ -294,6 +312,29 @@ def settings():
                             print("\n- TEXT STYLE\n")
                         print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(items))
                         ii+=1
+                    selected=str(input("\n    ")).upper()
+                    if selected.isnumeric():
+                        if int(selected)-1<len(list_settings[choice][1]) and int(selected)>=0:
+                            if choice>0:
+                                list_settings[choice][2]=uppercase(list_settings[choice][1][int(selected)-1])
+                            if choice==0:
+                                os.system('color '+str(int(selected)-1)+'f')
+                                list_settings[0][2]=hex(int(selected)-1).replace('0x','')
+                            elif choice==1:
+                                print(f"{bcolors.RESET}")
+                                barcolor=changecolor(list_settings[1][2])
+                            elif choice==2:
+                                print(f"{bcolors.RESET}")
+                                color=changecolor(list_settings[2][2])
+                            elif choice==7:
+                                date_format=list_settings[7][2]
+                    elif selected=="H":
+                        return("home")
+                    elif selected=="B" or selected=="S":
+                        return("set")
+                    elif selected=="E":
+                        os.system('color')
+                        exit()
                 else:
                     list_languages=['as','ab','ae','of','ak','am','an','ar','as','av','ay','az','ba','be','bg','bh','bi','bm','bn','bo','br','bs','ca','ce','ch','co','cr','cs','cu','cv','cy','da','de','dv','dz','ee','el','en','eo','es','et','eu','fa','ff','fi','fj','fo','fr','fy','ga','gd','gl','gn','gu','gv','ha','he','hi','ho','hr','ht','hu','hy','hz','is','id','ie','ii','ik','io','is','it','iu','ja','jv','ka','kg','ki','kj','kk','kl','km','kn','ko','kr','ks','ku','kv','kw','ky','la','lb','lg','li','ln','lo','lt','lu','lv','mg','mh','mi','mk','ml','mn','mo','mr','ms','mt','my','na','nb','nd','ne','ng','nl','nn','no','nr','nv','ny','oc','oj','om','or','os','pa','pi','pl','ps','pt','qu','rc','rm','rn','ro','ru','rw','sa','sc','sd','se','sg','sh','si','sk','sl','sm','sn','so','sq','sr','ss','st','su','sv','sw','ta','te','tg','th','ti','tk','tl','tn','to','tr','ts','tt','tw','ty','ug','uk','ur','uz','ve','vi','vo','wa','wo','xh','yi','yo','za','zh','zu']
                     print("Enter Google Search Language (Type 'help' for list of languages):")
@@ -320,27 +361,6 @@ def settings():
                         print("Unrecognized Language.")
                         time.sleep(1.5)
                         return("set")
-                selected=str(input("\n    ")).upper()
-                if selected.isnumeric():
-                    if int(selected)-1<len(list_settings[choice][1]) and int(selected)>=0:
-                        if choice>0 and choice!=6:
-                            list_settings[choice][2]=uppercase(list_settings[choice][1][int(selected)-1])
-                        if choice==0:
-                            os.system('color '+str(int(selected)-1)+'f')
-                            list_settings[0][2]=hex(int(selected)-1).replace('0x','')
-                        elif choice==1:
-                            print(f"{bcolors.RESET}")
-                            barcolor=changecolor(list_settings[1][2])
-                        elif choice==2:
-                            print(f"{bcolors.RESET}")
-                            color=changecolor(list_settings[2][2])
-                elif selected=="H":
-                    return("home")
-                elif selected=="B" or selected=="S":
-                    return("set")
-                elif selected=="E":
-                    os.system('color')
-                    exit()
             elif int(selected)-1==len(list_settings):
                 save()
         elif selected=="H" or selected=="B":
@@ -588,7 +608,7 @@ def google_search():
     while 1:
         global google_page,query,lang_google
         while query=="":
-            bar()
+            bar(True)
             print("Search Google:")
             query =str(input("\n    "))
             google_page=1
@@ -620,26 +640,111 @@ def google_search():
 month=int(datetime.date.today().strftime("%m/%Y").split("/")[0])
 year=int(datetime.date.today().strftime("%m/%Y").split("/")[1])
 
+def format_date(date):
+    global date_format
+    date=date.split('/')
+    if date_format=="dd/mm/YYYY":
+        day=date[0]
+        month=date[1]
+        year=date[2]
+    elif date_format=="mm/dd/YYYY":
+        day=date[1]
+        month=date[0]
+        year=date[2]
+    elif date_format=="YY/mm/dd":
+        day=date[2]
+        month=date[1]
+        year=date[0]
+    return(day+"/"+month+"/"+year)
+
+def deformat_date(date):
+    date=date.split('/')
+    day=date[0]
+    month=date[1]
+    year=date[2]
+    global date_format
+    if date_format=="dd/mm/YYYY":
+        return(day+"/"+month+"/"+year)
+    elif date_format=="mm/dd/YYYY":
+        return(month+"/"+day+"/"+year)
+    elif date_format=="YYYY/mm/dd":
+        return(year+"/"+month+"/"+day)
+
 def create_event(date):
-    import sqlite3
     db=sqlite3.connect('dios_events.db')
     cursor=db.cursor()
-    cursor.execute("""
-CREATE TABLE IF NOT EXISTS dates(
-     id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,
-     date TEXT,
-)
-""")
+    event=""
+    while event=="":
+        bar()
+        print("Enter The Title Of The Event On "+deformat_date(date)+".\n")
+        event=str(input("\n    "))
+        if event=="B":
+            return("calendar")
+        elif event=="H":
+            return("home")
+        elif event=="S":
+            return("set")
+        elif event=="E":
+            os.system('color')
+            exit()
+    bar()
+    print("Enter The Description Of The Event. (Leave Blank For No Description)")
+    desc=str(input("\n    "))
+    if desc=="B":
+        return("calendar")
+    elif desc=="H":
+        return("home")
+    elif desc=="S":
+        return("set")
+    elif desc=="E":
+        os.system('color')
+        exit()
+    cursor.execute("SELECT id FROM dates WHERE date = ?", (date,))
+    data=cursor.fetchone()
+    if data is None:
+        insert_query = """INSERT INTO dates (date, event, desc) 
+                           VALUES 
+                           ('"""+format_date(date)+"""', '"""+event.replace("'","''")+"""', '"""+desc.replace("'","''")+"""') """
+        cursor.execute(insert_query)
+        cursor.close()
+    else:
+        edit_query ="""UPDATE dates SET event = '"""+event.replace("'","''")+"""', desc = '"""+desc.replace("'","''")+"""' WHERE id = """+str(data[0])
+        cursor.execute(edit_query)
+        cursor.close()
     db.commit()
     db.close()
+    bar(True)
+    print("Event '"+event+"' Succesfully Created On "+date+".")
+    import time
+    time.sleep(1.5)
 
+def show_events(date):
+    import getpass
+    bar()
+    db=sqlite3.connect('dios_events.db')
+    cursor=db.cursor()
+    cursor.execute("""SELECT event,desc FROM dates WHERE date='"""+date+"""'""")
+    events=cursor.fetchall()
+    cursor.close()
+    db.commit()
+    db.close()
+    if events:
+        print("All Events On "+deformat_date(date)+":\n\nTitle - Description\n")
+        for event in events:
+            if event[1]=="":
+                event=event[0]
+                print("\u2022 "+event)
+            else:
+                print("\u2022 "+event[0]+" - "+event[1])
+    else:
+        print("There Are No Events On "+deformat_date(date)+".")
+    getpass.getpass("\nPress Enter")
 def calendar(month,year):
-    from math import floor
     list_months=["January","February","March","April","May","June","July","August","September","October","November","December"]
     list_weekdays=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]
-    weekdays="\n    \u2502"
+    weekdays=f"{bcolors.RESET}\n    \u2502"
     for day in list_weekdays:
-        weekdays+=f"{bcolors.RESET} "+day+f" {bcolors.BRIGHT_RED}\u2502"
+        weekdays+=" "+day+" \u2502"
     while 1:
         bar()
         #math for dates
@@ -650,20 +755,21 @@ def calendar(month,year):
             week+=("  "+str(day_count)+"  \u2502")
             day_count+=1
         #choices
-        list_choices=["Change Month","Change Year"]
+        list_choices=["Change Month","Change Year","Create An Event","See Events"]
         
         #show calendar
         print(f"\n    {bcolors.RESET}{bcolors.BRIGHT_RED}\u250F"+"\u2501"*41+"\u2513\n\
-    \u2503 "+f"{bcolors.RESET}"+str(list_months[month-1])+" ("+str(month)+")"+" "*(40-len(str(list_months[month-1])+" ("+str(month)+")"+" "+str(year)))+str(year)+" "+f"{bcolors.BRIGHT_RED}"+"\u2503\n\
+    \u2503 "+f"{bcolors.RESET}"+str(list_months[month-1])+" ("+str(month)+")"+" "*(40-len(str(list_months[month-1])+" ("+str(month)+")"+" "+str(year)))+str(year)+" "+f"{bcolors.BRIGHT_RED}\u2503\n\
     \u2521"+("\u2501"*5+"\u252F")*6+"\u2501"*5+"\u2529"+weekdays+"\n\
-    \u251C"+("\u2500"*5+"\u253C")*6+"\u2500"*5+"\u2524"+f"{bcolors.RESET}\n\
+    \u251C"+("\u2500"*5+"\u253C")*6+"\u2500"*5+"\u2524\n\
     \u2502"+week)
         next_month=month+1
         next_year=year
         if month==12:
             next_month=1
             next_year=year+1
-        days_in_month=[i for i in range(day_count,(datetime.date(next_year, next_month, 1) - datetime.date(year, month, 1)).days+1)]
+        how_many_days=(datetime.date(next_year, next_month, 1) - datetime.date(year, month, 1)).days
+        days_in_month=[i for i in range(day_count,how_many_days+1)]
         days_in_month=[days_in_month[i:i+7] for i in range(0,len(days_in_month),7)]
         for lines in days_in_month:
             print("    \u251C"+("\u2500"*5+"\u253C")*6+"\u2500"*5+"\u2524")
@@ -710,6 +816,30 @@ def calendar(month,year):
                         time.sleep(1.5)
                         return("calendar",month,year)
                 return("calendar",month,selected)
+            elif selected==3:
+                selected=0
+                while selected<1 or selected>how_many_days:
+                    print("\nEnter Day Of "+str(list_months[month])+" Of "+str(year)+" You Want To Create An Event for.")
+                    selected=str(input("\n    "))
+                    if selected.isnumeric() and int(selected)>0 and int(selected)<how_many_days+1:
+                        break
+                    else :
+                        print("\nEnter A Numeric Value Between 1 And "+str(how_many_days)+".")
+                        time.sleep(1.5)
+                        return("calendar",month,year)
+                create_event(str(selected)+"/"+str(month)+"/"+str(year))
+            elif selected==4:
+                selected=0
+                while selected<1 or selected>how_many_days:
+                    print("\nEnter Day Of "+str(list_months[month-1])+" Of "+str(year)+" You Want To See The Events Of.")
+                    selected=str(input("\n    "))
+                    if selected.isnumeric() and int(selected)>0 and int(selected)<how_many_days+1:
+                        break
+                    else :
+                        print("\nEnter A Numeric Value Between 1 And "+str(how_many_days)+".")
+                        time.sleep(1.5)
+                        return("calendar",month,year)
+                show_events(str(selected)+"/"+str(month)+"/"+str(year))
         elif selected=="H" or selected=="B":
             return("home",month,year)
         elif selected=="S":
@@ -765,14 +895,14 @@ def home():
             os.system('color')
             exit()
 
-def bar():
+def bar(no_UI=False):
     global currentpage,query
     os.system("cls")
     #BACKGROUND COLOR
     os.system('color '+list_settings[0][2]+'f')
     
     #show info
-    if currentpage=="google" and query=="":
+    if no_UI==True:
         print(f"{bcolors.RESET}\u018A\u0131\u0298\u054F"+f"\n{barcolor}    "+datetime.date.today().strftime("%d/%m/%Y")+
           " "+datetime.datetime.now().strftime("%H:%M")+
           f"{bcolors.RESET}")
@@ -783,7 +913,7 @@ def bar():
           f"{bcolors.RESET}")
     
     #separator (COMMENT THIS LINE OUT IF YOU WANT TO RUN IN YOU IDE, OTHERWISE YOU'LL NEED TO OPEN IN TERMINAL)
-    print("\u2501"*os.get_terminal_size()[0]+f"{color}")
+    #print("\u2501"*os.get_terminal_size()[0]+f"{color}")
 
 #setting initial page (SET THIS ONE TO "home" IF YOU WANT TO RUN IN YOUR IDE, OTHERWISE YOU'LL NEED TO OPEN IN TERMINAL)
 currentpage="title"
@@ -805,6 +935,7 @@ while 1:
     elif currentpage=="calendar":
         currentpage,month,year=calendar(month,year)
 
+#notif évènements + mettre plusieurs évènements par jour
 #calculator
 #snake
 #tetris
