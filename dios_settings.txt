@@ -4,3 +4,4 @@ color=WHITE
 sorting=BY_NAME
 show_hidden=YES
 type_to_show=BOTH
+lang_google=en
