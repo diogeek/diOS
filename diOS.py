@@ -154,7 +154,8 @@ barcolor='+str(list_settings[1][2])+'\n\
 color='+str(list_settings[2][2])+'\n\
 sorting='+str(list_settings[3][2])+'\n\
 show_hidden='+str(list_settings[4][2])+'\n\
-type_to_show='+str(list_settings[5][2])+'')
+type_to_show='+str(list_settings[5][2])+'\n\
+lang_google='+str(list_settings[6][1])+'')
     settings_file.close()
     
 #initial settings setup
@@ -171,7 +172,8 @@ def reset():
         ["UI Style",["Purple","Blue","Cyan","Green","Yellow","Red","White","Black","Bright Purple","Bright Blue","Bright Cyan","Bright Green","Bright Yellow","Bright Red","Bright White","Bright Black","Background Purple","Background Blue","Background Cyan","Background Green","Background Yellow","Background Red","Background White","Background Black","Background Bright Purple","Background Bright Blue","Background Bright Cyan","Background Bright Green","Background Bright Yellow","Background Bright Red","Background Bright White","Background Bright Black","Bold","Italic","Underline"],"WHITE"],
         ["Sorting Files",["By Name","By Type","By Creation Date","Non-Hidden Files First"],"BY_NAME"],
         ["Show Hidden Files",["Yes","No"],"YES"],
-        ["Type to Show",["Files Only","Directories Only","Both"],"BOTH"]
+        ["Type to Show",["Files Only","Directories Only","Both"],"BOTH"],
+        ["Google Search Language","en"]
          ]
     return(path,barcolor,color,list_settings)
 
@@ -200,7 +202,8 @@ barcolor=WHITE\n\
 color=WHITE\n\
 sorting=BY_NAME\n\
 show_hidden=YES\n\
-type_to_show=BOTH')
+type_to_show=BOTH\n\
+lang_google=en')
     settings_file.close()
 
 #fullscreen (it's ugly but it does the job), plus blocks the fullscreen key combinations
@@ -245,7 +248,7 @@ def title():
     
 
 def settings():
-    global barcolor,color,list_settings,query
+    global barcolor,color,list_settings,query,lang_google
     query=""
     while 1:
         bar()
@@ -269,23 +272,49 @@ def settings():
                 spaces=len(str(len(list_settings)))
                 choice=int(selected)-1
                 #choice = which setting you're changing
-                for items in list_settings[choice][1]:
-                    if (choice==2 or choice==3) and items=="Purple":
-                        print("- TEXT COLORS\n")
-                    elif (choice==2 or choice==3) and items=="Bright Purple":
-                        print("\n- BRIGHT TEXT COLORS\n")
-                    elif (choice==2 or choice==3) and items=="Background Purple":
-                        print("\n- TEXT BACKGROUND COLORS\n")
-                    elif (choice==2 or choice==3) and items=="Background Bright Purple":
-                        print("\n- BRIGHT TEXT BACKGROUND COLORS\n")
-                    elif (choice==2 or choice==3) and items=="Bold":
-                        print("\n- TEXT STYLE\n")
-                    print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(items))
-                    ii+=1
+                if choice!=6:
+                    for items in list_settings[choice][1]:
+                        if (choice==2 or choice==3) and items=="Purple":
+                            print("- TEXT COLORS\n")
+                        elif (choice==2 or choice==3) and items=="Bright Purple":
+                            print("\n- BRIGHT TEXT COLORS\n")
+                        elif (choice==2 or choice==3) and items=="Background Purple":
+                            print("\n- TEXT BACKGROUND COLORS\n")
+                        elif (choice==2 or choice==3) and items=="Background Bright Purple":
+                            print("\n- BRIGHT TEXT BACKGROUND COLORS\n")
+                        elif (choice==2 or choice==3) and items=="Bold":
+                            print("\n- TEXT STYLE\n")
+                        print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(items))
+                        ii+=1
+                else:
+                    list_languages=['as','ab','ae','of','ak','am','an','ar','as','av','ay','az','ba','be','bg','bh','bi','bm','bn','bo','br','bs','ca','ce','ch','co','cr','cs','cu','cv','cy','da','de','dv','dz','ee','el','en','eo','es','et','eu','fa','ff','fi','fj','fo','fr','fy','ga','gd','gl','gn','gu','gv','ha','he','hi','ho','hr','ht','hu','hy','hz','is','id','ie','ii','ik','io','is','it','iu','ja','jv','ka','kg','ki','kj','kk','kl','km','kn','ko','kr','ks','ku','kv','kw','ky','la','lb','lg','li','ln','lo','lt','lu','lv','mg','mh','mi','mk','ml','mn','mo','mr','ms','mt','my','na','nb','nd','ne','ng','nl','nn','no','nr','nv','ny','oc','oj','om','or','os','pa','pi','pl','ps','pt','qu','rc','rm','rn','ro','ru','rw','sa','sc','sd','se','sg','sh','si','sk','sl','sm','sn','so','sq','sr','ss','st','su','sv','sw','ta','te','tg','th','ti','tk','tl','tn','to','tr','ts','tt','tw','ty','ug','uk','ur','uz','ve','vi','vo','wa','wo','xh','yi','yo','za','zh','zu']
+                    print("Enter Google Search Language (Type 'help' for list of languages):")
+                    selected=str(input("\n    ")).lower()
+                    if selected in list_languages:
+                        lang_google=selected
+                    elif selected=="H":
+                        return("home")
+                    elif selected=="B" or selected=="S":
+                        return("set")
+                    elif selected=="E":
+                        os.system('color')
+                        exit()
+                    elif selected=="help":
+                        print("")
+                        for i in [list_languages[i:i+20] for i in range(0,len(list_languages),20)]:
+                            print(', '.join(i))
+                        import getpass
+                        getpass.getpass("\nPress Enter")
+                        return("set")
+                    else:
+                        import time
+                        print("Unrecognized Language.")
+                        time.sleep(1.5)
+                        return("set")
                 selected=str(input("\n    ")).upper()
                 if selected.isnumeric():
                     if int(selected)-1<len(list_settings[choice][1]) and int(selected)>=0:
-                        if choice>0:
+                        if choice>0 and choice!=6:
                             list_settings[choice][2]=uppercase(list_settings[choice][1][int(selected)-1])
                         if choice==0:
                             os.system('color '+str(int(selected)-1)+'f')
@@ -298,7 +327,7 @@ def settings():
                             color=changecolor(list_settings[2][2])
                 elif selected=="H":
                     return("home")
-                elif selected=="B":
+                elif selected=="B" or selected=="S":
                     return("set")
                 elif selected=="E":
                     os.system('color')
@@ -507,11 +536,11 @@ def chatrum():
             os.system('color')
             exit()
 
-def show_results(query,page):
+def show_results(query,page,lang_google):
     import googlesearch
     ii=1
     liste=[]
-    for results in googlesearch.search(query, tld='com', lang='en', tbs="0", safe='off', num=10, start=(page-1)*10-1, stop=10, pause=2.0, country='', extra_params=None, user_agent=None, verify_ssl=True):
+    for results in googlesearch.search(query, tld='com', lang=lang_google, tbs="0", safe='off', num=10, start=(page-1)*10-1, stop=10, pause=2.0, country='', extra_params=None, user_agent=None, verify_ssl=True):
         print((" "*(2-len(str(ii))))+str(ii)+". "+str(results))
         ii+=1
         liste.append(results)
@@ -519,18 +548,19 @@ def show_results(query,page):
 
 google_page=1
 query=""
+lang_google="en"
 
 def google_search():
     while 1:
-        global google_page,query
+        global google_page,query,lang_google
         while query=="":
             bar()
             print("Search Google:")
             query =str(input("\n    "))
             google_page=1
         bar()
-        print("Results For \""+query+"\" On https://google.com/en/ :\n")
-        liste=show_results(query,google_page)
+        print("Results For \""+query+"\" On https://google.com/"+str(lang_google)+":\n")
+        liste=show_results(query,google_page,lang_google)
         if google_page>1:
             print("\nPage : "+str(google_page)+" - [P]revious Page - [N]ext Page\n")
         else:
@@ -635,11 +665,11 @@ def calendar(month,year):
             elif selected==2:
                 selected=0
                 print("Enter Year:")
-                while selected<1 or selected>9999:
+                while selected<1 or selected>9998:
                     try:
                         selected=int(input("\n    "))
                     except ValueError :
-                        print("\nEnter A Numeric Value Between 1 and 9999.")
+                        print("\nEnter A Numeric Value Between 1 and 9998.")
                         time.sleep(1.5)
                         return("calendar",month,year)
                 return("calendar",month,selected)
