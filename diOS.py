@@ -38,16 +38,17 @@ class bcolors:
     GREEN = '\033[92m'
     YELLOW = '\033[93m'
     RED = '\033[91m'
-    WHITE = '\033[0m'
+    GOLD = '\033[0;33m'
+    WHITE = '\033[1;37m'
+    LIGHT_GRAY = '\033[0m'
+    DARK_GRAY = '\u001b[1;30m'
     BLACK = '\u001b[30m'
-    BRIGHT_PURPLE = '\u001b[35;1m'
-    BRIGHT_BLUE = '\u001b[34;1m'
-    BRIGHT_CYAN = '\u001b[36;1m'
-    BRIGHT_GREEN = '\u001b[32;1m'
-    BRIGHT_YELLOW = '\u001b[33;1m'
-    BRIGHT_RED = '\u001b[31;1m'
-    BRIGHT_WHITE = '\u001b[37;1m'
-    BRIGHT_BLACK = '\u001b[30;1m'
+    BRIGHT_PURPLE = '\u001b[1;35m'
+    BRIGHT_BLUE = '\u001b[1;34m'
+    BRIGHT_CYAN = '\u001b[1;36m'
+    BRIGHT_GREEN = '\u001b[1;32m'
+    BRIGHT_YELLOW = '\u001b[1;33m'
+    BRIGHT_RED = '\u001b[1;31m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
     #text background
@@ -87,8 +88,14 @@ def changecolor(color):
         return bcolors.YELLOW
     elif color=="RED":
         return bcolors.RED
+    elif color=="GOLD":
+        return bcolors.GOLD
     elif color=="WHITE":
         return bcolors.WHITE
+    elif color=="LIGHT_GRAY":
+        return bcolors.LIGHT_GRAY
+    elif color=="DARK_GRAY":
+        return bcolors.DARK_GRAY
     elif color=="BLACK":
         return bcolors.BLACK
     elif color=="BRIGHT_PURPLE":
@@ -103,8 +110,6 @@ def changecolor(color):
         return bcolors.BRIGHT_YELLOW
     elif color=="BRIGHT_RED":
         return bcolors.BRIGHT_RED
-    elif color=="BRIGHT_WHITE":
-        return bcolors.BRIGHT_WHITE
     elif color=="BRIGHT_BLACK":
         return bcolors.BRIGHT_BLACK
     elif color=="BOLD":
@@ -168,8 +173,8 @@ def reset():
     textbackcolor=bcolors.BACKGROUND_BLACK
     list_settings=[
         ["Console Background Color",["Black","Blue","Green","Aqua","Red","Purple","Yellow","White","Grey","Light Blue","Light Green","Cyan","Light Red","Light Purple","Light Yellow","Bright White"],"0"],
-        ["Info Bar Style",["Purple","Blue","Cyan","Green","Yellow","Red","White","Black","Bright Purple","Bright Blue","Bright Cyan","Bright Green","Bright Yellow","Bright Red","Bright White","Bright Black","Background Purple","Background Blue","Background Cyan","Background Green","Background Yellow","Background Red","Background White","Background Black","Background Bright Purple","Background Bright Blue","Background Bright Cyan","Background Bright Green","Background Bright Yellow","Background Bright Red","Background Bright White","Background Bright Black","Bold","Italic","Underline"],"WHITE"],
-        ["UI Style",["Purple","Blue","Cyan","Green","Yellow","Red","White","Black","Bright Purple","Bright Blue","Bright Cyan","Bright Green","Bright Yellow","Bright Red","Bright White","Bright Black","Background Purple","Background Blue","Background Cyan","Background Green","Background Yellow","Background Red","Background White","Background Black","Background Bright Purple","Background Bright Blue","Background Bright Cyan","Background Bright Green","Background Bright Yellow","Background Bright Red","Background Bright White","Background Bright Black","Bold","Italic","Underline"],"WHITE"],
+        ["Info Bar Style",["Purple","Blue","Cyan","Green","Yellow","Red","Gold","White","Light Gray","Dark Gray","Black","Bright Purple","Bright Blue","Bright Cyan","Bright Green","Bright Yellow","Bright Red","Bright Black","Background Purple","Background Blue","Background Cyan","Background Green","Background Yellow","Background Red","Background White","Background Black","Background Bright Purple","Background Bright Blue","Background Bright Cyan","Background Bright Green","Background Bright Yellow","Background Bright Red","Background Bright White","Background Bright Black","Bold","Italic","Underline"],"WHITE"],
+        ["UI Style",["Purple","Blue","Cyan","Green","Yellow","Red","Gold","White","Light Gray","Dark Gray","Black","Bright Purple","Bright Blue","Bright Cyan","Bright Green","Bright Yellow","Bright Red","Bright Black","Background Purple","Background Blue","Background Cyan","Background Green","Background Yellow","Background Red","Background White","Background Black","Background Bright Purple","Background Bright Blue","Background Bright Cyan","Background Bright Green","Background Bright Yellow","Background Bright Red","Background Bright White","Background Bright Black","Bold","Italic","Underline"],"WHITE"],
         ["Sorting Files",["By Name","By Type","By Creation Date","Non-Hidden Files First"],"BY_NAME"],
         ["Show Hidden Files",["Yes","No"],"YES"],
         ["Type to Show",["Files Only","Directories Only","Both"],"BOTH"],
@@ -190,7 +195,10 @@ if os.path.isfile('dios_settings.txt'):
     settings_lines=settings_file.readlines()
     for line in range(0,len(settings_lines)):
         #list_settings[line-{number} WHERE NUMBER IS NUMBER OF NON-SETTINGS LINES IN DIOS_SETTINGS
-        list_settings[line][2]=settings_lines[line].split("=",1)[-1].replace('\n','')
+        if line!=6:
+            list_settings[line][2]=settings_lines[line].split("=",1)[-1].replace('\n','')
+        else:
+            list_settings[6][1]=settings_lines[6].split("=",1)[-1].replace('\n','')
     os.system('color '+list_settings[0][2]+'f')
     barcolor=changecolor(list_settings[1][2])
     color=changecolor(list_settings[2][2])
@@ -225,23 +233,23 @@ def title():
     import getpass
     os.system('cls')
     getpass.getpass("\n"*((rows//2)-16)+"\
-"+" "*((cols//2)-shift)+"        @@@  @@@            "+f"{bcolors.CYAN}"+".,,,,,,,,,,,,, ."+f"{bcolors.WHITE}"+"                                    \n\
-"+" "*((cols//2)-shift)+"   @@@@@@@  ' .       "+f"{bcolors.CYAN}"+",,,,,,   ,,,,,,,,,,  ,,,,"+f"{bcolors.WHITE}"+"                                 \n\
-"+" "*((cols//2)-shift)+" .@@  /@@  @@@     "+f"{bcolors.CYAN}"+",,,,,,,,,,,,    ,,,,,,, ,,,,,,"+f"{bcolors.WHITE}"+",                              \n\
-"+" "*((cols//2)-shift)+" @@   @@  @@@    "+f"{bcolors.CYAN}"+",,,,,,,,,,,,,,,,     ,,,,  ,,,,,,,*"+f"{bcolors.WHITE}"+"                            \n\
-"+" "*((cols//2)-shift)+"@@#  @@* (@@    "+f"{bcolors.CYAN}"+",,,,                        ,,,,,,,,"+f"{bcolors.WHITE}"+"                            \n\
-"+" "*((cols//2)-shift)+" @@@@@@  @@       "+f"{bcolors.CYAN}"+",,,,,,,                    ,,,,,  ,,"+f"{bcolors.WHITE}"+"     @@@@@@@@@@@@@@@@@@@@,\n\
-"+" "*((cols//2)-shift)+"              "+f"{bcolors.CYAN}"+",,,,,,,,,                      ,,,.  ,,,,"+f"{bcolors.WHITE}"+"   @@@@@@@@@@@@@@@@@@@@@ \n\
-"+" "*((cols//2)-shift)+"              "+f"{bcolors.CYAN}"+",,,,,,,,                        ,  ,,,,,,"+f"{bcolors.WHITE}"+"  @@@@@@@@               \n\
-"+" "*((cols//2)-shift)+"              "+f"{bcolors.CYAN}"+",,,,,,  ,                        ,,,,,,,,"+f"{bcolors.WHITE}"+"  @@@@@@@                \n\
-"+" "*((cols//2)-shift)+"              "+f"{bcolors.CYAN}"+",,,,,  ,,,                      ,,,,,,,,,"+f"{bcolors.WHITE}"+" /@@@@@@@************    \n\
-"+" "*((cols//2)-shift)+"              "+f"{bcolors.CYAN}"+".,,  ,,,,,                    ,,,,,,,,,,"+f"{bcolors.WHITE}"+"  @@@@@@@@@@@@@@@@@@@@@.  \n\
-"+" "*((cols//2)-shift)+"                 "+f"{bcolors.CYAN}"+"*,,,,,,                            ,"+f"{bcolors.WHITE}"+"    (@@@@@@@@@@@@@@@@@@@   \n\
-"+" "*((cols//2)-shift)+"                 "+f"{bcolors.CYAN}"+",,,,,,,,  ,,/         /,,,,,,,,,,,,"+f"{bcolors.WHITE}"+"                  #@@@@@@   \n\
-"+" "*((cols//2)-shift)+"                  "+f"{bcolors.CYAN}"+",,,,,,,  ,,,,,,   .,,,,,,,,,,,,,"+f"{bcolors.WHITE}"+"                    @@@@@@    \n\
-"+" "*((cols//2)-shift)+"                     "+f"{bcolors.CYAN}"+",,,,,  ,,,,,,,,,   ,,,,,,,,"+f"{bcolors.WHITE}"+"      .@@@@@@@@@@@@@@@@@@@@@    \n\
-"+" "*((cols//2)-shift)+"                        "+f"{bcolors.CYAN}"+",,  ,,,,,,,,,,,,    ."+f"{bcolors.WHITE}"+"         @@@@@@@@@@@@@@@@@@@@@     \n\
-"+" "*((cols//2)-shift)+"                               "+f"{bcolors.CYAN}"+",,,,,,."+f"{bcolors.WHITE}"+"                @@@@@@@@@@@@@@@@@@@       \n\
+"+" "*((cols//2)-shift)+"        @@@  @@@            "+f"{bcolors.CYAN}.,,,,,,,,,,,,, .{bcolors.RESET}                                    \n\
+"+" "*((cols//2)-shift)+"   @@@@@@@  ' .       "+f"{bcolors.CYAN},,,,,,   ,,,,,,,,,,  ,,,,{bcolors.RESET}                                 \n\
+"+" "*((cols//2)-shift)+" .@@  /@@  @@@     "+f"{bcolors.CYAN},,,,,,,,,,,,    ,,,,,,, ,,,,,,{bcolors.RESET},                              \n\
+"+" "*((cols//2)-shift)+" @@   @@  @@@    "+f"{bcolors.CYAN},,,,,,,,,,,,,,,,     ,,,,  ,,,,,,,*{bcolors.RESET}                            \n\
+"+" "*((cols//2)-shift)+"@@#  @@* (@@    "+f"{bcolors.CYAN},,,,                        ,,,,,,,,{bcolors.RESET}                            \n\
+"+" "*((cols//2)-shift)+" @@@@@@  @@       "+f"{bcolors.CYAN},,,,,,,                    ,,,,,  ,,{bcolors.RESET}     @@@@@@@@@@@@@@@@@@@@,\n\
+"+" "*((cols//2)-shift)+"              "+f"{bcolors.CYAN},,,,,,,,,                      ,,,.  ,,,,{bcolors.RESET}   @@@@@@@@@@@@@@@@@@@@@ \n\
+"+" "*((cols//2)-shift)+"              "+f"{bcolors.CYAN},,,,,,,,                        ,  ,,,,,,{bcolors.RESET}  @@@@@@@@               \n\
+"+" "*((cols//2)-shift)+"              "+f"{bcolors.CYAN},,,,,,  ,                        ,,,,,,,,{bcolors.RESET}  @@@@@@@                \n\
+"+" "*((cols//2)-shift)+"              "+f"{bcolors.CYAN},,,,,  ,,,                      ,,,,,,,,,{bcolors.RESET} /@@@@@@@************    \n\
+"+" "*((cols//2)-shift)+"              "+f"{bcolors.CYAN}.,,  ,,,,,                    ,,,,,,,,,,{bcolors.RESET}  @@@@@@@@@@@@@@@@@@@@@.  \n\
+"+" "*((cols//2)-shift)+"                 "+f"{bcolors.CYAN}*,,,,,,                            ,{bcolors.RESET}    (@@@@@@@@@@@@@@@@@@@   \n\
+"+" "*((cols//2)-shift)+"                 "+f"{bcolors.CYAN},,,,,,,,  ,,/         /,,,,,,,,,,,,{bcolors.RESET}                  #@@@@@@   \n\
+"+" "*((cols//2)-shift)+"                  "+f"{bcolors.CYAN},,,,,,,  ,,,,,,   .,,,,,,,,,,,,,{bcolors.RESET}                    @@@@@@    \n\
+"+" "*((cols//2)-shift)+"                     "+f"{bcolors.CYAN},,,,,  ,,,,,,,,,   ,,,,,,,,{bcolors.RESET}      .@@@@@@@@@@@@@@@@@@@@@    \n\
+"+" "*((cols//2)-shift)+"                        "+f"{bcolors.CYAN},,  ,,,,,,,,,,,,    .{bcolors.RESET}         @@@@@@@@@@@@@@@@@@@@@     \n\
+"+" "*((cols//2)-shift)+"                               "+f"{bcolors.CYAN},,,,,,.{bcolors.RESET}                @@@@@@@@@@@@@@@@@@@       \n\
 "+"\n"*(rows-((rows//2)+1)-10)+"\
 "+" "*((cols//2)-7)+"PRESS ENTER")
     return("home")
@@ -292,6 +300,7 @@ def settings():
                     selected=str(input("\n    ")).lower()
                     if selected in list_languages:
                         lang_google=selected
+                        return("set")
                     elif selected=="H":
                         return("home")
                     elif selected=="B" or selected=="S":
@@ -476,15 +485,30 @@ def directories(path):
         selected=str(input(f"\n    ")).upper()
         if selected.isnumeric():
             if selected=="0":
-                bar()
-                ii=1
-                spaces=len(str(len(available_drives)))
-                for drive in available_drives:
-                    print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(drive))
-                    ii+=1
-                selected=str(input(f"\n    ")).upper()
-                if int(selected)-1<len(available_drives) and int(selected)>0:
-                    path=available_drives[int(selected)-1]+'\\'
+                while 1:
+                    bar()
+                    ii=1
+                    spaces=len(str(len(available_drives)))
+                    for drive in available_drives:
+                        print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(drive))
+                        ii+=1
+                    selected=str(input(f"\n    ")).upper()
+                    if selected.isnumeric():
+                        if int(selected)-1<len(available_drives) and int(selected)>0:
+                            path=available_drives[int(selected)-1]+'\\'
+                            break
+                    elif selected=="H":
+                        return("home")
+                    elif selected=="S":
+                        return("set")
+                    elif selected=="B":
+                        if path.count("\\")>1:
+                            path=path.rsplit('\\',2)[0]+str("\\")
+                        else:
+                            return("home")
+                    elif selected=="E":
+                        os.system('color')
+                        exit()
             elif int(selected)-1<len(liste) and int(selected)>0:
                 selected=liste[int(selected)-1]
                 if os.path.isdir(path+selected):
@@ -510,7 +534,7 @@ def directories(path):
             os.system('color')
             exit()
 
-list_chatrum=["Host a Local Chatrum Server","Join a Local Chatrum Server"]
+list_chatrum=["What Is Chatrum ?","Host a Local Chatrum Server","Join a Local Chatrum Server"]
        
 def chatrum():
     while 1:
@@ -522,11 +546,21 @@ def chatrum():
             ii+=1
         selected=str(input("\n    ")).upper()
         if selected.isnumeric():
-            if selected=="1":
-                webbrowser.open('chatrum\server.py')
-            webbrowser.open('chatrum\client.py')
-            webbrowser.open('chatrum\client_recv.py')
-            input()
+            if int(selected)>1:
+                if selected=="2":
+                    webbrowser.open('chatrum\server.py')
+                webbrowser.open('chatrum\client.py')
+                webbrowser.open('chatrum\client_recv.py')
+                bar()
+            else:
+                bar()
+                print("Chatrum is a local (LAN), randomly encrypted chatroom.\n\nIt requires a randomly generated Password, and the Host's IP to connect.\nIf you are the Host, putting 'localhost' as Host's IP works just fine too.\n\n\
+All you have to do is either host or join a local Chatrum server and enter required info to connect to a Chatrum server and chat with your friends !\n\nThere are basically three scripts :\n\
+ - Server.py : The server. It is only used by the Host and gives you the generated password you need to enter the room.\n - Client.py : The first client script. It sends the messages, and is only used for that.\n\
+ - Client-recv.py : The second and last client script. It recieves and shows the messages on screen, and is only used for that.\n\n\
+It is recommended to put each of your client scripts on each half of your screen for a better chatting experience.\n\nEnjoy! \u263A\n")
+            import getpass
+            getpass.getpass("Press Enter To Go Back To Homepage.")
             return("home")
         elif selected=="H" or selected=="B":
             return("home")
@@ -602,10 +636,12 @@ CREATE TABLE IF NOT EXISTS dates(
 def calendar(month,year):
     from math import floor
     list_months=["January","February","March","April","May","June","July","August","September","October","November","December"]
-    list_weekdays=["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    list_weekdays=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]
+    weekdays="\n    \u2502"
+    for day in list_weekdays:
+        weekdays+=f"{bcolors.RESET} "+day+f" {bcolors.BRIGHT_RED}\u2502"
     while 1:
         bar()
-
         #math for dates
         first_day=datetime.date(year, month, 1).weekday()
         week="     \u2502"*first_day
@@ -617,9 +653,10 @@ def calendar(month,year):
         list_choices=["Change Month","Change Year"]
         
         #show calendar
-        print(f"\n    {bcolors.BRIGHT_RED}\u250F"+"\u2501"*41+"\u2513\n\
+        print(f"\n    {bcolors.RESET}{bcolors.BRIGHT_RED}\u250F"+"\u2501"*41+"\u2513\n\
     \u2503 "+f"{bcolors.RESET}"+str(list_months[month-1])+" ("+str(month)+")"+" "*(40-len(str(list_months[month-1])+" ("+str(month)+")"+" "+str(year)))+str(year)+" "+f"{bcolors.BRIGHT_RED}"+"\u2503\n\
-    \u2521"+("\u2501"*5+"\u252F")*6+"\u2501"*5+"\u2529"+f"{bcolors.RESET}"+"\n\
+    \u2521"+("\u2501"*5+"\u252F")*6+"\u2501"*5+"\u2529"+weekdays+"\n\
+    \u251C"+("\u2500"*5+"\u253C")*6+"\u2500"*5+"\u2524"+f"{bcolors.RESET}\n\
     \u2502"+week)
         next_month=month+1
         next_year=year
@@ -688,34 +725,34 @@ def home():
     while 1:
         list_home=["title","dir","set","chat","google","calendar"]
         bar()
-        print(f"{bcolors.RESET}"+"\n\n\n\n\
-    "+f"{bcolors.CYAN}"+"        #.  #######, ##            "+f"{bcolors.BRIGHT_YELLOW}"+"                                "+f"{bcolors.PURPLE}"+"               ,@@@@@,           \n\
-    "+f"{bcolors.CYAN}"+"     ######,   (####  ####         "+f"{bcolors.BRIGHT_YELLOW}"+"    *//////*                    "+f"{bcolors.PURPLE}"+"       @@@,,, (@@@@@@@  ,@@@@,   \n\
-    "+f"{bcolors.CYAN}"+"   #########       ## ######       "+f"{bcolors.BRIGHT_YELLOW}"+"    /,,,,,,,,,,,,,,,,,,,,,.     "+f"{bcolors.PURPLE}"+"     @@@@@@@@@@@@@@@@@@@@@@@@@@/ \n\
-    "+f"{bcolors.CYAN}"+"      ,,               ###  ,      "+f"{bcolors.BRIGHT_YELLOW}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"      *@@@@@@@@@@@@( @@@@@@@@@@@ \n\
-    "+f"{bcolors.CYAN}"+" #######               #'  ###     "+f"{bcolors.BRIGHT_YELLOW}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"      .@@@@@@@         @@@@@@@   \n\
-    "+f"{bcolors.CYAN}"+" ####                    #####     "+f"{bcolors.BRIGHT_YELLOW}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"        &@@@@          @@@@@*    \n\
-    "+f"{bcolors.CYAN}"+" ##   ##                ######     "+f"{bcolors.BRIGHT_YELLOW}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"      #@@@@@@@         @@@@@@@,  \n\
-    "+f"{bcolors.CYAN}"+"    ####              #.,,         "+f"{bcolors.BRIGHT_YELLOW}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"    %@@@@@@@@@@@@@@@@@@@@@@@@@@@ \n\
-    "+f"{bcolors.CYAN}"+"   #####  #          .######       "+f"{bcolors.BRIGHT_YELLOW}"+"    //////////////////////.     "+f"{bcolors.PURPLE}"+"     *@@@@@@@@@@@@@@@@@@@@@@@@@/ \n\
-    "+f"{bcolors.CYAN}"+"    ##### #####    #######(        "+f"{bcolors.BRIGHT_YELLOW}"+"    ,/////////////////////      "+f"{bcolors.PURPLE}"+"       '@@@@' .@@@@@@@'  @@@@'   \n\
-    "+f"{bcolors.CYAN}"+"       ##  #######.  ###           "+f"{bcolors.BRIGHT_YELLOW}"+"                                "+f"{bcolors.PURPLE}"+"               '@@@@@'           \n\
+        print(f"{bcolors.RESET}\n\n\n\n\
+    {bcolors.CYAN}        #.  #######, ##            {bcolors.BRIGHT_YELLOW}                                {bcolors.DARK_GRAY}               @@@@@            \n\
+    {bcolors.CYAN}     ######,   (####  ####         {bcolors.BRIGHT_YELLOW}    *//////*                    {bcolors.DARK_GRAY}        @@@@  @@@@@@@  @@@@     \n\
+    {bcolors.CYAN}   #########       ## ######       {bcolors.BRIGHT_YELLOW}    /,,,,,,,,,,,,,,,,,,,,,.     {bcolors.DARK_GRAY}       @@@@@@@@@@@@@@@@@@@@@    \n\
+    {bcolors.CYAN}      ,,               ###  ,      {bcolors.BRIGHT_YELLOW}    //////////////////////.     {bcolors.DARK_GRAY}        @@@@@@@@   @@@@@@@@     \n\
+    {bcolors.CYAN} #######               #'  ###     {bcolors.BRIGHT_YELLOW}    //////////////////////.     {bcolors.DARK_GRAY}    @@@@@@@@@@       @@@@@@@@@@ \n\
+    {bcolors.CYAN} ####                    #####     {bcolors.BRIGHT_YELLOW}    //////////////////////.     {bcolors.DARK_GRAY}    @@@@@@@@@         @@@@@@@@@ \n\
+    {bcolors.CYAN} ##   ##                ######     {bcolors.BRIGHT_YELLOW}    //////////////////////.     {bcolors.DARK_GRAY}    @@@@@@@@@@       @@@@@@@@@@ \n\
+    {bcolors.CYAN}    ####              #.,,         {bcolors.BRIGHT_YELLOW}    //////////////////////.     {bcolors.DARK_GRAY}        @@@@@@@@   @@@@@@@@     \n\
+    {bcolors.CYAN}   #####  #          .######       {bcolors.BRIGHT_YELLOW}    //////////////////////.     {bcolors.DARK_GRAY}       @@@@@@@@@@@@@@@@@@@@@    \n\
+    {bcolors.CYAN}    ##### #####    #######(        {bcolors.BRIGHT_YELLOW}    ,/////////////////////      {bcolors.DARK_GRAY}        @@@@  @@@@@@@  @@@@     \n\
+    {bcolors.CYAN}       ##  #######.  ###           {bcolors.BRIGHT_YELLOW}                                {bcolors.DARK_GRAY}               @@@@@            \n\
     \n\
-    "+f"{bcolors.WHITE}"+"       1.TITLE SCREEN                      2.FILE SYSTEM                       3.SETTINGS           \n\
+    {bcolors.WHITE}       1.TITLE SCREEN                      2.FILE SYSTEM                       3.SETTINGS\n\
     \n\
-    "+f"{bcolors.GREEN}"+"                                  "+f"{bcolors.RED}"+"          ,(((((((((((                 "                                                           +f"{bcolors.RED}"+"                              \n\
-    "+f"{bcolors.GREEN}"+"         @@@@@@@@@@@@@            "+f"{bcolors.RED}"+"       ((((((((((((((((((           "                                                              +f"{bcolors.RED}"+"        *###       (##        \n\
-    "+f"{bcolors.GREEN}"+"      @@@@@@@@@@@@@@@@@@/         "+f"{bcolors.RED}"+"     ((((((((       ((/             "                                                              +f"{bcolors.RED}"+"     #(#*############# ###    \n\
-    "+f"{bcolors.GREEN}"+"    .@@@@@@@@@@@@@@@@@@@@@        "+f"{bcolors.BRIGHT_YELLOW}"+"    //"+f"{bcolors.RED}"+"((((                          "                                +f"{bcolors.RED}"+"     ##(##(##########(####    \n\
-    "+f"{bcolors.GREEN}"+"    @@@@@@@@@@@@@@@@@@@@@@@       "+f"{bcolors.BRIGHT_YELLOW}"+"   //////       "+f"{bcolors.BRIGHT_BLUE}"+",************       "                      +f"{bcolors.WHITE}"+"     #######  ###  ##(  ##    \n\
-    "+f"{bcolors.GREEN}"+"    @@@@@@@@@@@@@@@@@@@@@@@       "+f"{bcolors.BRIGHT_YELLOW}"+"   /////        "+f"{bcolors.BRIGHT_BLUE}"+"*/////////////      "                      +f"{bcolors.WHITE}"+"     #######  ###  (##  ##    \n\
-    "+f"{bcolors.GREEN}"+"    @@@@@@@@@@@@@@@@@@@@@@@       "+f"{bcolors.BRIGHT_YELLOW}"+"   //////       "+f"{bcolors.BRIGHT_BLUE}"+"*////////////       "                      +f"{bcolors.WHITE}"+"     #*  ###  ###  ###  ##    \n\
-    "+f"{bcolors.GREEN}"+"     @@@@@@@@@@@@@@@@@@@@@        "+f"{bcolors.BRIGHT_YELLOW}"+"    /"+f"{bcolors.GREEN}"+"#####             "+f"{bcolors.BRIGHT_BLUE}"+"//////       "+f"{bcolors.WHITE}"+"     #####################    \n\
-    "+f"{bcolors.GREEN}"+"      @@@@@@@@@@@@@@@@@@          "+f"{bcolors.GREEN}"+"    ########,      ##"+f"{bcolors.BRIGHT_BLUE}"+"//////         "                              +f"{bcolors.WHITE}"+"     #*  ###  ###  #######    \n\
-    "+f"{bcolors.GREEN}"+"     @@@@*@@@@@@@@@@*             "+f"{bcolors.GREEN}"+"       ##################"+f"{bcolors.BRIGHT_BLUE}"+"/          "                              +f"{bcolors.WHITE}"+"     ####################(    \n\
-    "+f"{bcolors.GREEN}"+"    @@                            "+f"{bcolors.GREEN}"+"           ###########              "                                                          +f"{bcolors.WHITE}"+"                              \n\
+    {bcolors.GREEN}                                  {bcolors.RED}          ,(((((((((((                 {bcolors.RED}                             \n\
+    {bcolors.GREEN}         @@@@@@@@@@@@@            {bcolors.RED}       ((((((((((((((((((           {bcolors.RED}       ####       ####       \n\
+    {bcolors.GREEN}      @@@@@@@@@@@@@@@@@@/         {bcolors.RED}     ((((((((       ((/             {bcolors.RED}    #####################    \n\
+    {bcolors.GREEN}    .@@@@@@@@@@@@@@@@@@@@@        {bcolors.BRIGHT_YELLOW}    //{bcolors.RED}((((                          {bcolors.RED}    #{bcolors.WHITE}######{bcolors.RED}###########{bcolors.WHITE}##{bcolors.RED}#    \n\
+    {bcolors.GREEN}    @@@@@@@@@@@@@@@@@@@@@@@       {bcolors.BRIGHT_YELLOW}   //////       {bcolors.BRIGHT_BLUE},************       {bcolors.RED}    #####################    \n\
+    {bcolors.GREEN}    @@@@@@@@@@@@@@@@@@@@@@@       {bcolors.BRIGHT_YELLOW}   /////        {bcolors.BRIGHT_BLUE}*/////////////      {bcolors.WHITE}    #######  ###  ###  ##    \n\
+    {bcolors.GREEN}    @@@@@@@@@@@@@@@@@@@@@@@       {bcolors.BRIGHT_YELLOW}   //////       {bcolors.BRIGHT_BLUE}*////////////       {bcolors.WHITE}    #####################    \n\
+    {bcolors.GREEN}     @@@@@@@@@@@@@@@@@@@@@        {bcolors.BRIGHT_YELLOW}    /{bcolors.GREEN}#####             {bcolors.BRIGHT_BLUE}//////       {bcolors.WHITE}    ##  ###  ###  ###  ##    \n\
+    {bcolors.GREEN}      @@@@@@@@@@@@@@@@@@          {bcolors.GREEN}    ########,      ##{bcolors.BRIGHT_BLUE}//////         {bcolors.WHITE}    #####################    \n\
+    {bcolors.GREEN}     @@@@*@@@@@@@@@@*             {bcolors.GREEN}       ##################{bcolors.BRIGHT_BLUE}/          {bcolors.WHITE}    ##  ###  ###  #######    \n\
+    {bcolors.GREEN}    @@                            {bcolors.GREEN}           ###########              {bcolors.WHITE}    #####################    \n\
     \n\
-    "+f"{bcolors.WHITE}"+"          4.CHATRUM                       5.GOOGLE SEARCH              "                                                                          +"         6.CALENDAR\n\
+    {bcolors.WHITE}          4.CHATRUM                       5.GOOGLE SEARCH                      6.CALENDAR\n\
     ")
         selected=str(input("\n    ")).upper()
         if selected.isnumeric():
@@ -768,7 +805,6 @@ while 1:
     elif currentpage=="calendar":
         currentpage,month,year=calendar(month,year)
 
-#calendar
 #calculator
 #snake
 #tetris
