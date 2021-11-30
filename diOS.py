@@ -186,7 +186,7 @@ def reset():
     barbackcolor=bcolors.BACKGROUND_BLACK
     color=bcolors.WHITE
     textbackcolor=bcolors.BACKGROUND_BLACK
-    date_format="dd/mm/YYYY"
+    date_format="DD/MM/YYYY"
     list_settings=[
         ["Console Background Color",["Black","Blue","Green","Aqua","Red","Purple","Yellow","White","Grey","Light Blue","Light Green","Cyan","Light Red","Light Purple","Light Yellow","Bright White"],"0"],
         ["Info Bar Style",["Purple","Blue","Cyan","Green","Yellow","Red","Gold","White","Light Gray","Dark Gray","Black","Bright Purple","Bright Blue","Bright Cyan","Bright Green","Bright Yellow","Bright Red","Bright Black","Background Purple","Background Blue","Background Cyan","Background Green","Background Yellow","Background Red","Background White","Background Black","Background Bright Purple","Background Bright Blue","Background Bright Cyan","Background Bright Green","Background Bright Yellow","Background Bright Red","Background Bright White","Background Bright Black","Bold","Italic","Underline"],"WHITE"],
@@ -195,7 +195,7 @@ def reset():
         ["Show Hidden Files",["Yes","No"],"YES"],
         ["Type to Show",["Files Only","Directories Only","Both"],"BOTH"],
         ["Google Search Language","en"],
-        ["Date Format",["dd/mm/YYYY","mm/dd/YYYY","YYYY/mm/dd"],"dd/mm/YYYY"]
+        ["Date Format",["dd/mm/YYYY","mm/dd/YYYY","YYYY/mm/dd"],"DD/MM/YYYY"]
          ]
     return(path,barcolor,color,list_settings,date_format)
 
@@ -219,6 +219,7 @@ if os.path.isfile('dios_settings.txt'):
     os.system('color '+list_settings[0][2]+'f')
     barcolor=changecolor(list_settings[1][2])
     color=changecolor(list_settings[2][2])
+    date_format=list_settings[7][2]
     settings_file.close()
 else:
     settings_file=open('dios_settings.txt','w')
@@ -229,7 +230,7 @@ sorting=BY_NAME\n\
 show_hidden=YES\n\
 type_to_show=BOTH\n\
 lang_google=en\n\
-date_format=dd/mm/YYYY')
+date_format=DD/MM/YYYY')
     settings_file.close()
 
 #fullscreen (it's ugly but it does the job), plus blocks the fullscreen key combinations
@@ -643,15 +644,15 @@ year=int(datetime.date.today().strftime("%m/%Y").split("/")[1])
 def format_date(date):
     global date_format
     date=date.split('/')
-    if date_format=="dd/mm/YYYY":
+    if date_format=="DD/MM/YYYY":
         day=date[0]
         month=date[1]
         year=date[2]
-    elif date_format=="mm/dd/YYYY":
+    elif date_format=="MM/DD/YYYY":
         day=date[1]
         month=date[0]
         year=date[2]
-    elif date_format=="YY/mm/dd":
+    elif date_format=="YYYY/MM/DD":
         day=date[2]
         month=date[1]
         year=date[0]
@@ -663,11 +664,11 @@ def deformat_date(date):
     month=date[1]
     year=date[2]
     global date_format
-    if date_format=="dd/mm/YYYY":
+    if date_format=="DD/MM/YYYY":
         return(day+"/"+month+"/"+year)
-    elif date_format=="mm/dd/YYYY":
+    elif date_format=="MM/DD/YYYY":
         return(month+"/"+day+"/"+year)
-    elif date_format=="YYYY/mm/dd":
+    elif date_format=="YYYY/MM/DD":
         return(year+"/"+month+"/"+day)
 
 def create_event(date):
@@ -710,7 +711,7 @@ def create_event(date):
     db.close()
     import getpass
     bar(True)
-    print("Event '"+event+"' Succesfully Created On "+date+".")
+    print("Event '"+event+"' Succesfully Created On "+date+".\n")
     getpass.getpass("   Press Enter")
 
 def list_events(date):
@@ -740,8 +741,9 @@ def show_events(date):
         if events:
             print("All Events On "+deformat_date(date)+":\n")
             ii=1
+            spaces=len(str(len(list_chatrum)))
             for event in events:
-                print((" "*(2-len(str(ii))))+str(ii)+". "+str(event))
+                print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(event))
                 ii+=1
             print("\nEnter Number Of An Event To Delete It.")
             selected=str(input("\n    ")).upper()
@@ -760,13 +762,10 @@ def show_events(date):
                 os.system('color')
                 exit()
         else:
-            import getpass
-            print("There Are No Events On "+deformat_date(date)+".\n")
-            getpass.getpass("   Press Enter")
             return("calendar")
 
 def del_event(event,date):
-    print(event, date)
+    import getpass
     db=sqlite3.connect('dios_events.db')
     cursor=db.cursor()
     cursor.execute("""SELECT id FROM dates WHERE date='"""+date+"""' AND event='"""+event.replace("'","''")+"""'""")
@@ -775,7 +774,9 @@ def del_event(event,date):
     cursor.close()
     db.commit()
     db.close()
-    print("Event '"+event+"' Deleted")
+    bar(True)
+    print("Event '"+event+"' Deleted.\n")
+    getpass.getpass("   Press Enter")
 
 def calendar(month,year):
     list_months=["January","February","March","April","May","June","July","August","September","October","November","December"]
@@ -835,29 +836,36 @@ def calendar(month,year):
             if selected==1:
                 selected=0
                 print("Enter Month Number:")
-                while selected>12 or selected<1:
-                    try :
-                        selected=int(input("\n    "))
-                    except ValueError:
-                        print("\nEnter A Numeric Value Between 1 And 12.")
-                        time.sleep(1.5)
-                        return("calendar",month,year)
-                return("calendar",selected,year)
+                while 1:
+                    selected=str(input("\n    "))
+                    if selected.isnumeric():
+                        if (int(selected)<1 or int(selected)>12):
+                            print("\nEnter A Numeric Value Between 1 And 12.")
+                            time.sleep(1.5)
+                            return("calendar",month,year)
+                        return("calendar",selected,year)
+                    print("\nEnter A Numeric Value Between 1 And 12.")
+                    time.sleep(1.5)
+                    return("calendar",month,year)
             elif selected==2:
                 selected=0
                 print("Enter Year:")
-                while selected<1 or selected>9998:
-                    try:
-                        selected=int(input("\n    "))
-                    except ValueError :
-                        print("\nEnter A Numeric Value Between 1 and 9998.")
-                        time.sleep(1.5)
-                        return("calendar",month,year)
+                while 1:
+                    selected=str(input("\n    "))
+                    if selected.isnumeric():
+                        if (int(selected)<1 or int(selected)>9998):
+                            print("\nEnter A Numeric Value Between 1 And 9998.")
+                            time.sleep(1.5)
+                            return("calendar",month,year)
+                        return("calendar",selected,year)
+                    print("\nEnter A Numeric Value Between 1 And 9998.")
+                    time.sleep(1.5)
+                    return("calendar",month,year)
                 return("calendar",month,selected)
             elif selected==3:
                 selected=0
                 while selected<1 or selected>how_many_days:
-                    print("\nEnter Day Of "+str(list_months[month])+" Of "+str(year)+" You Want To Create An Event for.")
+                    print("\nEnter Day Of "+str(list_months[month-1])+" Of "+str(year)+" You Want To Create An Event for.")
                     selected=str(input("\n    "))
                     if selected.isnumeric() and int(selected)>0 and int(selected)<how_many_days+1:
                         break
@@ -867,17 +875,41 @@ def calendar(month,year):
                         return("calendar",month,year)
                 create_event(str(selected)+"/"+str(month)+"/"+str(year))
             elif selected==4:
-                selected=0
-                while selected<1 or selected>how_many_days:
-                    print("\nEnter Day Of "+str(list_months[month-1])+" Of "+str(year)+" You Want To See The Events Of.")
-                    selected=str(input("\n    "))
-                    if selected.isnumeric() and int(selected)>0 and int(selected)<how_many_days+1:
-                        break
-                    else :
-                        print("\nEnter A Numeric Value Between 1 And "+str(how_many_days)+".")
-                        time.sleep(1.5)
-                        return("calendar",month,year)
-                return(show_events(str(selected)+"/"+str(month)+"/"+str(year)),month,year)
+                db=sqlite3.connect('dios_events.db')
+                cursor=db.cursor()
+                cursor.execute("""SELECT date FROM dates""")
+                dates=cursor.fetchall()
+                cursor.close()
+                db.commit()
+                db.close()
+                if dates:
+                    selected=0
+                    while int(selected)<1 or int(selected)>len(dates):
+                        bar()
+                        print("You Have Events On The Following Dates :\n")
+                        ii=1
+                        spaces=len(str(len(dates)))
+                        for date in dates:
+                            print((" "*(spaces-len(str(ii))))+str(ii)+". "+deformat_date(date[0]))
+                            ii+=1
+                            print("\nSelect Date You Want To See The Events Of.")
+                            selected=str(input("\n    "))
+                            if selected.isnumeric() and int(selected)>0 and int(selected)<len(dates)+1:
+                                return(show_events(dates[int(selected)-1][0]),month,year)
+                            elif selected=="B":
+                                return("calendar",month,year)
+                            elif selected=="H":
+                                return("home",month,year)
+                            elif selected=="S":
+                                return("set",month,year)
+                            elif selected=="E":
+                                os.system('color')
+                                exit()
+                else:
+                    bar()
+                    import getpass
+                    print("There Are No Events.\n")
+                    getpass.getpass("   Press Enter")
         elif selected=="H" or selected=="B":
             return("home",month,year)
         elif selected=="S":
@@ -941,17 +973,17 @@ def bar(no_UI=False):
     
     #show info
     if no_UI==True:
-        print(f"{bcolors.RESET}\u018A\u0131\u0298\u054F"+f"\n{barcolor}    "+datetime.date.today().strftime("%d/%m/%Y")+
+        print(f"{bcolors.RESET}\u018A\u0131\u0298\u054F"+f"\n{barcolor}    "+deformat_date(datetime.date.today().strftime("%d/%m/%Y"))+
           " "+datetime.datetime.now().strftime("%H:%M")+
           f"{bcolors.RESET}")
     else:
-        print(f"{bcolors.RESET}\u018A\u0131\u0298\u054F"+f"\n{barcolor}    "+datetime.date.today().strftime("%d/%m/%Y")+
+        print(f"{bcolors.RESET}\u018A\u0131\u0298\u054F"+f"\n{barcolor}    "+deformat_date(datetime.date.today().strftime("%d/%m/%Y"))+
           " "+datetime.datetime.now().strftime("%H:%M")+
           " - [H]ome - [B]ack - [S]ettings - [E]xit diOS"+
           f"{bcolors.RESET}")
     
     #separator (COMMENT THIS LINE OUT IF YOU WANT TO RUN IN YOU IDE, OTHERWISE YOU'LL NEED TO OPEN IN TERMINAL)
-    #print("\u2501"*os.get_terminal_size()[0]+f"{color}")
+    print("\u2501"*os.get_terminal_size()[0]+f"{color}")
 
 #setting initial page (SET THIS ONE TO "home" IF YOU WANT TO RUN IN YOUR IDE, OTHERWISE YOU'LL NEED TO OPEN IN TERMINAL)
 currentpage="title"
