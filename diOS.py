@@ -911,8 +911,8 @@ def home():
     {bcolors.GREEN}                                  {bcolors.RED}          ,(((((((((((                 {bcolors.RED}                             \n\
     {bcolors.GREEN}         @@@@@@@@@@@@@            {bcolors.RED}       ((((((((((((((((((           {bcolors.RED}       ####       ####       \n\
     {bcolors.GREEN}      @@@@@@@@@@@@@@@@@@/         {bcolors.RED}     ((((((((       ((/             {bcolors.RED}    #####################    \n\
-    {bcolors.GREEN}    .@@@@@@@@@@@@@@@@@@@@@        {bcolors.BRIGHT_YELLOW}    //{bcolors.RED}((((                          {bcolors.RED}    #{bcolors.WHITE}######{bcolors.RED}###########{bcolors.WHITE}##{bcolors.RED}#    \n\
-    {bcolors.GREEN}    @@@@@@@@@@@@@@@@@@@@@@@       {bcolors.BRIGHT_YELLOW}   //////       {bcolors.BRIGHT_BLUE},************       {bcolors.RED}    #####################    \n\
+    {bcolors.GREEN}    .@@@@@@@@@@@@@@@@@@@@@        {bcolors.BRIGHT_YELLOW}    //{bcolors.RED}((((                          {bcolors.RED}    #####################    \n\
+    {bcolors.GREEN}    @@@@@@@@@@@@@@@@@@@@@@@       {bcolors.BRIGHT_YELLOW}   //////       {bcolors.BRIGHT_BLUE},************       {bcolors.WHITE}    #####################    \n\
     {bcolors.GREEN}    @@@@@@@@@@@@@@@@@@@@@@@       {bcolors.BRIGHT_YELLOW}   /////        {bcolors.BRIGHT_BLUE}*/////////////      {bcolors.WHITE}    #######  ###  ###  ##    \n\
     {bcolors.GREEN}    @@@@@@@@@@@@@@@@@@@@@@@       {bcolors.BRIGHT_YELLOW}   //////       {bcolors.BRIGHT_BLUE}*////////////       {bcolors.WHITE}    #####################    \n\
     {bcolors.GREEN}     @@@@@@@@@@@@@@@@@@@@@        {bcolors.BRIGHT_YELLOW}    /{bcolors.GREEN}#####             {bcolors.BRIGHT_BLUE}//////       {bcolors.WHITE}    ##  ###  ###  ###  ##    \n\
