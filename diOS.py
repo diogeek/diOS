@@ -566,7 +566,7 @@ def chatrum():
             ii+=1
         selected=str(input("\n    ")).upper()
         if selected.isnumeric():
-            if int(selected)>1:
+            if int(selected)>1 and int(selected)<4:
                 if selected=="2":
                     webbrowser.open('chatrum\server.py')
                 webbrowser.open('chatrum\client.py')
@@ -620,7 +620,7 @@ def google_search():
         else:
             print("\n[N]ext Page\n")
         selected=str(input("\n    ")).upper()
-        if selected.isnumeric():
+        if selected.isnumeric() and selected>0 and selected <11:
             webbrowser.open(liste[int(selected)-1])
             return("google")
         elif selected=="P" and google_page>1:
@@ -701,26 +701,19 @@ def create_event(date):
         exit()
     cursor.execute("SELECT id FROM dates WHERE date = ?", (date,))
     data=cursor.fetchone()
-    if data is None:
-        insert_query = """INSERT INTO dates (date, event, desc) 
-                           VALUES 
-                           ('"""+format_date(date)+"""', '"""+event.replace("'","''")+"""', '"""+desc.replace("'","''")+"""') """
-        cursor.execute(insert_query)
-        cursor.close()
-    else:
-        edit_query ="""UPDATE dates SET event = '"""+event.replace("'","''")+"""', desc = '"""+desc.replace("'","''")+"""' WHERE id = """+str(data[0])
-        cursor.execute(edit_query)
-        cursor.close()
+    insert_query = """INSERT INTO dates (date, event, desc) 
+                       VALUES 
+                       ('"""+format_date(date)+"""', '"""+event.replace("'","''")+"""', '"""+desc.replace("'","''")+"""') """
+    cursor.execute(insert_query)
+    cursor.close()
     db.commit()
     db.close()
+    import getpass
     bar(True)
     print("Event '"+event+"' Succesfully Created On "+date+".")
-    import time
-    time.sleep(1.5)
+    getpass.getpass("   Press Enter")
 
-def show_events(date):
-    import getpass
-    bar()
+def list_events(date):
     db=sqlite3.connect('dios_events.db')
     cursor=db.cursor()
     cursor.execute("""SELECT event,desc FROM dates WHERE date='"""+date+"""'""")
@@ -729,16 +722,61 @@ def show_events(date):
     db.commit()
     db.close()
     if events:
-        print("All Events On "+deformat_date(date)+":\n\nTitle - Description\n")
+        events_final=[]
         for event in events:
             if event[1]=="":
-                event=event[0]
-                print("\u2022 "+event)
+                event=str(event[0])
             else:
-                print("\u2022 "+event[0]+" - "+event[1])
+                event=str(event[0]+" - "+event[1])
+            events_final.append(event)
+        return(events_final)
     else:
-        print("There Are No Events On "+deformat_date(date)+".")
-    getpass.getpass("\nPress Enter")
+        return(None)
+
+def show_events(date):
+    while 1:
+        events=list_events(date)
+        bar()
+        if events:
+            print("All Events On "+deformat_date(date)+":\n")
+            ii=1
+            for event in events:
+                print((" "*(2-len(str(ii))))+str(ii)+". "+str(event))
+                ii+=1
+            print("\nEnter Number Of An Event To Delete It.")
+            selected=str(input("\n    ")).upper()
+            if selected.isnumeric():
+                if int(selected)>0 and int(selected)<len(events)+1:
+                    del_event(events[int(selected)-1].split(" - ")[0],date)
+                    if not events:
+                        return("calendar")
+            elif selected=="B":
+                return("calendar")
+            elif selected=="H":
+                return("home")
+            elif selected=="S":
+                return("set")
+            elif selected=="E":
+                os.system('color')
+                exit()
+        else:
+            import getpass
+            print("There Are No Events On "+deformat_date(date)+".\n")
+            getpass.getpass("   Press Enter")
+            return("calendar")
+
+def del_event(event,date):
+    print(event, date)
+    db=sqlite3.connect('dios_events.db')
+    cursor=db.cursor()
+    cursor.execute("""SELECT id FROM dates WHERE date='"""+date+"""' AND event='"""+event.replace("'","''")+"""'""")
+    id_event=cursor.fetchall()[0][0]
+    cursor.execute("""DELETE FROM dates WHERE id='"""+str(id_event)+"""'""")
+    cursor.close()
+    db.commit()
+    db.close()
+    print("Event '"+event+"' Deleted")
+
 def calendar(month,year):
     list_months=["January","February","March","April","May","June","July","August","September","October","November","December"]
     list_weekdays=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]
@@ -839,7 +877,7 @@ def calendar(month,year):
                         print("\nEnter A Numeric Value Between 1 And "+str(how_many_days)+".")
                         time.sleep(1.5)
                         return("calendar",month,year)
-                show_events(str(selected)+"/"+str(month)+"/"+str(year))
+                return(show_events(str(selected)+"/"+str(month)+"/"+str(year)),month,year)
         elif selected=="H" or selected=="B":
             return("home",month,year)
         elif selected=="S":
