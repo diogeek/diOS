@@ -835,7 +835,7 @@ def calendar(month,year):
             week+=("  "+str(day_count)+"  \u2502")
             day_count+=1
         #choices
-        list_choices=["Change Month","Change Year","Create An Event","See Events"]
+        list_choices=["Change Month","Change Year","Create An Event","See, Edit And Delete Events"]
         
         #show calendar
         print(f"\n    {bcolors.RESET}{bcolors.BRIGHT_RED}\u250F"+"\u2501"*41+"\u2513\n\
@@ -933,7 +933,7 @@ def calendar(month,year):
                         for date in dates:
                             print((" "*(spaces-len(str(ii))))+str(ii)+". "+deformat_date(date[0]))
                             ii+=1
-                            print("\nSelect Date You Want To See The Events Of.")
+                            print("\nSelect Date You Want To See, Edit Or Delete The Events Of.")
                             selected=str(input("\n    "))
                             if selected.isnumeric() and int(selected)>0 and int(selected)<len(dates)+1:
                                 return(show_events(dates[int(selected)-1][0]),month,year)
