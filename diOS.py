@@ -700,11 +700,11 @@ def create_event(date):
     elif desc=="E":
         os.system('color')
         exit()
-    cursor.execute("SELECT id FROM dates WHERE date = ?", (date,))
-    data=cursor.fetchone()
+    if len(date.split('/')[0])==1:
+        date="0"+date
     insert_query = """INSERT INTO dates (date, event, desc) 
                        VALUES 
-                       ('"""+format_date(date)+"""', '"""+event.replace("'","''")+"""', '"""+desc.replace("'","''")+"""') """
+                       ('"""+date+"""', '"""+event.replace("'","''")+"""', '"""+desc.replace("'","''")+"""') """
     cursor.execute(insert_query)
     cursor.close()
     db.commit()
@@ -717,26 +717,28 @@ def create_event(date):
 def list_events(date):
     db=sqlite3.connect('dios_events.db')
     cursor=db.cursor()
-    cursor.execute("""SELECT event,desc FROM dates WHERE date='"""+date+"""'""")
+    cursor.execute("""SELECT event,desc,id FROM dates WHERE date='"""+date+"""'""")
     events=cursor.fetchall()
     cursor.close()
     db.commit()
     db.close()
     if events:
         events_final=[]
+        ids=[]
         for event in events:
+            ids.append(event[2])
             if event[1]=="":
                 event=str(event[0])
             else:
                 event=str(event[0]+" - "+event[1])
             events_final.append(event)
-        return(events_final)
+        return(events_final,ids)
     else:
-        return(None)
+        return(None,None)
 
 def show_events(date):
     while 1:
-        events=list_events(date)
+        events,ids=list_events(date)
         bar()
         if events:
             print("All Events On "+deformat_date(date)+":\n")
@@ -745,13 +747,30 @@ def show_events(date):
             for event in events:
                 print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(event))
                 ii+=1
-            print("\nEnter Number Of An Event To Delete It.")
+            print("\nEnter Number Of An Event To Edit Or Delete It.")
             selected=str(input("\n    ")).upper()
             if selected.isnumeric():
                 if int(selected)>0 and int(selected)<len(events)+1:
-                    del_event(events[int(selected)-1].split(" - ")[0],date)
-                    if not events:
+                    bar()
+                    print(events[int(selected)-1])
+                    print("\n1. Edit Event\n2. Delete Event")
+                    selected=str(input("\n    ")).upper()
+                    if selected.isnumeric():
+                        if selected=="1":
+                            edit_event(events[int(selected)-1].split(" - ")[0],events[int(selected)-1].split(" - ")[1],ids[int(selected)-1],date)
+                        elif selected=="2":
+                            del_event(events[int(selected)-1].split(" - ")[0],date)
+                            if not events:
+                                return("calendar")
+                    elif selected=="B":
                         return("calendar")
+                    elif selected=="H":
+                        return("home")
+                    elif selected=="S":
+                        return("set")
+                    elif selected=="E":
+                        os.system('color')
+                        exit()
             elif selected=="B":
                 return("calendar")
             elif selected=="H":
@@ -763,6 +782,28 @@ def show_events(date):
                 exit()
         else:
             return("calendar")
+
+def edit_event(event_title,event_desc,event_id,date):
+    import getpass
+    db=sqlite3.connect('dios_events.db')
+    cursor=db.cursor()
+    bar(True)
+    print("Current Title Of The Event: '"+str(event_title)+"'.\n\nEnter The New Title Of The Event Or Leave Blank To Skip This Step.")
+    new=str(input("\n    "))
+    if new:
+        event_title=new
+    bar(True)
+    print("Current Description Of The Event: '"+str(event_desc)+"'.\n\nEnter The New Description Of The Event Or Leave Blank To Skip This Step.")
+    new=str(input("\n    "))
+    if new:
+        event_desc=new
+    cursor.execute("""UPDATE dates SET event='"""+event_title+"""', desc='"""+event_desc+"""' WHERE id="""+str(event_id))
+    cursor.close()
+    db.commit()
+    db.close()
+    bar(True)
+    print("Event '"+event_title+"' Edited.\n")
+    getpass.getpass("   Press Enter")
 
 def del_event(event,date):
     import getpass
@@ -970,17 +1011,30 @@ def bar(no_UI=False):
     os.system("cls")
     #BACKGROUND COLOR
     os.system('color '+list_settings[0][2]+'f')
-    
+
     #show info
+    bartext=f"{bcolors.RESET}\u018A\u0131\u0298\u054F\n{barcolor}    "+deformat_date(datetime.date.today().strftime("%d/%m/%Y"))+" "+datetime.datetime.now().strftime("%H:%M")
+    db=sqlite3.connect('dios_events.db')
+    cursor=db.cursor()
+    cursor.execute("""SELECT id FROM dates WHERE date='"""+datetime.date.today().strftime("%d/%m/%Y")+"""'""")
+    dates=cursor.fetchall()
+    cursor.close()
+    db.commit()
+    db.close()
+    if dates:
+        s=""
+        if len(dates)>1:
+            s="s"
+        if "RED" in list_settings[1][2].upper():
+            notification_color=f"{bcolors.BRIGHT_BLUE}"
+        else:
+            notification_color=f"{bcolors.BRIGHT_RED}"
+        bartext+=" - ["+notification_color+str(len(dates))+f"{barcolor}] Event"+s+" Today"
     if no_UI==True:
-        print(f"{bcolors.RESET}\u018A\u0131\u0298\u054F"+f"\n{barcolor}    "+deformat_date(datetime.date.today().strftime("%d/%m/%Y"))+
-          " "+datetime.datetime.now().strftime("%H:%M")+
-          f"{bcolors.RESET}")
+        bartext+=f"{bcolors.RESET}"
     else:
-        print(f"{bcolors.RESET}\u018A\u0131\u0298\u054F"+f"\n{barcolor}    "+deformat_date(datetime.date.today().strftime("%d/%m/%Y"))+
-          " "+datetime.datetime.now().strftime("%H:%M")+
-          " - [H]ome - [B]ack - [S]ettings - [E]xit diOS"+
-          f"{bcolors.RESET}")
+        bartext+=f" - [H]ome - [B]ack - [S]ettings - [E]xit diOS{bcolors.RESET}"
+    print(bartext)
     
     #separator (COMMENT THIS LINE OUT IF YOU WANT TO RUN IN YOU IDE, OTHERWISE YOU'LL NEED TO OPEN IN TERMINAL)
     print("\u2501"*os.get_terminal_size()[0]+f"{color}")
