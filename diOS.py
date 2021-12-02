@@ -748,20 +748,20 @@ def show_events(date):
                 print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(event))
                 ii+=1
             print("\nEnter Number Of An Event To Edit Or Delete It.")
-            selected=str(input("\n    ")).upper()
-            if selected.isnumeric():
-                if int(selected)>0 and int(selected)<len(events)+1:
+            event_choosed=str(input("\n    ")).upper()
+            if event_choosed.isnumeric():
+                if int(event_choosed)>0 and int(event_choosed)<len(events)+1:
                     bar()
-                    print(events[int(selected)-1])
+                    print(events[int(event_choosed)-1])
                     print("\n1. Edit Event\n2. Delete Event")
                     selected=str(input("\n    ")).upper()
                     if selected.isnumeric():
                         if selected=="1":
-                            edit_event(events[int(selected)-1].split(" - ")[0],events[int(selected)-1].split(" - ")[1],ids[int(selected)-1],date)
+                            edit_event(events[int(event_choosed)-1].split(" - ")[0],events[int(event_choosed)-1].split(" - ")[1],ids[int(event_choosed)-1],date)
+                            return(None)
                         elif selected=="2":
-                            del_event(events[int(selected)-1].split(" - ")[0],date)
-                            if not events:
-                                return("calendar")
+                            del_event(events[int(event_choosed)-1].split(" - ")[0],date)
+                            return(None)
                     elif selected=="B":
                         return("calendar")
                     elif selected=="H":
@@ -915,7 +915,7 @@ def calendar(month,year):
                         time.sleep(1.5)
                         return("calendar",month,year)
                 create_event(str(selected)+"/"+str(month)+"/"+str(year))
-            elif selected==4:
+            while selected==4:
                 db=sqlite3.connect('dios_events.db')
                 cursor=db.cursor()
                 cursor.execute("""SELECT date FROM dates""")
@@ -924,8 +924,9 @@ def calendar(month,year):
                 db.commit()
                 db.close()
                 if dates:
-                    selected=0
-                    while int(selected)<1 or int(selected)>len(dates):
+                    dates=list(dict.fromkeys(dates))
+                    date_selected=0
+                    while int(date_selected)<1 or int(date_selected)>len(dates):
                         bar()
                         print("You Have Events On The Following Dates :\n")
                         ii=1
@@ -933,24 +934,27 @@ def calendar(month,year):
                         for date in dates:
                             print((" "*(spaces-len(str(ii))))+str(ii)+". "+deformat_date(date[0]))
                             ii+=1
-                            print("\nSelect Date You Want To See, Edit Or Delete The Events Of.")
-                            selected=str(input("\n    "))
-                            if selected.isnumeric() and int(selected)>0 and int(selected)<len(dates)+1:
-                                return(show_events(dates[int(selected)-1][0]),month,year)
-                            elif selected=="B":
-                                return("calendar",month,year)
-                            elif selected=="H":
-                                return("home",month,year)
-                            elif selected=="S":
-                                return("set",month,year)
-                            elif selected=="E":
-                                os.system('color')
-                                exit()
+                        print("\nSelect Date You Want To See, Edit Or Delete The Events Of.")
+                        date_selected=str(input("\n    "))
+                        if date_selected.isnumeric() and int(date_selected)>0 and int(date_selected)<len(dates)+1:
+                            return_value=show_events(dates[int(date_selected)-1][0])
+                            if return_value:
+                                return(return_value,month,year)
+                        elif date_selected=="B":
+                            return("calendar",month,year)
+                        elif date_selected=="H":
+                            return("home",month,year)
+                        elif date_selected=="S":
+                            return("set",month,year)
+                        elif date_selected=="E":
+                            os.system('color')
+                            exit()
                 else:
                     bar()
                     import getpass
                     print("There Are No Events.\n")
                     getpass.getpass("   Press Enter")
+                    return("calendar",month,year)
         elif selected=="H" or selected=="B":
             return("home",month,year)
         elif selected=="S":
