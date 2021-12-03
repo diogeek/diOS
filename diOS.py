@@ -820,8 +820,30 @@ def del_event(event,date):
     getpass.getpass("   Press Enter")
 
 def calendar(month,year):
-    list_months=["January","February","March","April","May","June","July","August","September","October","November","December"]
+    list_months=["January - Winter","February - Winter","March - ","April - Spring","May - Spring","June - ","July - Summer","August - Summer","September - ","October - Autumn","November - Autumn","December - "]
     list_weekdays=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]
+    day=int(datetime.date.today().strftime("%d"))
+    season=""
+    if month==3:
+        if day<20:
+            season="Winter"
+        elif day>19:
+            season="Spring"
+    elif month==6:
+        if day<21:
+            season="Spring"
+        elif day>20:
+            season="Summer"
+    elif month==9:
+        if day<23:
+            season="Summer"
+        elif day>22:
+            season="Autumn"
+    elif month==12:
+        if day<21:
+            season="Autumn"
+        elif day>20:
+            season="Winter"
     weekdays=f"{bcolors.RESET}\n    \u2502"
     for day in list_weekdays:
         weekdays+=" "+day+" \u2502"
@@ -839,7 +861,7 @@ def calendar(month,year):
         
         #show calendar
         print(f"\n    {bcolors.RESET}{bcolors.BRIGHT_RED}\u250F"+"\u2501"*41+"\u2513\n\
-    \u2503 "+f"{bcolors.RESET}"+str(list_months[month-1])+" ("+str(month)+")"+" "*(40-len(str(list_months[month-1])+" ("+str(month)+")"+" "+str(year)))+str(year)+" "+f"{bcolors.BRIGHT_RED}\u2503\n\
+    \u2503 "+f"{bcolors.RESET}"+str(list_months[month-1])+season+" ("+str(month)+")"+" "*(40-len(str(list_months[month-1])+season+" ("+str(month)+")"+" "+str(year)))+str(year)+" "+f"{bcolors.BRIGHT_RED}\u2503\n\
     \u2521"+("\u2501"*5+"\u252F")*6+"\u2501"*5+"\u2529"+weekdays+"\n\
     \u251C"+("\u2500"*5+"\u253C")*6+"\u2500"*5+"\u2524\n\
     \u2502"+week)
