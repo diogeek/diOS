@@ -621,9 +621,10 @@ def google_search():
         else:
             print("\n[N]ext Page\n")
         selected=str(input("\n    ")).upper()
-        if selected.isnumeric() and selected>0 and selected <11:
-            webbrowser.open(liste[int(selected)-1])
-            return("google")
+        if selected.isnumeric():
+            if selected>0 and selected <11:
+                webbrowser.open(liste[int(selected)-1])
+                return("google")
         elif selected=="P" and google_page>1:
             google_page-=1
             return("google")
@@ -906,7 +907,7 @@ def calendar(month,year):
                             print("\nEnter A Numeric Value Between 1 And 12.")
                             time.sleep(1.5)
                             return("calendar",month,year)
-                        return("calendar",selected,year)
+                        return("calendar",int(selected),year)
                     print("\nEnter A Numeric Value Between 1 And 12.")
                     time.sleep(1.5)
                     return("calendar",month,year)
@@ -920,11 +921,10 @@ def calendar(month,year):
                             print("\nEnter A Numeric Value Between 1 And 9998.")
                             time.sleep(1.5)
                             return("calendar",month,year)
-                        return("calendar",selected,year)
+                        return("calendar",month,int(selected))
                     print("\nEnter A Numeric Value Between 1 And 9998.")
                     time.sleep(1.5)
                     return("calendar",month,year)
-                return("calendar",month,selected)
             elif selected==3:
                 selected=0
                 while selected<1 or selected>how_many_days:
@@ -1063,7 +1063,7 @@ def bar(no_UI=False):
     print(bartext)
     
     #separator (COMMENT THIS LINE OUT IF YOU WANT TO RUN IN YOU IDE, OTHERWISE YOU'LL NEED TO OPEN IN TERMINAL)
-    print("\u2501"*os.get_terminal_size()[0]+f"{color}")
+    #print("\u2501"*os.get_terminal_size()[0]+f"{color}")
 
 #setting initial page (SET THIS ONE TO "home" IF YOU WANT TO RUN IN YOUR IDE, OTHERWISE YOU'LL NEED TO OPEN IN TERMINAL)
 currentpage="title"
