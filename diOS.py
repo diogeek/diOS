@@ -1,6 +1,7 @@
+print("let's ride")
 import os,datetime,webbrowser,sys,subprocess,platform,string,sqlite3
 
-db=sqlite3.connect('dios_events.db')
+db=sqlite3.connect('dios_database.db')
 cursor=db.cursor()
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS dates(
@@ -8,6 +9,14 @@ CREATE TABLE IF NOT EXISTS dates(
      date TEXT,
      event TEXT,
      desc TEXT
+)
+""")
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS notes(
+     id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,
+     title TEXT,
+     text TEXT,
+     color TEXT
 )
 """)
 cursor.close()
@@ -246,7 +255,10 @@ keyboard.add_hotkey("alt + tab", lambda: None, suppress =True)
 keyboard.add_hotkey("ctrl + c", lambda: None, suppress =True)
 #pages (home, directories, settings)
 
-#title screen
+#INITIAL SETUP ^^^^
+
+#SETTINGS, TITLE SCREEN vvvv
+
 def title():
     shift=40
     import getpass
@@ -338,7 +350,7 @@ def settings():
                         exit()
                 else:
                     list_languages=['as','ab','ae','of','ak','am','an','ar','as','av','ay','az','ba','be','bg','bh','bi','bm','bn','bo','br','bs','ca','ce','ch','co','cr','cs','cu','cv','cy','da','de','dv','dz','ee','el','en','eo','es','et','eu','fa','ff','fi','fj','fo','fr','fy','ga','gd','gl','gn','gu','gv','ha','he','hi','ho','hr','ht','hu','hy','hz','is','id','ie','ii','ik','io','is','it','iu','ja','jv','ka','kg','ki','kj','kk','kl','km','kn','ko','kr','ks','ku','kv','kw','ky','la','lb','lg','li','ln','lo','lt','lu','lv','mg','mh','mi','mk','ml','mn','mo','mr','ms','mt','my','na','nb','nd','ne','ng','nl','nn','no','nr','nv','ny','oc','oj','om','or','os','pa','pi','pl','ps','pt','qu','rc','rm','rn','ro','ru','rw','sa','sc','sd','se','sg','sh','si','sk','sl','sm','sn','so','sq','sr','ss','st','su','sv','sw','ta','te','tg','th','ti','tk','tl','tn','to','tr','ts','tt','tw','ty','ug','uk','ur','uz','ve','vi','vo','wa','wo','xh','yi','yo','za','zh','zu']
-                    print("Enter Google Search Language (Type 'help' for list of languages):")
+                    print("Enter Google Search language (Type 'help' for list of languages):")
                     selected=str(input("\n    ")).lower()
                     if selected in list_languages:
                         lang_google=selected
@@ -371,6 +383,10 @@ def settings():
         elif selected=="E":
             os.system('color')
             exit()
+
+#SETTINGS, TITLE SCREEN ^^^^
+
+#ALL APPLICATIONS vvvv
 
 def sort_by_creation_date(dirpath):
     a = [s for s in os.listdir(dirpath)]
@@ -411,22 +427,22 @@ def create_file():
         if int(selected)==1:
             bar()
             print(path+"‖\n"+"═"*len(path)+"╝")
-            print("Name The File. A Name With No Extension Will Result In A Text File (.txt)")
+            print("Name the File. A name with no extension will result in a Text file (.txt)")
             try:
                 f=open(str(input(f"\n    ")),"w").close()
                 return(True)
             except:
-                print('Error Creating File. Please Try Again')
+                print('Error creating File. Please try again')
                 return(False)
         elif int(selected)==2:
             bar()
             print(path+"‖\n"+"═"*len(path)+"╝")
-            print("Name The Directory:")
+            print("Name the Directory:")
             try:
                 os.mkdir(path+str(input(f"\n    ")))
                 return(True)
             except:
-                print('Error Creating Directory. Please Try Again')
+                print('Error creating Directory. Please try again')
                 return(False)
     elif selected=="H":
         return("home")
@@ -449,7 +465,7 @@ def directories(path):
             spaces=len(str(len(os.listdir(path))))
         except PermissionError:
             import time
-            print('Access To This Directory Has Been Denied.')
+            print('Access to this Directory has been Denied.')
             time.sleep(1)
             path=path[:path.rfind('\\')]
             return('dir')
@@ -475,7 +491,7 @@ def directories(path):
             liste=list(filter(os.path.isdir, os.listdir(path)))
         #show files
         if not liste or liste==[' ']:
-            print("Files Are Protected Or The Directory Is Empty.")
+            print("Files are protected or the Directory is empty.")
             liste=[]
         else:
             print((" "*(spaces-1))+"0. Switch Drive\n")
@@ -502,7 +518,7 @@ def directories(path):
         try:
             liste.pop(liste.index(' '))
         except:None
-        print(("\n"+" "*(spaces-len(str(ii))))+str(len(liste)+1)+". Create File Or Directory\n")
+        print(("\n"+" "*(spaces-len(str(ii))))+str(len(liste)+1)+". Create File or Directory\n")
         selected=str(input(f"\n    ")).upper()
         if selected.isnumeric():
             if selected=="0":
@@ -581,7 +597,7 @@ All you have to do is either host or join a local Chatrum server and enter requi
  - Client-recv.py : The second and last client script. It recieves and shows the messages on screen, and is only used for that.\n\n\
 It is recommended to put each of your client scripts on each half of your screen for a better chatting experience.\n\nEnjoy! \u263A\n")
             import getpass
-            getpass.getpass("Press Enter To Go Back To Homepage.")
+            getpass.getpass("Press Enter to go back to Homepage.")
             return("home")
         elif selected=="H" or selected=="B":
             return("home")
@@ -614,7 +630,7 @@ def google_search():
             query =str(input("\n    "))
             google_page=1
         bar()
-        print("Results For \""+query+"\" On https://google.com/"+str(lang_google)+":\n")
+        print("Results for \""+query+"\" on https://google.com/"+str(lang_google)+":\n")
         liste=show_results(query,google_page,lang_google)
         if google_page>1:
             print("\nPage : "+str(google_page)+" - [P]revious Page - [N]ext Page\n")
@@ -673,12 +689,12 @@ def deformat_date(date):
         return(year+"/"+month+"/"+day)
 
 def create_event(date):
-    db=sqlite3.connect('dios_events.db')
+    db=sqlite3.connect('dios_database.db')
     cursor=db.cursor()
     event=""
     while event=="":
         bar()
-        print("Enter The Title Of The Event On "+deformat_date(date)+".\n")
+        print("Enter the title of the event on "+deformat_date(date)+".\n")
         event=str(input("\n    "))
         if event=="B":
             return("calendar")
@@ -690,7 +706,7 @@ def create_event(date):
             os.system('color')
             exit()
     bar()
-    print("Enter The Description Of The Event. (Leave Blank For No Description)")
+    print("Enter the description of the event. (Leave blank for no description)")
     desc=str(input("\n    "))
     if desc=="B":
         return("calendar")
@@ -712,11 +728,11 @@ def create_event(date):
     db.close()
     import getpass
     bar(True)
-    print("Event '"+event+"' Succesfully Created On "+date+".\n")
+    print("Event '"+event+"' succesfully created on "+date+".\n")
     getpass.getpass("   Press Enter")
 
 def list_events(date):
-    db=sqlite3.connect('dios_events.db')
+    db=sqlite3.connect('dios_database.db')
     cursor=db.cursor()
     cursor.execute("""SELECT event,desc,id FROM dates WHERE date='"""+date+"""'""")
     events=cursor.fetchall()
@@ -742,13 +758,13 @@ def show_events(date):
         events,ids=list_events(date)
         bar()
         if events:
-            print("All Events On "+deformat_date(date)+":\n")
+            print("All events on "+deformat_date(date)+":\n")
             ii=1
             spaces=len(str(len(list_chatrum)))
             for event in events:
                 print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(event))
                 ii+=1
-            print("\nEnter Number Of An Event To Edit Or Delete It.")
+            print("\nEnter number of an event to edit or delete it.")
             event_choosed=str(input("\n    ")).upper()
             if event_choosed.isnumeric():
                 if int(event_choosed)>0 and int(event_choosed)<len(events)+1:
@@ -786,15 +802,15 @@ def show_events(date):
 
 def edit_event(event_title,event_desc,event_id,date):
     import getpass
-    db=sqlite3.connect('dios_events.db')
+    db=sqlite3.connect('dios_database.db')
     cursor=db.cursor()
     bar(True)
-    print("Current Title Of The Event: '"+str(event_title)+"'.\n\nEnter The New Title Of The Event Or Leave Blank To Skip This Step.")
+    print("Current title of the event: '"+str(event_title)+"'.\n\nEnter the new title of the event or leave blank to skip this step.")
     new=str(input("\n    "))
     if new:
         event_title=new
     bar(True)
-    print("Current Description Of The Event: '"+str(event_desc)+"'.\n\nEnter The New Description Of The Event Or Leave Blank To Skip This Step.")
+    print("Current description of the event: '"+str(event_desc)+"'.\n\nEnter the new description of the event or leave blank to skip this step.")
     new=str(input("\n    "))
     if new:
         event_desc=new
@@ -803,12 +819,12 @@ def edit_event(event_title,event_desc,event_id,date):
     db.commit()
     db.close()
     bar(True)
-    print("Event '"+event_title+"' Edited.\n")
+    print("Event '"+event_title+"' edited.\n")
     getpass.getpass("   Press Enter")
 
 def del_event(event,date):
     import getpass
-    db=sqlite3.connect('dios_events.db')
+    db=sqlite3.connect('dios_database.db')
     cursor=db.cursor()
     cursor.execute("""SELECT id FROM dates WHERE date='"""+date+"""' AND event='"""+event.replace("'","''")+"""'""")
     id_event=cursor.fetchall()[0][0]
@@ -817,7 +833,7 @@ def del_event(event,date):
     db.commit()
     db.close()
     bar(True)
-    print("Event '"+event+"' Deleted.\n")
+    print("Event '"+event+"' deleted.\n")
     getpass.getpass("   Press Enter")
 
 def calendar(month,year):
@@ -904,11 +920,11 @@ def calendar(month,year):
                     selected=str(input("\n    "))
                     if selected.isnumeric():
                         if (int(selected)<1 or int(selected)>12):
-                            print("\nEnter A Numeric Value Between 1 And 12.")
+                            print("\nEnter a numeric value between 1 and 12.")
                             time.sleep(1.5)
                             return("calendar",month,year)
                         return("calendar",int(selected),year)
-                    print("\nEnter A Numeric Value Between 1 And 12.")
+                    print("\nEnter a numeric value between 1 and 12.")
                     time.sleep(1.5)
                     return("calendar",month,year)
             elif selected==2:
@@ -918,27 +934,27 @@ def calendar(month,year):
                     selected=str(input("\n    "))
                     if selected.isnumeric():
                         if (int(selected)<1 or int(selected)>9998):
-                            print("\nEnter A Numeric Value Between 1 And 9998.")
+                            print("\nEnter a numeric value between 1 and 9998.")
                             time.sleep(1.5)
                             return("calendar",month,year)
                         return("calendar",month,int(selected))
-                    print("\nEnter A Numeric Value Between 1 And 9998.")
+                    print("\nEnter a numeric value between 1 and 9998.")
                     time.sleep(1.5)
                     return("calendar",month,year)
             elif selected==3:
                 selected=0
                 while selected<1 or selected>how_many_days:
-                    print("\nEnter Day Of "+str(list_months[month-1])+" Of "+str(year)+" You Want To Create An Event for.")
+                    print("\nEnter day of "+str(list_months[month-1]).split(" - ")[0]+" of "+str(year)+" you want to create an event for.")
                     selected=str(input("\n    "))
                     if selected.isnumeric() and int(selected)>0 and int(selected)<how_many_days+1:
                         break
                     else :
-                        print("\nEnter A Numeric Value Between 1 And "+str(how_many_days)+".")
+                        print("\nEnter a numeric value between 1 and "+str(how_many_days)+".")
                         time.sleep(1.5)
                         return("calendar",month,year)
                 create_event(str(selected)+"/"+str(month)+"/"+str(year))
             while selected==4:
-                db=sqlite3.connect('dios_events.db')
+                db=sqlite3.connect('dios_database.db')
                 cursor=db.cursor()
                 cursor.execute("""SELECT date FROM dates""")
                 dates=cursor.fetchall()
@@ -950,13 +966,13 @@ def calendar(month,year):
                     date_selected=0
                     while int(date_selected)<1 or int(date_selected)>len(dates):
                         bar()
-                        print("You Have Events On The Following Dates :\n")
+                        print("You have events on the following dates :\n")
                         ii=1
                         spaces=len(str(len(dates)))
                         for date in dates:
                             print((" "*(spaces-len(str(ii))))+str(ii)+". "+deformat_date(date[0]))
                             ii+=1
-                        print("\nSelect Date You Want To See, Edit Or Delete The Events Of.")
+                        print("\nSelect date you want to see, edit or delete the events of.")
                         date_selected=str(input("\n    "))
                         if date_selected.isnumeric() and int(date_selected)>0 and int(date_selected)<len(dates)+1:
                             return_value=show_events(dates[int(date_selected)-1][0])
@@ -974,7 +990,7 @@ def calendar(month,year):
                 else:
                     bar()
                     import getpass
-                    print("There Are No Events.\n")
+                    print("There are no events.\n")
                     getpass.getpass("   Press Enter")
                     return("calendar",month,year)
         elif selected=="H" or selected=="B":
@@ -984,7 +1000,23 @@ def calendar(month,year):
         elif selected=="E":
             os.system('color')
             exit()
-    
+
+def notes():
+    db=sqlite3.connect('dios_database.db')
+    cursor=db.cursor()
+    cursor.execute("""SELECT title,text,color FROM notes""")
+    notes=cursor.fetchall()
+    cursor.close()
+    db.commit()
+    db.close()
+
+    for note in notes:
+        print(note[0]+" - "+note[1]+" - "+note[2])
+
+#ALL APPLICATIONS ^^^^
+
+#HOME, BAR, LOOP vvvv
+
 def home():
     global query
     query=""
@@ -993,33 +1025,34 @@ def home():
         list_home=["title","dir","set","chat","google","calendar"]
         bar()
         print(f"{bcolors.RESET}\n\n\n\n\
-    {bcolors.CYAN}        #.  #######, ##            {bcolors.BRIGHT_YELLOW}                                {bcolors.DARK_GRAY}               @@@@@            \n\
-    {bcolors.CYAN}     ######,   (####  ####         {bcolors.BRIGHT_YELLOW}    *//////*                    {bcolors.DARK_GRAY}        @@@@  @@@@@@@  @@@@     \n\
-    {bcolors.CYAN}   #########       ## ######       {bcolors.BRIGHT_YELLOW}    /,,,,,,,,,,,,,,,,,,,,,.     {bcolors.DARK_GRAY}       @@@@@@@@@@@@@@@@@@@@@    \n\
-    {bcolors.CYAN}      ,,               ###  ,      {bcolors.BRIGHT_YELLOW}    //////////////////////.     {bcolors.DARK_GRAY}        @@@@@@@@   @@@@@@@@     \n\
-    {bcolors.CYAN} #######               #'  ###     {bcolors.BRIGHT_YELLOW}    //////////////////////.     {bcolors.DARK_GRAY}    @@@@@@@@@@       @@@@@@@@@@ \n\
-    {bcolors.CYAN} ####                    #####     {bcolors.BRIGHT_YELLOW}    //////////////////////.     {bcolors.DARK_GRAY}    @@@@@@@@@         @@@@@@@@@ \n\
-    {bcolors.CYAN} ##   ##                ######     {bcolors.BRIGHT_YELLOW}    //////////////////////.     {bcolors.DARK_GRAY}    @@@@@@@@@@       @@@@@@@@@@ \n\
-    {bcolors.CYAN}    ####              #.,,         {bcolors.BRIGHT_YELLOW}    //////////////////////.     {bcolors.DARK_GRAY}        @@@@@@@@   @@@@@@@@     \n\
-    {bcolors.CYAN}   #####  #          .######       {bcolors.BRIGHT_YELLOW}    //////////////////////.     {bcolors.DARK_GRAY}       @@@@@@@@@@@@@@@@@@@@@    \n\
-    {bcolors.CYAN}    ##### #####    #######(        {bcolors.BRIGHT_YELLOW}    ,/////////////////////      {bcolors.DARK_GRAY}        @@@@  @@@@@@@  @@@@     \n\
-    {bcolors.CYAN}       ##  #######.  ###           {bcolors.BRIGHT_YELLOW}                                {bcolors.DARK_GRAY}               @@@@@            \n\
+    {bcolors.CYAN}      ▄▄█▄  ███████▄ ██▄▄          {bcolors.BRIGHT_YELLOW}                                {bcolors.DARK_GRAY}               ▄███▄            \n\
+    {bcolors.CYAN}    ▄██████▄   ▐████  ████▄        {bcolors.BRIGHT_YELLOW}    ▄█████████████████████      {bcolors.DARK_GRAY}        ▄██▄  ███████  ▄██▄     \n\
+    {bcolors.CYAN}  ▄██████████     ▀██ ██████       {bcolors.BRIGHT_YELLOW}    █▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄      {bcolors.DARK_GRAY}       █████████████████████    \n\
+    {bcolors.CYAN}     ▄▄▄▄             ▀███  ▄      {bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.DARK_GRAY}        ▀█████▀▀   ▀▀█████▀     \n\
+    {bcolors.CYAN} ███████               █▀  ███     {bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.DARK_GRAY}     ▄███████         ███████▄  \n\
+    {bcolors.CYAN} ████                    █████     {bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.DARK_GRAY}    ████████           ████████ \n\
+    {bcolors.CYAN} ██   ██                ██████     {bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.DARK_GRAY}     ▀███████         ███████▀  \n\
+    {bcolors.CYAN}    ████▌            ████▀▀▀       {bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.DARK_GRAY}        ▄█████▄▄   ▄▄█████▄     \n\
+    {bcolors.CYAN}  ▀█████▌ █▄         ▄▄▄▄▄▄▄       {bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.DARK_GRAY}       █████████████████████    \n\
+    {bcolors.CYAN}   ▀█████ ▐████▄  ▀███████▀        {bcolors.BRIGHT_YELLOW}    █████████████████████▀      {bcolors.DARK_GRAY}        ▀██▀  ███████  ▀██▀     \n\
+    {bcolors.CYAN}      ▀██▌ ▐██████▄  ▀██▀          {bcolors.BRIGHT_YELLOW}                                {bcolors.DARK_GRAY}               ▀███▀            \n\
     \n\
     {bcolors.WHITE}       1.TITLE SCREEN                      2.FILE SYSTEM                       3.SETTINGS\n\
     \n\
-    {bcolors.GREEN}                                  {bcolors.RED}          ,(((((((((((                 {bcolors.RED}                             \n\
-    {bcolors.GREEN}         @@@@@@@@@@@@@            {bcolors.RED}       ((((((((((((((((((           {bcolors.RED}       ####       ####       \n\
-    {bcolors.GREEN}      @@@@@@@@@@@@@@@@@@/         {bcolors.RED}     ((((((((       ((/             {bcolors.RED}    #####################    \n\
-    {bcolors.GREEN}    .@@@@@@@@@@@@@@@@@@@@@        {bcolors.BRIGHT_YELLOW}    //{bcolors.RED}((((                          {bcolors.RED}    #####################    \n\
-    {bcolors.GREEN}    @@@@@@@@@@@@@@@@@@@@@@@       {bcolors.BRIGHT_YELLOW}   //////       {bcolors.BRIGHT_BLUE},************       {bcolors.WHITE}    #####################    \n\
-    {bcolors.GREEN}    @@@@@@@@@@@@@@@@@@@@@@@       {bcolors.BRIGHT_YELLOW}   /////        {bcolors.BRIGHT_BLUE}*/////////////      {bcolors.WHITE}    #######  ###  ###  ##    \n\
-    {bcolors.GREEN}    @@@@@@@@@@@@@@@@@@@@@@@       {bcolors.BRIGHT_YELLOW}   //////       {bcolors.BRIGHT_BLUE}*////////////       {bcolors.WHITE}    #####################    \n\
-    {bcolors.GREEN}     @@@@@@@@@@@@@@@@@@@@@        {bcolors.BRIGHT_YELLOW}    /{bcolors.GREEN}#####             {bcolors.BRIGHT_BLUE}//////       {bcolors.WHITE}    ##  ###  ###  ###  ##    \n\
-    {bcolors.GREEN}      @@@@@@@@@@@@@@@@@@          {bcolors.GREEN}    ########,      ##{bcolors.BRIGHT_BLUE}//////         {bcolors.WHITE}    #####################    \n\
-    {bcolors.GREEN}     @@@@*@@@@@@@@@@*             {bcolors.GREEN}       ##################{bcolors.BRIGHT_BLUE}/          {bcolors.WHITE}    ##  ###  ###  #######    \n\
-    {bcolors.GREEN}    @@                            {bcolors.GREEN}           ###########              {bcolors.WHITE}    #####################    \n\
+    {bcolors.BRIGHT_GREEN}                                  {bcolors.RED}         ███████████████             {bcolors.WHITE}                               \n\
+    {bcolors.BRIGHT_GREEN}        ▄████████████▄▄           {bcolors.RED}       ███████████████████▄          {bcolors.WHITE}    ║║  ║║  ║║  ║║  ║║        \n\
+    {bcolors.BRIGHT_GREEN}      ▄█████████▀███████▄         {bcolors.RED}     ███████▀       ▀██████          {bcolors.RED}  ██{bcolors.WHITE}║║{bcolors.RED}██{bcolors.WHITE}║║{bcolors.RED}██{bcolors.WHITE}║║{bcolors.RED}██{bcolors.WHITE}║║{bcolors.RED}██{bcolors.WHITE}║║{bcolors.RED}██      \n\
+    {bcolors.BRIGHT_GREEN}     ████████████ ███████▄        {bcolors.BRIGHT_YELLOW}    ██{bcolors.RED}████                          {bcolors.RED}   ██████████████████████      \n\
+    {bcolors.BRIGHT_GREEN}    █████████  ███ ███████        {bcolors.BRIGHT_YELLOW}   ██████       {bcolors.BRIGHT_BLUE}▄▄▄▄▄▄▄▄▄▄▄▄▄       {bcolors.WHITE}   ███████▀▀█▀▀█▀▀█▀▀█▀▀█      \n\
+    {bcolors.BRIGHT_GREEN}    ██████████████ ███████        {bcolors.BRIGHT_YELLOW}   █████        {bcolors.BRIGHT_BLUE}██████████████      {bcolors.WHITE}   ██████████████████████      \n\
+    {bcolors.BRIGHT_GREEN}    █████████  ██ ████████        {bcolors.BRIGHT_YELLOW}   ██████       {bcolors.BRIGHT_BLUE}▀████████████       {bcolors.WHITE}   █▀▀█▀▀█▀▀█▀▀█▀▀█▀▀█▀▀█      \n\
+    {bcolors.BRIGHT_GREEN}     ███████████▄████████▀        {bcolors.BRIGHT_YELLOW}    ████{bcolors.GREEN}██             {bcolors.BRIGHT_BLUE}██████       {bcolors.WHITE}   ██████████████████████   \n\
+    {bcolors.BRIGHT_GREEN}      █████████████████▀          {bcolors.BRIGHT_YELLOW}    ▀{bcolors.GREEN}███████▄      ▄█{bcolors.BRIGHT_BLUE}██████         {bcolors.WHITE}   █▀▀█▀▀█▀▀█▀▀█▀▀█▀▀████      \n\
+    {bcolors.BRIGHT_GREEN}     ████▀▀█████████▀▀            {bcolors.GREEN}       ██████████████████{bcolors.BRIGHT_BLUE}█          {bcolors.WHITE}   ██████████████████████      \n\
+    {bcolors.BRIGHT_GREEN}    ██▀▀                          {bcolors.GREEN}           ███████████              {bcolors.WHITE}   ██████████████████████      \n\
     \n\
     {bcolors.WHITE}          4.CHATRUM                       5.GOOGLE SEARCH                      6.CALENDAR\n\
+    \n\
     ")
         selected=str(input("\n    ")).upper()
         if selected.isnumeric():
@@ -1040,7 +1073,7 @@ def bar(no_UI=False):
 
     #show info
     bartext=f"{bcolors.RESET}\u018A\u0131\u0298\u054F\n{barcolor}    "+deformat_date(datetime.date.today().strftime("%d/%m/%Y"))+" "+datetime.datetime.now().strftime("%H:%M")
-    db=sqlite3.connect('dios_events.db')
+    db=sqlite3.connect('dios_database.db')
     cursor=db.cursor()
     cursor.execute("""SELECT id FROM dates WHERE date='"""+datetime.date.today().strftime("%d/%m/%Y")+"""'""")
     dates=cursor.fetchall()
@@ -1063,7 +1096,7 @@ def bar(no_UI=False):
     print(bartext)
     
     #separator (COMMENT THIS LINE OUT IF YOU WANT TO RUN IN YOU IDE, OTHERWISE YOU'LL NEED TO OPEN IN TERMINAL)
-    #print("\u2501"*os.get_terminal_size()[0]+f"{color}")
+    print("\u2501"*os.get_terminal_size()[0]+f"{color}")
 
 #setting initial page (SET THIS ONE TO "home" IF YOU WANT TO RUN IN YOUR IDE, OTHERWISE YOU'LL NEED TO OPEN IN TERMINAL)
 currentpage="title"
@@ -1084,6 +1117,8 @@ while 1:
         currentpage=google_search()
     elif currentpage=="calendar":
         currentpage,month,year=calendar(month,year)
+    elif currentpage=="notes":
+        currentpage=notes()
 
 #notif évènements + mettre plusieurs évènements par jour
 #calculator
