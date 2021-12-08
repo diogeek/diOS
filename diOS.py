@@ -74,6 +74,7 @@ class bcolors:
     BRIGHT_RED = '\u001b[1;31m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
+    REVERSED = '\u001b[7m'
     #text background
     BACKGROUND_BLACK = '\u001b[40m'
     BACKGROUND_RED = '\u001b[41m'
@@ -139,6 +140,8 @@ def changecolor(color):
         return bcolors.BOLD
     elif color=="UNDERLINE":
         return bcolors.UNDERLINE
+    elif color=="REVERSED":
+        return bcolors.REVERSED
 
     #text background
     elif color=="BACKGROUND_PURPLE":
@@ -184,7 +187,8 @@ sorting='+str(list_settings[3][2])+'\n\
 show_hidden='+str(list_settings[4][2])+'\n\
 type_to_show='+str(list_settings[5][2])+'\n\
 lang_google='+str(list_settings[6][1])+'\n\
-date_format='+str(list_settings[7][2])+'')
+date_format='+str(list_settings[7][2])+'\n\
+logo_color='+str(list_settings[8][2])+'')
     settings_file.close()
     
 #initial settings setup
@@ -198,13 +202,14 @@ def reset():
     date_format="DD/MM/YYYY"
     list_settings=[
         ["Console Background Color",["Black","Blue","Green","Aqua","Red","Purple","Yellow","White","Grey","Light Blue","Light Green","Cyan","Light Red","Light Purple","Light Yellow","Bright White"],"0"],
-        ["Info Bar Style",["Purple","Blue","Cyan","Green","Yellow","Red","Gold","White","Light Gray","Dark Gray","Black","Bright Purple","Bright Blue","Bright Cyan","Bright Green","Bright Yellow","Bright Red","Bright Black","Background Purple","Background Blue","Background Cyan","Background Green","Background Yellow","Background Red","Background White","Background Black","Background Bright Purple","Background Bright Blue","Background Bright Cyan","Background Bright Green","Background Bright Yellow","Background Bright Red","Background Bright White","Background Bright Black","Bold","Italic","Underline"],"WHITE"],
-        ["UI Style",["Purple","Blue","Cyan","Green","Yellow","Red","Gold","White","Light Gray","Dark Gray","Black","Bright Purple","Bright Blue","Bright Cyan","Bright Green","Bright Yellow","Bright Red","Bright Black","Background Purple","Background Blue","Background Cyan","Background Green","Background Yellow","Background Red","Background White","Background Black","Background Bright Purple","Background Bright Blue","Background Bright Cyan","Background Bright Green","Background Bright Yellow","Background Bright Red","Background Bright White","Background Bright Black","Bold","Italic","Underline"],"WHITE"],
+        ["Info Bar Style",["Purple","Blue","Cyan","Green","Yellow","Red","Gold","White","Light Gray","Dark Gray","Black","Bright Purple","Bright Blue","Bright Cyan","Bright Green","Bright Yellow","Bright Red","Bright Black","Background Purple","Background Blue","Background Cyan","Background Green","Background Yellow","Background Red","Background White","Background Black","Background Bright Purple","Background Bright Blue","Background Bright Cyan","Background Bright Green","Background Bright Yellow","Background Bright Red","Background Bright White","Background Bright Black","Bold","Underline","Reversed"],"WHITE"],
+        ["UI Style",["Purple","Blue","Cyan","Green","Yellow","Red","Gold","White","Light Gray","Dark Gray","Black","Bright Purple","Bright Blue","Bright Cyan","Bright Green","Bright Yellow","Bright Red","Bright Black","Background Purple","Background Blue","Background Cyan","Background Green","Background Yellow","Background Red","Background White","Background Black","Background Bright Purple","Background Bright Blue","Background Bright Cyan","Background Bright Green","Background Bright Yellow","Background Bright Red","Background Bright White","Background Bright Black","Bold","Underline","Reversed"],"WHITE"],
         ["Sorting Files",["By Name","By Type","By Creation Date","Non-Hidden Files First"],"BY_NAME"],
         ["Show Hidden Files",["Yes","No"],"YES"],
         ["Type to Show",["Files Only","Directories Only","Both"],"BOTH"],
         ["Google Search Language","en"],
-        ["Date Format",["dd/mm/YYYY","mm/dd/YYYY","YYYY/mm/dd"],"DD/MM/YYYY"]
+        ["Date Format",["dd/mm/YYYY","mm/dd/YYYY","YYYY/mm/dd"],"DD/MM/YYYY"],
+        ["DiOS Logo Color",["Purple","Blue","Cyan","Green","Yellow","Red","Gold","White","Light Gray","Dark Gray","Black","Bright Purple","Bright Blue","Bright Cyan","Bright Green","Bright Yellow","Bright Red","Bright Black"],"CYAN"],
          ]
     return(path,barcolor,color,list_settings,date_format)
 
@@ -239,7 +244,8 @@ sorting=BY_NAME\n\
 show_hidden=YES\n\
 type_to_show=BOTH\n\
 lang_google=en\n\
-date_format=DD/MM/YYYY')
+date_format=DD/MM/YYYY\n\
+logo_color=CYAN')
     settings_file.close()
 
 #fullscreen (it's ugly but it does the job), plus blocks the fullscreen key combinations
@@ -259,28 +265,28 @@ keyboard.add_hotkey("ctrl + c", lambda: None, suppress =True)
 
 #SETTINGS, TITLE SCREEN vvvv
 
-def title():
+def title(logo_color):
     shift=40
     import getpass
     os.system('cls')
-    getpass.getpass("\n"*((rows//2)-16)+"\
-"+" "*((cols//2)-shift)+"        @@@  @@@            "+f"{bcolors.CYAN}.,,,,,,,,,,,,, .{bcolors.RESET}                                    \n\
-"+" "*((cols//2)-shift)+"   @@@@@@@  ' .       "+f"{bcolors.CYAN},,,,,,   ,,,,,,,,,,  ,,,,{bcolors.RESET}                                 \n\
-"+" "*((cols//2)-shift)+" .@@  /@@  @@@     "+f"{bcolors.CYAN},,,,,,,,,,,,    ,,,,,,, ,,,,,,,{bcolors.RESET}                              \n\
-"+" "*((cols//2)-shift)+" @@   @@  @@@    "+f"{bcolors.CYAN},,,,,,,,,,,,,,,,     ,,,,  ,,,,,,,*{bcolors.RESET}                            \n\
-"+" "*((cols//2)-shift)+"@@#  @@* (@@    "+f"{bcolors.CYAN},,,,                        ,,,,,,,,{bcolors.RESET}                            \n\
-"+" "*((cols//2)-shift)+" @@@@@@  @@       "+f"{bcolors.CYAN},,,,,,,                    ,,,,,  ,,{bcolors.RESET}     @@@@@@@@@@@@@@@@@@@@,\n\
-"+" "*((cols//2)-shift)+"              "+f"{bcolors.CYAN},,,,,,,,,                      ,,,.  ,,,,{bcolors.RESET}   @@@@@@@@@@@@@@@@@@@@@ \n\
-"+" "*((cols//2)-shift)+"              "+f"{bcolors.CYAN},,,,,,,,                        ,  ,,,,,,{bcolors.RESET}  @@@@@@@@               \n\
-"+" "*((cols//2)-shift)+"              "+f"{bcolors.CYAN},,,,,,  ,                        ,,,,,,,,{bcolors.RESET}  @@@@@@@                \n\
-"+" "*((cols//2)-shift)+"              "+f"{bcolors.CYAN},,,,,  ,,,                      ,,,,,,,,,{bcolors.RESET} /@@@@@@@************    \n\
-"+" "*((cols//2)-shift)+"              "+f"{bcolors.CYAN}.,,  ,,,,,                    ,,,,,,,,,,{bcolors.RESET}  @@@@@@@@@@@@@@@@@@@@@.  \n\
-"+" "*((cols//2)-shift)+"                 "+f"{bcolors.CYAN}*,,,,,,                            ,{bcolors.RESET}    (@@@@@@@@@@@@@@@@@@@   \n\
-"+" "*((cols//2)-shift)+"                 "+f"{bcolors.CYAN},,,,,,,,  ,,/         /,,,,,,,,,,,,{bcolors.RESET}                  #@@@@@@   \n\
-"+" "*((cols//2)-shift)+"                  "+f"{bcolors.CYAN},,,,,,,  ,,,,,,   .,,,,,,,,,,,,,{bcolors.RESET}                    @@@@@@    \n\
-"+" "*((cols//2)-shift)+"                     "+f"{bcolors.CYAN},,,,,  ,,,,,,,,,   ,,,,,,,,{bcolors.RESET}      .@@@@@@@@@@@@@@@@@@@@@    \n\
-"+" "*((cols//2)-shift)+"                        "+f"{bcolors.CYAN},,  ,,,,,,,,,,,,    .{bcolors.RESET}         @@@@@@@@@@@@@@@@@@@@@     \n\
-"+" "*((cols//2)-shift)+"                               "+f"{bcolors.CYAN},,,,,,.{bcolors.RESET}                @@@@@@@@@@@@@@@@@@@       \n\
+    getpass.getpass(f"{bcolors.WHITE}\n"*((rows//2)-16)+"\
+"+" "*((cols//2)-shift)+"         ███  ███           "+f"{logo_color}▀███████████   ▄{bcolors.WHITE}                                    \n\
+"+" "*((cols//2)-shift)+"   ▄███████   ▀▀      "+f"{logo_color}████▄▄   ▀█████████  ████{bcolors.WHITE}                                 \n\
+"+" "*((cols//2)-shift)+"  ▐█▀  ▐██  ███    "+f"{logo_color}███████████    ▀██████▄  ██████{bcolors.WHITE}                              \n\
+"+" "*((cols//2)-shift)+"  ██   ██  ███   "+f"{logo_color}████████████▀▀▀▀   ▀▀████  ███████ {bcolors.WHITE}                            \n\
+"+" "*((cols//2)-shift)+" ▐█▌  ██▀ ▐██   "+f"{logo_color}██▀    ▄▄▄               ▀  ██████  ▄{bcolors.WHITE}                           \n\
+"+" "*((cols//2)-shift)+"  ▀█████  ██      "+f"{logo_color} ▄▄███▀                   ████▀  ▄██{bcolors.WHITE}     ▄███████████████████ \n\
+"+" "*((cols//2)-shift)+"              "+f"{logo_color} ████████                      ██▀  ▄████{bcolors.WHITE}   ████████████████████▀ \n\
+"+" "*((cols//2)-shift)+"              "+f"{logo_color}███████▀                           ██████{bcolors.WHITE}  ████████▀              \n\
+"+" "*((cols//2)-shift)+"              "+f"{logo_color}██████  ▄                        ████████{bcolors.WHITE} ▄███████                \n\
+"+" "*((cols//2)-shift)+"              "+f"{logo_color}████▀  ███                      █████████{bcolors.WHITE} ████████▄▄▄▄▄▄▄▄▄▄▄▄    \n\
+"+" "*((cols//2)-shift)+"              "+f"{logo_color} ██▀ ▄████                     ████▀▀   {bcolors.WHITE}  █████████████████████   \n\
+"+" "*((cols//2)-shift)+"                "+f"{logo_color}▀  ██████                         ▄▄█{bcolors.WHITE}    ▀███████████████████▌  \n\
+"+" "*((cols//2)-shift)+"                 "+f"{logo_color} ███████  ██▄         ▄▄▄▄█████████{bcolors.WHITE}                   ██████▌  \n\
+"+" "*((cols//2)-shift)+"                  "+f"{logo_color}███████  ▀█████▄    ████████████{bcolors.WHITE}                   ▄███████   \n\
+"+" "*((cols//2)-shift)+"                     "+f"{logo_color}█████  ███████▄▄  ▀████████{bcolors.WHITE}      ▄█████████████████████    \n\
+"+" "*((cols//2)-shift)+"                        "+f"{logo_color}██▄  █████████▄▄  ▀▀▀{bcolors.WHITE}         █████████████████████     \n\
+"+" "*((cols//2)-shift)+"                             "+f"{logo_color}▀▀████████▀▀{bcolors.WHITE}             ███████████████████       \n\
 "+"\n"*(rows-((rows//2)+1)-10)+"\
 "+" "*((cols//2)-7)+"PRESS ENTER")
     return("home")
@@ -1001,23 +1007,26 @@ def calendar(month,year):
             os.system('color')
             exit()
 
+def create_note():
+    None
+
 def notes():
     db=sqlite3.connect('dios_database.db')
     cursor=db.cursor()
-    cursor.execute("""SELECT title,text,color FROM notes""")
+    cursor.execute("""SELECT id,title,text,color FROM notes""")
     notes=cursor.fetchall()
     cursor.close()
     db.commit()
     db.close()
 
     for note in notes:
-        print(note[0]+" - "+note[1]+" - "+note[2])
+        print(note[1]+" - "+note[2]+" - "+note[3])
 
 #ALL APPLICATIONS ^^^^
 
 #HOME, BAR, LOOP vvvv
 
-def home():
+def home(logo_color):
     global query
     query=""
     #home page, with colored icons (all icons are 11 lines tall and 30 charactrs wide)
@@ -1025,17 +1034,17 @@ def home():
         list_home=["title","dir","set","chat","google","calendar"]
         bar()
         print(f"{bcolors.RESET}\n\n\n\n\
-    {bcolors.CYAN}      ▄█▄  ▀███████▄ ▐█▄▄          {bcolors.BRIGHT_YELLOW}                                {bcolors.DARK_GRAY}               ▄███▄            \n\
-    {bcolors.CYAN}    ▄██████▄  ▀█████▌ ████▄        {bcolors.BRIGHT_YELLOW}    ▄█████████████████████      {bcolors.DARK_GRAY}        ▄██▄  ███████  ▄██▄     \n\
-    {bcolors.CYAN}  ▄████████▀▀▀   ▀▀▀█ █████        {bcolors.BRIGHT_YELLOW}    █▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄      {bcolors.DARK_GRAY}       █████████████████████    \n\
-    {bcolors.CYAN}     ▄▄▄▄             ▀███  █      {bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.DARK_GRAY}        ▀█████▀▀   ▀▀█████▀     \n\
-    {bcolors.CYAN} ███████               █▀  ███     {bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.DARK_GRAY}     ▄███████         ███████▄  \n\
-    {bcolors.CYAN} ████                    █████     {bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.DARK_GRAY}    ████████           ████████ \n\
-    {bcolors.CYAN} ██   ██               ▄██████     {bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.DARK_GRAY}     ▀███████         ███████▀  \n\
-    {bcolors.CYAN}    ████▌             ▄██▀▀▀▀      {bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.DARK_GRAY}        ▄█████▄▄   ▄▄█████▄     \n\
-    {bcolors.CYAN}  ▀█████▌ █▄         ▄▄▄▄▄▄▄       {bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.DARK_GRAY}       █████████████████████    \n\
-    {bcolors.CYAN}   ▀█████ ▐████▄  ▀███████▀        {bcolors.BRIGHT_YELLOW}    █████████████████████▀      {bcolors.DARK_GRAY}        ▀██▀  ███████  ▀██▀     \n\
-    {bcolors.CYAN}      ▀██▌ ▐██████▄  ▀██▀          {bcolors.BRIGHT_YELLOW}                                {bcolors.DARK_GRAY}               ▀███▀            \n\
+    {logo_color}      ▄█▄  ▀███████▄ ▐█▄▄          {bcolors.BRIGHT_YELLOW}                                {bcolors.DARK_GRAY}               ▄███▄            \n\
+    {logo_color}    ▄██████▄  ▀█████▌ ████▄        {bcolors.BRIGHT_YELLOW}    ▄█████████████████████      {bcolors.DARK_GRAY}        ▄██▄  ███████  ▄██▄     \n\
+    {logo_color}  ▄████████▀▀▀   ▀▀▀█ █████        {bcolors.BRIGHT_YELLOW}    █▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄      {bcolors.DARK_GRAY}       █████████████████████    \n\
+    {logo_color}     ▄▄▄▄             ▀███  █      {bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.DARK_GRAY}        ▀█████▀▀   ▀▀█████▀     \n\
+    {logo_color} ███████               █▀  ███     {bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.DARK_GRAY}     ▄███████         ███████▄  \n\
+    {logo_color} ████                    █████     {bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.DARK_GRAY}    ████████           ████████ \n\
+    {logo_color} ██   ██               ▄██████     {bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.DARK_GRAY}     ▀███████         ███████▀  \n\
+    {logo_color}    ████▌             ▄██▀▀▀▀      {bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.DARK_GRAY}        ▄█████▄▄   ▄▄█████▄     \n\
+    {logo_color}  ▀█████▌ █▄         ▄▄▄▄▄▄▄       {bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.DARK_GRAY}       █████████████████████    \n\
+    {logo_color}   ▀█████ ▐████▄  ▀███████▀        {bcolors.BRIGHT_YELLOW}    █████████████████████▀      {bcolors.DARK_GRAY}        ▀██▀  ███████  ▀██▀     \n\
+    {logo_color}      ▀██▌ ▐██████▄  ▀██▀          {bcolors.BRIGHT_YELLOW}                                {bcolors.DARK_GRAY}               ▀███▀            \n\
     \n\
     {bcolors.WHITE}       1.TITLE SCREEN                      2.FILE SYSTEM                       3.SETTINGS\n\
     \n\
@@ -1104,9 +1113,9 @@ currentpage="title"
 while 1:
     #show page
     if currentpage=="title":
-        currentpage=title()
+        currentpage=title(changecolor(list_settings[8][2]))
     elif currentpage=="home":
-        currentpage=home()
+        currentpage=home(changecolor(list_settings[8][2]))
     elif currentpage=="dir":
         currentpage=directories(path)
     elif currentpage=="set":
