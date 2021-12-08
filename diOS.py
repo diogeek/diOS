@@ -1025,23 +1025,23 @@ def home():
         list_home=["title","dir","set","chat","google","calendar"]
         bar()
         print(f"{bcolors.RESET}\n\n\n\n\
-    {bcolors.CYAN}      ▄▄█▄  ███████▄ ██▄▄          {bcolors.BRIGHT_YELLOW}                                {bcolors.DARK_GRAY}               ▄███▄            \n\
-    {bcolors.CYAN}    ▄██████▄   ▐████  ████▄        {bcolors.BRIGHT_YELLOW}    ▄█████████████████████      {bcolors.DARK_GRAY}        ▄██▄  ███████  ▄██▄     \n\
-    {bcolors.CYAN}  ▄██████████     ▀██ ██████       {bcolors.BRIGHT_YELLOW}    █▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄      {bcolors.DARK_GRAY}       █████████████████████    \n\
-    {bcolors.CYAN}     ▄▄▄▄             ▀███  ▄      {bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.DARK_GRAY}        ▀█████▀▀   ▀▀█████▀     \n\
+    {bcolors.CYAN}      ▄█▄  ▀███████▄ ▐█▄▄          {bcolors.BRIGHT_YELLOW}                                {bcolors.DARK_GRAY}               ▄███▄            \n\
+    {bcolors.CYAN}    ▄██████▄  ▀█████▌ ████▄        {bcolors.BRIGHT_YELLOW}    ▄█████████████████████      {bcolors.DARK_GRAY}        ▄██▄  ███████  ▄██▄     \n\
+    {bcolors.CYAN}  ▄████████▀▀▀   ▀▀▀█ █████        {bcolors.BRIGHT_YELLOW}    █▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄      {bcolors.DARK_GRAY}       █████████████████████    \n\
+    {bcolors.CYAN}     ▄▄▄▄             ▀███  █      {bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.DARK_GRAY}        ▀█████▀▀   ▀▀█████▀     \n\
     {bcolors.CYAN} ███████               █▀  ███     {bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.DARK_GRAY}     ▄███████         ███████▄  \n\
     {bcolors.CYAN} ████                    █████     {bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.DARK_GRAY}    ████████           ████████ \n\
-    {bcolors.CYAN} ██   ██                ██████     {bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.DARK_GRAY}     ▀███████         ███████▀  \n\
-    {bcolors.CYAN}    ████▌            ████▀▀▀       {bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.DARK_GRAY}        ▄█████▄▄   ▄▄█████▄     \n\
+    {bcolors.CYAN} ██   ██               ▄██████     {bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.DARK_GRAY}     ▀███████         ███████▀  \n\
+    {bcolors.CYAN}    ████▌             ▄██▀▀▀▀      {bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.DARK_GRAY}        ▄█████▄▄   ▄▄█████▄     \n\
     {bcolors.CYAN}  ▀█████▌ █▄         ▄▄▄▄▄▄▄       {bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.DARK_GRAY}       █████████████████████    \n\
     {bcolors.CYAN}   ▀█████ ▐████▄  ▀███████▀        {bcolors.BRIGHT_YELLOW}    █████████████████████▀      {bcolors.DARK_GRAY}        ▀██▀  ███████  ▀██▀     \n\
     {bcolors.CYAN}      ▀██▌ ▐██████▄  ▀██▀          {bcolors.BRIGHT_YELLOW}                                {bcolors.DARK_GRAY}               ▀███▀            \n\
     \n\
     {bcolors.WHITE}       1.TITLE SCREEN                      2.FILE SYSTEM                       3.SETTINGS\n\
     \n\
-    {bcolors.BRIGHT_GREEN}                                  {bcolors.RED}         ███████████████             {bcolors.WHITE}                               \n\
-    {bcolors.BRIGHT_GREEN}        ▄████████████▄▄           {bcolors.RED}       ███████████████████▄          {bcolors.WHITE}    ║║  ║║  ║║  ║║  ║║        \n\
-    {bcolors.BRIGHT_GREEN}      ▄█████████▀███████▄         {bcolors.RED}     ███████▀       ▀██████          {bcolors.RED}  ██{bcolors.WHITE}║║{bcolors.RED}██{bcolors.WHITE}║║{bcolors.RED}██{bcolors.WHITE}║║{bcolors.RED}██{bcolors.WHITE}║║{bcolors.RED}██{bcolors.WHITE}║║{bcolors.RED}██      \n\
+    {bcolors.BRIGHT_GREEN}                                  {bcolors.RED}         ██████████████              {bcolors.WHITE}                               \n\
+    {bcolors.BRIGHT_GREEN}        ▄▄███████████▄▄           {bcolors.RED}       ██████████████████▄           {bcolors.WHITE}    ║║  ║║  ║║  ║║  ║║        \n\
+    {bcolors.BRIGHT_GREEN}      ▄█████████▀███████▄         {bcolors.RED}     ███████▀      ▀██████           {bcolors.RED}  ██{bcolors.WHITE}║║{bcolors.RED}██{bcolors.WHITE}║║{bcolors.RED}██{bcolors.WHITE}║║{bcolors.RED}██{bcolors.WHITE}║║{bcolors.RED}██{bcolors.WHITE}║║{bcolors.RED}██      \n\
     {bcolors.BRIGHT_GREEN}     ████████████ ███████▄        {bcolors.BRIGHT_YELLOW}    ██{bcolors.RED}████                          {bcolors.RED}   ██████████████████████      \n\
     {bcolors.BRIGHT_GREEN}    █████████  ███ ███████        {bcolors.BRIGHT_YELLOW}   ██████       {bcolors.BRIGHT_BLUE}▄▄▄▄▄▄▄▄▄▄▄▄▄       {bcolors.WHITE}   ███████▀▀█▀▀█▀▀█▀▀█▀▀█      \n\
     {bcolors.BRIGHT_GREEN}    ██████████████ ███████        {bcolors.BRIGHT_YELLOW}   █████        {bcolors.BRIGHT_BLUE}██████████████      {bcolors.WHITE}   ██████████████████████      \n\
