@@ -266,7 +266,7 @@ def title():
     getpass.getpass("\n"*((rows//2)-16)+"\
 "+" "*((cols//2)-shift)+"        @@@  @@@            "+f"{bcolors.CYAN}.,,,,,,,,,,,,, .{bcolors.RESET}                                    \n\
 "+" "*((cols//2)-shift)+"   @@@@@@@  ' .       "+f"{bcolors.CYAN},,,,,,   ,,,,,,,,,,  ,,,,{bcolors.RESET}                                 \n\
-"+" "*((cols//2)-shift)+" .@@  /@@  @@@     "+f"{bcolors.CYAN},,,,,,,,,,,,    ,,,,,,, ,,,,,,{bcolors.RESET},                              \n\
+"+" "*((cols//2)-shift)+" .@@  /@@  @@@     "+f"{bcolors.CYAN},,,,,,,,,,,,    ,,,,,,, ,,,,,,,{bcolors.RESET}                              \n\
 "+" "*((cols//2)-shift)+" @@   @@  @@@    "+f"{bcolors.CYAN},,,,,,,,,,,,,,,,     ,,,,  ,,,,,,,*{bcolors.RESET}                            \n\
 "+" "*((cols//2)-shift)+"@@#  @@* (@@    "+f"{bcolors.CYAN},,,,                        ,,,,,,,,{bcolors.RESET}                            \n\
 "+" "*((cols//2)-shift)+" @@@@@@  @@       "+f"{bcolors.CYAN},,,,,,,                    ,,,,,  ,,{bcolors.RESET}     @@@@@@@@@@@@@@@@@@@@,\n\
