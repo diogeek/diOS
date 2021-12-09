@@ -206,10 +206,10 @@ def reset():
         ["UI Style",["Purple","Blue","Cyan","Green","Yellow","Red","Gold","White","Light Gray","Dark Gray","Black","Bright Purple","Bright Blue","Bright Cyan","Bright Green","Bright Yellow","Bright Red","Bright Black","Background Purple","Background Blue","Background Cyan","Background Green","Background Yellow","Background Red","Background White","Background Black","Background Bright Purple","Background Bright Blue","Background Bright Cyan","Background Bright Green","Background Bright Yellow","Background Bright Red","Background Bright White","Background Bright Black","Bold","Underline","Reversed"],"WHITE"],
         ["Sorting Files",["By Name","By Type","By Creation Date","Non-Hidden Files First"],"BY_NAME"],
         ["Show Hidden Files",["Yes","No"],"YES"],
-        ["Type to Show",["Files Only","Directories Only","Both"],"BOTH"],
+        ["Type of Files to Show in File System",["Files Only","Directories Only","Both"],"BOTH"],
         ["Google Search Language","en"],
         ["Date Format",["dd/mm/YYYY","mm/dd/YYYY","YYYY/mm/dd"],"DD/MM/YYYY"],
-        ["DiOS Logo Color",["Purple","Blue","Cyan","Green","Yellow","Red","Gold","White","Light Gray","Dark Gray","Black","Bright Purple","Bright Blue","Bright Cyan","Bright Green","Bright Yellow","Bright Red","Bright Black"],"CYAN"],
+        ["DiOS Logo Color",["Purple","Blue","Cyan","Green","Yellow","Red","Gold","White","Light Gray","Dark Gray","Bright Purple","Bright Blue","Bright Cyan","Bright Green","Bright Yellow","Bright Red","Reversed"],"CYAN"],
          ]
     return(path,barcolor,color,list_settings,date_format)
 
@@ -269,24 +269,24 @@ def title(logo_color):
     shift=40
     import getpass
     os.system('cls')
-    getpass.getpass(f"{bcolors.WHITE}\n"*((rows//2)-16)+"\
-"+" "*((cols//2)-shift)+"         ███  ███           "+f"{logo_color}▀███████████   ▄{bcolors.WHITE}                                    \n\
-"+" "*((cols//2)-shift)+"   ▄███████   ▀▀      "+f"{logo_color}████▄▄   ▀█████████  ████{bcolors.WHITE}                                 \n\
-"+" "*((cols//2)-shift)+"  ▐█▀  ▐██  ███    "+f"{logo_color}███████████    ▀██████▄  ██████{bcolors.WHITE}                              \n\
-"+" "*((cols//2)-shift)+"  ██   ██  ███   "+f"{logo_color}████████████▀▀▀▀   ▀▀████  ███████ {bcolors.WHITE}                            \n\
-"+" "*((cols//2)-shift)+" ▐█▌  ██▀ ▐██   "+f"{logo_color}██▀    ▄▄▄               ▀  ██████  ▄{bcolors.WHITE}                           \n\
-"+" "*((cols//2)-shift)+"  ▀█████  ██      "+f"{logo_color} ▄▄███▀                   ████▀  ▄██{bcolors.WHITE}     ▄███████████████████ \n\
-"+" "*((cols//2)-shift)+"              "+f"{logo_color} ████████                      ██▀  ▄████{bcolors.WHITE}   ████████████████████▀ \n\
-"+" "*((cols//2)-shift)+"              "+f"{logo_color}███████▀                           ██████{bcolors.WHITE}  ████████▀              \n\
-"+" "*((cols//2)-shift)+"              "+f"{logo_color}██████  ▄                        ████████{bcolors.WHITE} ▄███████                \n\
-"+" "*((cols//2)-shift)+"              "+f"{logo_color}████▀  ███                      █████████{bcolors.WHITE} ████████▄▄▄▄▄▄▄▄▄▄▄▄    \n\
-"+" "*((cols//2)-shift)+"              "+f"{logo_color} ██▀ ▄████                     ████▀▀   {bcolors.WHITE}  █████████████████████   \n\
-"+" "*((cols//2)-shift)+"                "+f"{logo_color}▀  ██████                         ▄▄█{bcolors.WHITE}    ▀███████████████████▌  \n\
-"+" "*((cols//2)-shift)+"                 "+f"{logo_color} ███████  ██▄         ▄▄▄▄█████████{bcolors.WHITE}                   ██████▌  \n\
-"+" "*((cols//2)-shift)+"                  "+f"{logo_color}███████  ▀█████▄    ████████████{bcolors.WHITE}                   ▄███████   \n\
-"+" "*((cols//2)-shift)+"                     "+f"{logo_color}█████  ███████▄▄  ▀████████{bcolors.WHITE}      ▄█████████████████████    \n\
-"+" "*((cols//2)-shift)+"                        "+f"{logo_color}██▄  █████████▄▄  ▀▀▀{bcolors.WHITE}         █████████████████████     \n\
-"+" "*((cols//2)-shift)+"                             "+f"{logo_color}▀▀████████▀▀{bcolors.WHITE}             ███████████████████       \n\
+    getpass.getpass(f"{bcolors.RESET}{bcolors.WHITE}\n"*((rows//2)-16)+"\
+"+" "*((cols//2)-shift)+"         ▄██  ███           "+f"{bcolors.RESET}{logo_color}▀███████████   ▄{bcolors.RESET}{bcolors.WHITE}                                    \n\
+"+" "*((cols//2)-shift)+"   ▄███████   ▀▀     "+f"{bcolors.RESET}{logo_color}▄████▄▄   ▀█████████  ███▄▄{bcolors.RESET}{bcolors.WHITE}                                \n\
+"+" "*((cols//2)-shift)+"  ▐█▌  ▐██  ██▌   "+f"{bcolors.RESET}{logo_color}▄███████████▄   ▀██████▄  █████▄{bcolors.RESET}{bcolors.WHITE}                              \n\
+"+" "*((cols//2)-shift)+"  ██   ██▌ ███   "+f"{bcolors.RESET}{logo_color}████████████▀▀▀▀   ▀▀████  ███████ {bcolors.RESET}{bcolors.WHITE}                            \n\
+"+" "*((cols//2)-shift)+" ▐█▌  ▐██ ▐██   "+f"{bcolors.RESET}{logo_color}██▀    ▄▄▄               ▀  ██████  ▄{bcolors.RESET}{bcolors.WHITE}                           \n\
+"+" "*((cols//2)-shift)+"  ▀█████▌ ██      "+f"{bcolors.RESET}{logo_color} ▄▄███▀                   ████▀  ▄██{bcolors.RESET}{bcolors.WHITE}     ▄███████████████████ \n\
+"+" "*((cols//2)-shift)+"              "+f"{bcolors.RESET}{logo_color} ▄███████                      ██▀  ▄████{bcolors.RESET}{bcolors.WHITE}   ████████████████████▀ \n\
+"+" "*((cols//2)-shift)+"              "+f"{bcolors.RESET}{logo_color}███████▀                           ██████{bcolors.RESET}{bcolors.WHITE}  ████████▀              \n\
+"+" "*((cols//2)-shift)+"              "+f"{bcolors.RESET}{logo_color}██████  ▄                        ████████{bcolors.RESET}{bcolors.WHITE} ▄███████                \n\
+"+" "*((cols//2)-shift)+"              "+f"{bcolors.RESET}{logo_color}████▀  ██                       ████████▀{bcolors.RESET}{bcolors.WHITE} ████████▄▄▄▄▄▄▄▄▄▄▄▄    \n\
+"+" "*((cols//2)-shift)+"              "+f"{bcolors.RESET}{logo_color}███▀ ▄████                     ████▀▀   {bcolors.RESET}{bcolors.WHITE}  █████████████████████   \n\
+"+" "*((cols//2)-shift)+"               "+f"{bcolors.RESET}{logo_color}█▀  ██████                         ▄▄█{bcolors.RESET}{bcolors.WHITE}    ▀███████████████████▌  \n\
+"+" "*((cols//2)-shift)+"                "+f"{bcolors.RESET}{logo_color}  ███████  ▄              ▄█████████{bcolors.RESET}{bcolors.WHITE}                   ██████▌  \n\
+"+" "*((cols//2)-shift)+"                 "+f"{bcolors.RESET}{logo_color}▀███████  ▀██▄▄▄▄    ▄████████████     {bcolors.RESET}{bcolors.WHITE}             ▄███████   \n\
+"+" "*((cols//2)-shift)+"                  "+f"{bcolors.RESET}{logo_color}▀███████  ███████▄▄  ▀█████████▀    {bcolors.RESET}{bcolors.WHITE}▄█████████████████████    \n\
+"+" "*((cols//2)-shift)+"                    "+f"{bcolors.RESET}{logo_color}▀▀████   █████████▄▄  ▀████▀    {bcolors.RESET}{bcolors.WHITE}  █████████████████████     \n\
+"+" "*((cols//2)-shift)+"                        "+f"{bcolors.RESET}{logo_color}▀▀▀  ▀▀█████████▀       {bcolors.RESET}{bcolors.WHITE}     ███████████████████       \n\
 "+"\n"*(rows-((rows//2)+1)-10)+"\
 "+" "*((cols//2)-7)+"PRESS ENTER")
     return("home")
@@ -1018,7 +1018,7 @@ def notes():
     cursor.close()
     db.commit()
     db.close()
-
+    
     for note in notes:
         print(note[1]+" - "+note[2]+" - "+note[3])
 
@@ -1031,36 +1031,36 @@ def home(logo_color):
     query=""
     #home page, with colored icons (all icons are 11 lines tall and 30 charactrs wide)
     while 1:
-        list_home=["title","dir","set","chat","google","calendar"]
+        list_home=["title","dir","set","notes","chat","google","calendar"]
         bar()
         print(f"{bcolors.RESET}\n\n\n\n\
-    {logo_color}      ▄█▄  ▀███████▄ ▐█▄▄          {bcolors.BRIGHT_YELLOW}                                {bcolors.DARK_GRAY}               ▄███▄            \n\
-    {logo_color}    ▄██████▄  ▀█████▌ ████▄        {bcolors.BRIGHT_YELLOW}    ▄█████████████████████      {bcolors.DARK_GRAY}        ▄██▄  ███████  ▄██▄     \n\
-    {logo_color}  ▄████████▀▀▀   ▀▀▀█ █████        {bcolors.BRIGHT_YELLOW}    █▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄      {bcolors.DARK_GRAY}       █████████████████████    \n\
-    {logo_color}     ▄▄▄▄             ▀███  █      {bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.DARK_GRAY}        ▀█████▀▀   ▀▀█████▀     \n\
-    {logo_color} ███████               █▀  ███     {bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.DARK_GRAY}     ▄███████         ███████▄  \n\
-    {logo_color} ████                    █████     {bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.DARK_GRAY}    ████████           ████████ \n\
-    {logo_color} ██   ██               ▄██████     {bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.DARK_GRAY}     ▀███████         ███████▀  \n\
-    {logo_color}    ████▌             ▄██▀▀▀▀      {bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.DARK_GRAY}        ▄█████▄▄   ▄▄█████▄     \n\
-    {logo_color}  ▀█████▌ █▄         ▄▄▄▄▄▄▄       {bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.DARK_GRAY}       █████████████████████    \n\
-    {logo_color}   ▀█████ ▐████▄  ▀███████▀        {bcolors.BRIGHT_YELLOW}    █████████████████████▀      {bcolors.DARK_GRAY}        ▀██▀  ███████  ▀██▀     \n\
-    {logo_color}      ▀██▌ ▐██████▄  ▀██▀          {bcolors.BRIGHT_YELLOW}                                {bcolors.DARK_GRAY}               ▀███▀            \n\
+    {bcolors.RESET}{logo_color}       ▄▄  ▀███████▄ ▐██▄          {bcolors.RESET}{bcolors.BRIGHT_YELLOW}                                {bcolors.RESET}{bcolors.DARK_GRAY}               ▄███▄            {bcolors.RESET}{bcolors.YELLOW}                                \n\
+    {bcolors.RESET}{logo_color}     ▄█████▄  ▀█████▌ ████▄        {bcolors.RESET}{bcolors.BRIGHT_YELLOW}    ▄█████████████████████      {bcolors.RESET}{bcolors.DARK_GRAY}        ▄██▄  ███████  ▄██▄     {bcolors.RESET}{bcolors.YELLOW}        ████████████████████▄   \n\
+    {bcolors.RESET}{logo_color}   ▄████████▀▀   ▀▀▀█ █████        {bcolors.RESET}{bcolors.BRIGHT_YELLOW}    █▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄      {bcolors.RESET}{bcolors.DARK_GRAY}       █████████████████████    {bcolors.RESET}{bcolors.YELLOW}       ████▀▀▀▀▀▀▀▀▀▀▀▀▀███ █   \n\
+    {bcolors.RESET}{logo_color}      ▄▄▄▄            ████  █      {bcolors.RESET}{bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.RESET}{bcolors.DARK_GRAY}        ▀█████▀▀   ▀▀█████▀     {bcolors.RESET}{bcolors.YELLOW}       █████████████████████    \n\
+    {bcolors.RESET}{logo_color}  ▄████▀               █▀  ███     {bcolors.RESET}{bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.RESET}{bcolors.DARK_GRAY}     ▄███████         ███████▄  {bcolors.RESET}{bcolors.YELLOW}       ███▀▀▀▀▀▀▀▀▀▀▀▀▀████     \n\
+    {bcolors.RESET}{logo_color}  ███▀  ▄                ▄████     {bcolors.RESET}{bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.RESET}{bcolors.DARK_GRAY}    ████████           ████████ {bcolors.RESET}{bcolors.YELLOW}       ████████████████████     \n\
+    {bcolors.RESET}{logo_color}  ██▀ ▄██              ▄████▀▀     {bcolors.RESET}{bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.RESET}{bcolors.DARK_GRAY}     ▀███████         ███████▀  {bcolors.RESET}{bcolors.YELLOW}       ███▀▀▀▀▀▀▀▀▀▀▀▀▀████     \n\
+    {bcolors.RESET}{logo_color}  █▀ ▄███▌            ▄█▀▀  ▄      {bcolors.RESET}{bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.RESET}{bcolors.DARK_GRAY}        ▄█████▄▄   ▄▄█████▄     {bcolors.RESET}{bcolors.YELLOW}       ████████████████████     \n\
+    {bcolors.RESET}{logo_color}    ▄████▌ █▄▄▄   ▄▄▄▄▄▄▄▄███      {bcolors.RESET}{bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.RESET}{bcolors.DARK_GRAY}       █████████████████████    {bcolors.RESET}{bcolors.YELLOW}       ██▀▀▀▀▀▀▀▀▀▀▀▀▀█████     \n\
+    {bcolors.RESET}{logo_color}    ▀█████ ▐████▄  ▀███████▀       {bcolors.RESET}{bcolors.BRIGHT_YELLOW}    █████████████████████▀      {bcolors.RESET}{bcolors.DARK_GRAY}        ▀██▀  ███████  ▀██▀     {bcolors.RESET}{bcolors.YELLOW}      ████████████████████▀     \n\
+    {bcolors.RESET}{logo_color}      ▀▀██▌ ▐█████▄▄ ▀██▀▀         {bcolors.RESET}{bcolors.BRIGHT_YELLOW}                                {bcolors.RESET}{bcolors.DARK_GRAY}               ▀███▀            {bcolors.RESET}{bcolors.YELLOW}     ████████████████████▀      \n\
     \n\
-    {bcolors.WHITE}       1.TITLE SCREEN                      2.FILE SYSTEM                       3.SETTINGS\n\
+    {bcolors.RESET}{bcolors.WHITE}        1.TITLE SCREEN                     2.FILE SYSTEM                       3.SETTINGS                      4.NOTES\n\
     \n\
-    {bcolors.BRIGHT_GREEN}                                  {bcolors.RED}         ██████████████              {bcolors.WHITE}                               \n\
-    {bcolors.BRIGHT_GREEN}        ▄▄███████████▄▄           {bcolors.RED}       ██████████████████▄           {bcolors.WHITE}    ║║  ║║  ║║  ║║  ║║        \n\
-    {bcolors.BRIGHT_GREEN}      ▄█████████▀███████▄         {bcolors.RED}     ███████▀      ▀██████           {bcolors.RED}  ██{bcolors.WHITE}║║{bcolors.RED}██{bcolors.WHITE}║║{bcolors.RED}██{bcolors.WHITE}║║{bcolors.RED}██{bcolors.WHITE}║║{bcolors.RED}██{bcolors.WHITE}║║{bcolors.RED}██      \n\
-    {bcolors.BRIGHT_GREEN}     ████████████ ███████▄        {bcolors.BRIGHT_YELLOW}    ██{bcolors.RED}████                          {bcolors.RED}   ██████████████████████      \n\
-    {bcolors.BRIGHT_GREEN}    █████████  ███ ███████        {bcolors.BRIGHT_YELLOW}   ██████       {bcolors.BRIGHT_BLUE}▄▄▄▄▄▄▄▄▄▄▄▄▄       {bcolors.WHITE}   ███████▀▀█▀▀█▀▀█▀▀█▀▀█      \n\
-    {bcolors.BRIGHT_GREEN}    ██████████████ ███████        {bcolors.BRIGHT_YELLOW}   █████        {bcolors.BRIGHT_BLUE}██████████████      {bcolors.WHITE}   ██████████████████████      \n\
-    {bcolors.BRIGHT_GREEN}    █████████  ██ ████████        {bcolors.BRIGHT_YELLOW}   ██████       {bcolors.BRIGHT_BLUE}▀████████████       {bcolors.WHITE}   █▀▀█▀▀█▀▀█▀▀█▀▀█▀▀█▀▀█      \n\
-    {bcolors.BRIGHT_GREEN}     ███████████▄████████▀        {bcolors.BRIGHT_YELLOW}    ████{bcolors.GREEN}██             {bcolors.BRIGHT_BLUE}██████       {bcolors.WHITE}   ██████████████████████   \n\
-    {bcolors.BRIGHT_GREEN}      █████████████████▀          {bcolors.BRIGHT_YELLOW}    ▀{bcolors.GREEN}███████▄      ▄█{bcolors.BRIGHT_BLUE}██████         {bcolors.WHITE}   █▀▀█▀▀█▀▀█▀▀█▀▀█▀▀████      \n\
-    {bcolors.BRIGHT_GREEN}     ████▀▀█████████▀▀            {bcolors.GREEN}       ██████████████████{bcolors.BRIGHT_BLUE}█          {bcolors.WHITE}   ██████████████████████      \n\
-    {bcolors.BRIGHT_GREEN}    ██▀▀                          {bcolors.GREEN}           ███████████              {bcolors.WHITE}   ██████████████████████      \n\
+    {bcolors.RESET}{bcolors.BRIGHT_GREEN}                                  {bcolors.RESET}{bcolors.RED}         ██████████████              {bcolors.RESET}{bcolors.WHITE}                              \n\
+    {bcolors.RESET}{bcolors.BRIGHT_GREEN}        ▄▄███████████▄▄           {bcolors.RESET}{bcolors.RED}       ██████████████████▄           {bcolors.RESET}{bcolors.WHITE}    ║║  ║║  ║║  ║║  ║║        \n\
+    {bcolors.RESET}{bcolors.BRIGHT_GREEN}      ▄█████████▀███████▄         {bcolors.RESET}{bcolors.RED}     ███████▀      ▀██████           {bcolors.RESET}{bcolors.RED}  ██{bcolors.RESET}{bcolors.WHITE}║║{bcolors.RESET}{bcolors.RED}██{bcolors.RESET}{bcolors.WHITE}║║{bcolors.RESET}{bcolors.RED}██{bcolors.RESET}{bcolors.WHITE}║║{bcolors.RESET}{bcolors.RED}██{bcolors.RESET}{bcolors.WHITE}║║{bcolors.RESET}{bcolors.RED}██{bcolors.RESET}{bcolors.WHITE}║║{bcolors.RESET}{bcolors.RED}██      \n\
+    {bcolors.RESET}{bcolors.BRIGHT_GREEN}     ████████████ ███████▄        {bcolors.RESET}{bcolors.BRIGHT_YELLOW}    ██{bcolors.RESET}{bcolors.RED}████                          {bcolors.RESET}{bcolors.RED}   ██████████████████████      \n\
+    {bcolors.RESET}{bcolors.BRIGHT_GREEN}    █████████  ███ ███████        {bcolors.RESET}{bcolors.BRIGHT_YELLOW}   ██████       {bcolors.RESET}{bcolors.BRIGHT_BLUE}▄▄▄▄▄▄▄▄▄▄▄▄▄       {bcolors.RESET}{bcolors.WHITE}   ███████▀▀█▀▀█▀▀█▀▀█▀▀█      \n\
+    {bcolors.RESET}{bcolors.BRIGHT_GREEN}    ██████████████ ███████        {bcolors.RESET}{bcolors.BRIGHT_YELLOW}   █████        {bcolors.RESET}{bcolors.BRIGHT_BLUE}██████████████      {bcolors.RESET}{bcolors.WHITE}   ██████████████████████      \n\
+    {bcolors.RESET}{bcolors.BRIGHT_GREEN}    █████████  ██ ████████        {bcolors.RESET}{bcolors.BRIGHT_YELLOW}   ██████       {bcolors.RESET}{bcolors.BRIGHT_BLUE}▀████████████       {bcolors.RESET}{bcolors.WHITE}   █▀▀█▀▀█▀▀█▀▀█▀▀█▀▀█▀▀█      \n\
+    {bcolors.RESET}{bcolors.BRIGHT_GREEN}     ███████████▄████████▀        {bcolors.RESET}{bcolors.BRIGHT_YELLOW}    ████{bcolors.RESET}{bcolors.GREEN}██             {bcolors.RESET}{bcolors.BRIGHT_BLUE}██████       {bcolors.RESET}{bcolors.WHITE}   ██████████████████████      \n\
+    {bcolors.RESET}{bcolors.BRIGHT_GREEN}      █████████████████▀          {bcolors.RESET}{bcolors.BRIGHT_YELLOW}    ▀{bcolors.RESET}{bcolors.GREEN}███████▄      ▄█{bcolors.RESET}{bcolors.BRIGHT_BLUE}██████         {bcolors.RESET}{bcolors.WHITE}   █▀▀█▀▀█▀▀█▀▀█▀▀█▀▀████      \n\
+    {bcolors.RESET}{bcolors.BRIGHT_GREEN}     ████▀▀█████████▀▀            {bcolors.RESET}{bcolors.GREEN}       ██████████████████{bcolors.RESET}{bcolors.BRIGHT_BLUE}█          {bcolors.RESET}{bcolors.WHITE}   ██████████████████████      \n\
+    {bcolors.RESET}{bcolors.BRIGHT_GREEN}    ██▀▀                          {bcolors.RESET}{bcolors.GREEN}           ███████████              {bcolors.RESET}{bcolors.WHITE}   ██████████████████████      \n\
     \n\
-    {bcolors.WHITE}          4.CHATRUM                       5.GOOGLE SEARCH                      6.CALENDAR\n\
+    {bcolors.RESET}{bcolors.WHITE}          5.CHATRUM                       6.GOOGLE SEARCH                      7.CALENDAR\n\
     \n\
     ")
         selected=str(input("\n    ")).upper()
@@ -1098,7 +1098,7 @@ def bar(no_UI=False):
         else:
             notification_color=f"{bcolors.BRIGHT_RED}"
         bartext+=" - ["+notification_color+str(len(dates))+f"{barcolor}] Event"+s+" Today"
-    if no_UI==True:
+    if no_UI:
         bartext+=f"{bcolors.RESET}"
     else:
         bartext+=f" - [H]ome - [B]ack - [S]ettings - [E]xit diOS{bcolors.RESET}"
