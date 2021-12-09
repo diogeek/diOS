@@ -644,7 +644,7 @@ def google_search():
             print("\n[N]ext Page\n")
         selected=str(input("\n    ")).upper()
         if selected.isnumeric():
-            if selected>0 and selected <11:
+            if int(selected)>0 and int(selected)<11:
                 webbrowser.open(liste[int(selected)-1])
                 return("google")
         elif selected=="P" and google_page>1:
@@ -939,7 +939,7 @@ def calendar(month,year):
                 while 1:
                     selected=str(input("\n    "))
                     if selected.isnumeric():
-                        if (int(selected)<1 or int(selected)>9998):
+                        if int(selected)<1 or int(selected)>9998:
                             print("\nEnter a numeric value between 1 and 9998.")
                             time.sleep(1.5)
                             return("calendar",month,year)
