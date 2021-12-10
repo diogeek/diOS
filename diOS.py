@@ -269,7 +269,7 @@ def title(logo_color):
     shift=40
     import getpass
     os.system('cls')
-    getpass.getpass(f"{bcolors.RESET}{bcolors.WHITE}\n"*((rows//2)-16)+"\
+    getpass.getpass(f"{bcolors.RESET}{bcolors.WHITE}"+"\n"*((rows//2)-16)+"\
 "+" "*((cols//2)-shift)+"         ▄██  ███           "+f"{bcolors.RESET}{logo_color}▀███████████   ▄{bcolors.RESET}{bcolors.WHITE}                                    \n\
 "+" "*((cols//2)-shift)+"   ▄███████   ▀▀     "+f"{bcolors.RESET}{logo_color}▄████▄▄   ▀█████████  ███▄▄{bcolors.RESET}{bcolors.WHITE}                                \n\
 "+" "*((cols//2)-shift)+"  ▐█▌  ▐██  ███   "+f"{bcolors.RESET}{logo_color}▄███████████▄   ▀██████▄  █████▄{bcolors.RESET}{bcolors.WHITE}                              \n\
@@ -1001,8 +1001,10 @@ def calendar(month,year):
                     return("calendar",month,year)
 
 def create_note():
-    bar(True)
-    title=str(input("Enter the Title of the Note.\n\n    ")).replace("'","''")
+    title=""
+    while not title:
+        bar(True)
+        title=str(input("Enter the Title of the Note.\n\n    ")).replace("'","''")
     bar(True)
     print("Write your Note, and press Escape when Done.\n")
     text=""
@@ -1041,8 +1043,89 @@ def create_note():
         os.system('color')
         exit()
 
-def read_note(note_id):
-    None
+def edit_note(note):
+    import getpass
+    db=sqlite3.connect('dios_database.db')
+    cursor=db.cursor()
+    note_id=note[0]
+    title=note[1]
+    text=note[2]
+    color=note[3]
+    bar(True)
+    print("Current title of the Note: '"+str(title)+"'.\n\nEnter the new title of the Note or leave blank to skip this step.")
+    new=str(input("\n    "))
+    if new:
+        title=new
+    bar(True)
+    print("Enter new text to write in the Note or leave blank to skip this step. Press Escape to proceed when finished.")
+    new=""
+    keyboard.add_hotkey("esc", lambda: keyboard.press("enter"), suppress =False)
+    userinput=""
+    while 1:
+        if not keyboard.is_pressed("esc"):
+            userinput=str(input("\n    "))
+            new+=(userinput)
+            if userinput:
+                new+="\n"
+        else:
+            break
+    keyboard.remove_hotkey("esc")
+    if new:
+        text=new
+    colors=["Purple","Blue","Cyan","Green","Yellow","Red","Gold","White","Light Gray","Dark Gray","Bright Purple","Bright Blue","Bright Cyan","Bright Green","Bright Yellow","Bright Red"]
+    spaces=len(str(len(colors)))
+    while 1:
+        bar(True)
+        print("Current color of the Note: '"+str(color)+"'.\n\nChoose a new color or leave blank to skip this step.")
+        ii=1
+        for color in colors:
+            print((" "*(spaces-len(str(ii))))+str(ii)+". "+color)
+            ii+=1
+        new=str(input("\n    "))
+        if new:
+            if new.isnumeric():
+                if int(new)>0 and int(new)<len(colors)+1:
+                    break
+        else: break
+        import time
+        print("Please Enter a numeric value between 1 and "+str(len(colors)+1)+".")
+        time.sleep(1.5)
+    if new:
+        color=colors[int(new)-1]
+    cursor.execute("""UPDATE notes SET title='"""+title+"""', text='"""+text.replace("'","''")+"""', color='"""+uppercase(color)+"""' WHERE id="""+str(note_id))
+    cursor.close()
+    db.commit()
+    db.close()
+    bar(True)
+    print("Note '"+title+"' edited.\n")
+    getpass.getpass("   Press Enter")
+    return(title,text,changecolor(uppercase(color)))
+
+def read_note(note):
+    from math import floor
+    global color
+    title=note[1]
+    text=note[2].replace("''","'")
+    note_color=changecolor(note[3])
+    while 1:
+        bar()
+        print(f"{note_color}████████████████████ "+title+f"{bcolors.RESET}{color}\n")
+        print(text)
+        print("1.Edit Note\n2.Delete Note\n")
+        selected=str(input("\n    ")).upper()
+        if selected=="1":
+            title,text,note_color=edit_note(note)
+        elif selected=="2":
+            delete_note(note[0])
+        elif selected=="B":
+            return("notes")
+        elif selected=="H":
+            return("home")
+        elif selected=="S":
+            return("set")
+        elif selected=="E":
+            os.system('color')
+            exit()
 
 def notes():
     while 1:
@@ -1061,6 +1144,7 @@ def notes():
             for note in notes:
                 print((" "*(spaces-len(str(ii))))+str(ii)+". "+note[1]+" - "+note[3])
                 ii+=1
+            print("\nSelect a Note to read, edit or delete it.")
         else:
             print("You haven't wrote any Note yet.\n")
         selected=str(input("\n    ")).upper()
@@ -1068,7 +1152,7 @@ def notes():
             create_note()
         elif selected.isnumeric():
             if int(selected)>0 and int(selected)<len(notes)+1:
-                read_note(notes[int(selected-1)][0])
+                return(read_note(notes[int(selected)-1]))
         elif selected=="H" or selected=="B":
             return("home")
         elif selected=="S":
