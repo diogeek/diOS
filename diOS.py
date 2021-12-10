@@ -272,21 +272,21 @@ def title(logo_color):
     getpass.getpass(f"{bcolors.RESET}{bcolors.WHITE}\n"*((rows//2)-16)+"\
 "+" "*((cols//2)-shift)+"         ▄██  ███           "+f"{bcolors.RESET}{logo_color}▀███████████   ▄{bcolors.RESET}{bcolors.WHITE}                                    \n\
 "+" "*((cols//2)-shift)+"   ▄███████   ▀▀     "+f"{bcolors.RESET}{logo_color}▄████▄▄   ▀█████████  ███▄▄{bcolors.RESET}{bcolors.WHITE}                                \n\
-"+" "*((cols//2)-shift)+"  ▐█▌  ▐██  ██▌   "+f"{bcolors.RESET}{logo_color}▄███████████▄   ▀██████▄  █████▄{bcolors.RESET}{bcolors.WHITE}                              \n\
+"+" "*((cols//2)-shift)+"  ▐█▌  ▐██  ███   "+f"{bcolors.RESET}{logo_color}▄███████████▄   ▀██████▄  █████▄{bcolors.RESET}{bcolors.WHITE}                              \n\
 "+" "*((cols//2)-shift)+"  ██   ██▌ ███   "+f"{bcolors.RESET}{logo_color}████████████▀▀▀▀   ▀▀████  ███████ {bcolors.RESET}{bcolors.WHITE}                            \n\
 "+" "*((cols//2)-shift)+" ▐█▌  ▐██ ▐██   "+f"{bcolors.RESET}{logo_color}██▀    ▄▄▄               ▀  ██████  ▄{bcolors.RESET}{bcolors.WHITE}                           \n\
-"+" "*((cols//2)-shift)+"  ▀█████▌ ██      "+f"{bcolors.RESET}{logo_color} ▄▄███▀                   ████▀  ▄██{bcolors.RESET}{bcolors.WHITE}     ▄███████████████████ \n\
-"+" "*((cols//2)-shift)+"              "+f"{bcolors.RESET}{logo_color} ▄███████                      ██▀  ▄████{bcolors.RESET}{bcolors.WHITE}   ████████████████████▀ \n\
+"+" "*((cols//2)-shift)+"  ▀█████▌ ██   "+f"{bcolors.RESET}{logo_color}    ▄▄███▀                   ████▀  ▄██{bcolors.RESET}{bcolors.WHITE}     ▄███████████████████ \n\
+"+" "*((cols//2)-shift)+"              "+f"{bcolors.RESET}{logo_color} ▄███████                      ██▀  ▄████{bcolors.RESET}{bcolors.WHITE}   ████████████████████ \n\
 "+" "*((cols//2)-shift)+"              "+f"{bcolors.RESET}{logo_color}███████▀                           ██████{bcolors.RESET}{bcolors.WHITE}  ████████▀              \n\
 "+" "*((cols//2)-shift)+"              "+f"{bcolors.RESET}{logo_color}██████  ▄                        ████████{bcolors.RESET}{bcolors.WHITE} ▄███████                \n\
 "+" "*((cols//2)-shift)+"              "+f"{bcolors.RESET}{logo_color}████▀  ██                       ████████▀{bcolors.RESET}{bcolors.WHITE} ████████▄▄▄▄▄▄▄▄▄▄▄▄    \n\
 "+" "*((cols//2)-shift)+"              "+f"{bcolors.RESET}{logo_color}███▀ ▄████                     ████▀▀   {bcolors.RESET}{bcolors.WHITE}  █████████████████████   \n\
 "+" "*((cols//2)-shift)+"               "+f"{bcolors.RESET}{logo_color}█▀  ██████                         ▄▄█{bcolors.RESET}{bcolors.WHITE}    ▀███████████████████▌  \n\
 "+" "*((cols//2)-shift)+"                "+f"{bcolors.RESET}{logo_color}  ███████  ▄              ▄█████████{bcolors.RESET}{bcolors.WHITE}                   ██████▌  \n\
-"+" "*((cols//2)-shift)+"                 "+f"{bcolors.RESET}{logo_color}▀███████  ▀██▄▄▄▄    ▄████████████     {bcolors.RESET}{bcolors.WHITE}             ▄███████   \n\
-"+" "*((cols//2)-shift)+"                  "+f"{bcolors.RESET}{logo_color}▀███████  ███████▄▄  ▀█████████▀    {bcolors.RESET}{bcolors.WHITE}▄█████████████████████    \n\
-"+" "*((cols//2)-shift)+"                    "+f"{bcolors.RESET}{logo_color}▀▀████   █████████▄▄  ▀████▀    {bcolors.RESET}{bcolors.WHITE}  █████████████████████     \n\
-"+" "*((cols//2)-shift)+"                        "+f"{bcolors.RESET}{logo_color}▀▀▀  ▀▀█████████▀       {bcolors.RESET}{bcolors.WHITE}     ███████████████████       \n\
+"+" "*((cols//2)-shift)+"                 "+f"{bcolors.RESET}{logo_color}▀███████  ▀██▄▄▄▄    ▄████████████{bcolors.RESET}{bcolors.WHITE}                  ▄███████   \n\
+"+" "*((cols//2)-shift)+"                  "+f"{bcolors.RESET}{logo_color}▀███████  ███████▄▄  ▀█████████▀{bcolors.RESET}{bcolors.WHITE}    ▄█████████████████████    \n\
+"+" "*((cols//2)-shift)+"                    "+f"{bcolors.RESET}{logo_color}▀▀████   █████████▄▄  ▀████▀{bcolors.RESET}{bcolors.WHITE}      █████████████████████     \n\
+"+" "*((cols//2)-shift)+"                        "+f"{bcolors.RESET}{logo_color}▀▀▀  ▀███████████▄ {bcolors.RESET}{bcolors.WHITE}           ███████████████████▀      \n\
 "+"\n"*(rows-((rows//2)+1)-10)+"\
 "+" "*((cols//2)-7)+"PRESS ENTER")
     return("home")
@@ -999,28 +999,83 @@ def calendar(month,year):
                     print("There are no events.\n")
                     getpass.getpass("   Press Enter")
                     return("calendar",month,year)
-        elif selected=="H" or selected=="B":
-            return("home",month,year)
-        elif selected=="S":
-            return("set",month,year)
-        elif selected=="E":
-            os.system('color')
-            exit()
 
 def create_note():
+    bar(True)
+    title=str(input("Enter the Title of the Note.\n\n    ")).replace("'","''")
+    bar(True)
+    print("Write your Note, and press Escape when Done.\n")
+    text=""
+    keyboard.add_hotkey("esc", lambda: keyboard.press("enter"), suppress =False)
+    while 1:
+        if not keyboard.is_pressed("esc"):
+            text+=(str(input("\n    ")).replace("'","''")+"\n")
+        else:
+            break
+    keyboard.remove_hotkey("esc")
+    bar()
+    print("Choose a Color for your Note :\n")
+    ii=1
+    colors=["Purple","Blue","Cyan","Green","Yellow","Red","Gold","White","Light Gray","Dark Gray","Bright Purple","Bright Blue","Bright Cyan","Bright Green","Bright Yellow","Bright Red"]
+    spaces=len(str(len(colors)))
+    for color in colors:
+        print((" "*(spaces-len(str(ii))))+str(ii)+". "+color)
+        ii+=1
+    color=str(input("\n    ")).upper()
+    if color.isnumeric():
+        if int(color)>0 and int(color)<len(colors)+1:
+            color=colors[int(color)-1].upper()
+            db=sqlite3.connect('dios_database.db')
+            cursor=db.cursor()
+            cursor.execute("""INSERT INTO notes (title, text, color) 
+                       VALUES 
+                       ('"""+title+"""', '"""+text+"""', '"""+color+"""')""")
+            cursor.close()
+            db.commit()
+            db.close()
+    elif color=="H" or color=="B":
+        return("home",month,year)
+    elif color=="S":
+        return("set",month,year)
+    elif color=="E":
+        os.system('color')
+        exit()
+
+def read_note(note_id):
     None
 
 def notes():
-    db=sqlite3.connect('dios_database.db')
-    cursor=db.cursor()
-    cursor.execute("""SELECT id,title,text,color FROM notes""")
-    notes=cursor.fetchall()
-    cursor.close()
-    db.commit()
-    db.close()
-    
-    for note in notes:
-        print(note[1]+" - "+note[2]+" - "+note[3])
+    while 1:
+        bar()
+        db=sqlite3.connect('dios_database.db')
+        cursor=db.cursor()
+        cursor.execute("""SELECT id,title,text,color FROM notes""")
+        notes=cursor.fetchall()
+        cursor.close()
+        db.commit()
+        db.close()
+        print("Your Notes :\n\n0. Create a Note\n")
+        if notes:
+            ii=1
+            spaces=len(str(len(notes)))
+            for note in notes:
+                print((" "*(spaces-len(str(ii))))+str(ii)+". "+note[1]+" - "+note[3])
+                ii+=1
+        else:
+            print("You haven't wrote any Note yet.\n")
+        selected=str(input("\n    ")).upper()
+        if selected=="0":
+            create_note()
+        elif selected.isnumeric():
+            if int(selected)>0 and int(selected)<len(notes)+1:
+                read_note(notes[int(selected-1)][0])
+        elif selected=="H" or selected=="B":
+            return("home")
+        elif selected=="S":
+            return("set")
+        elif selected=="E":
+            os.system('color')
+            exit()
 
 #ALL APPLICATIONS ^^^^
 
@@ -1029,9 +1084,10 @@ def notes():
 def home(logo_color):
     global query
     query=""
+    list_home=["title","dir","set","notes","chat","google","calendar"]
     #home page, with colored icons (all icons are 11 lines tall and 30 charactrs wide)
     while 1:
-        list_home=["title","dir","set","notes","chat","google","calendar"]
+
         bar()
         print(f"{bcolors.RESET}\n\n\n\n\
     {bcolors.RESET}{logo_color}       ▄▄  ▀███████▄ ▐██▄          {bcolors.RESET}{bcolors.BRIGHT_YELLOW}                                {bcolors.RESET}{bcolors.DARK_GRAY}               ▄███▄            {bcolors.RESET}{bcolors.YELLOW}                                \n\
