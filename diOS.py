@@ -386,6 +386,8 @@ def settings():
             return("home")
         elif selected=="F":
             return("dir")
+        elif events_key==True and selected=="V":
+            return("events")
         elif selected=="E":
             os.system('color')
             exit()
@@ -456,6 +458,8 @@ def create_file():
         return("set")
     elif selected=="B":
         return("dir")
+    elif events_key==True and selected=="V":
+        return("events")
     elif selected=="E":
         os.system('color')
         exit()
@@ -568,6 +572,8 @@ def directories(path):
             return("home")
         elif selected=="S":
             return("set")
+        elif events_key==True and selected=="V":
+            return("events")
         elif selected=="B":
             if path.count("\\")>1:
                 path=path.rsplit('\\',2)[0]+str("\\")
@@ -609,6 +615,8 @@ It is recommended to put each of your client scripts on each half of your screen
             return("home")
         elif selected=="S":
             return("set")
+        elif events_key==True and selected=="V":
+            return("events")
         elif selected=="E":
             os.system('color')
             exit()
@@ -657,6 +665,8 @@ def google_search():
             return("home")
         elif selected=="S":
             return("set")
+        elif events_key==True and selected=="V":
+            return("events")
         elif selected=="E":
             os.system('color')
             exit()
@@ -702,25 +712,29 @@ def create_event(date):
         bar()
         print("Enter the title of the event on "+deformat_date(date)+".\n")
         event=str(input("\n    "))
-        if event=="B":
+        if event.upper()=="B":
             return("calendar")
-        elif event=="H":
+        elif event.upper()=="H":
             return("home")
-        elif event=="S":
+        elif event.upper()=="S":
             return("set")
-        elif event=="E":
+        elif events_key==True and event.upper()=="V":
+            return("events")
+        elif event.upper()=="E":
             os.system('color')
             exit()
     bar()
     print("Enter the description of the event. (Leave blank for no description)")
     desc=str(input("\n    "))
-    if desc=="B":
+    if desc.upper()=="B":
         return("calendar")
-    elif desc=="H":
+    elif desc.upper()=="H":
         return("home")
-    elif desc=="S":
+    elif desc.upper()=="S":
         return("set")
-    elif desc=="E":
+    elif events_key==True and desc.upper()=="V":
+        return("events")
+    elif desc.upper()=="E":
         os.system('color')
         exit()
     if len(date.split('/')[0])==1:
@@ -781,26 +795,28 @@ def show_events(date):
                     if selected.isnumeric():
                         if selected=="1":
                             edit_event(events[int(event_choosed)-1].split(" - ")[0],events[int(event_choosed)-1].split(" - ")[1],ids[int(event_choosed)-1],date)
-                            return(None)
                         elif selected=="2":
                             del_event(events[int(event_choosed)-1].split(" - ")[0],date)
-                            return(None)
                     elif selected=="B":
                         return("calendar")
                     elif selected=="H":
                         return("home")
                     elif selected=="S":
                         return("set")
+                    elif events_key==True and selected=="V":
+                        return("events")
                     elif selected=="E":
                         os.system('color')
                         exit()
-            elif selected=="B":
+            elif event_choosed=="B":
                 return("calendar")
-            elif selected=="H":
+            elif event_choosed=="H":
                 return("home")
-            elif selected=="S":
+            elif event_choosed=="S":
                 return("set")
-            elif selected=="E":
+            elif events_key==True and event_choosed=="V":
+                return("events")
+            elif event_choosed=="E":
                 os.system('color')
                 exit()
         else:
@@ -820,7 +836,7 @@ def edit_event(event_title,event_desc,event_id,date):
     new=str(input("\n    "))
     if new:
         event_desc=new
-    cursor.execute("""UPDATE dates SET event='"""+event_title+"""', desc='"""+event_desc+"""' WHERE id="""+str(event_id))
+    cursor.execute("""UPDATE dates SET event='"""+event_title.replace("'","''")+"""', desc='"""+event_desc.replace("'","''")+"""' WHERE id="""+str(event_id))
     cursor.close()
     db.commit()
     db.close()
@@ -916,10 +932,9 @@ def calendar(month,year):
             print((" "*(2-len(str(ii))))+str(ii)+". "+str(items))
             ii+=1
         selected=str(input("\n    ")).upper()
-        if selected.isnumeric():
+        if selected.isnumeric() or (events_key==True and selected=="V"):
             import time
-            selected=int(selected)
-            if selected==1:
+            if selected=="1":
                 selected=0
                 print("Enter Month Number:")
                 while 1:
@@ -933,7 +948,7 @@ def calendar(month,year):
                     print("\nEnter a numeric value between 1 and 12.")
                     time.sleep(1.5)
                     return("calendar",month,year)
-            elif selected==2:
+            elif selected=="2":
                 selected=0
                 print("Enter Year:")
                 while 1:
@@ -947,7 +962,7 @@ def calendar(month,year):
                     print("\nEnter a numeric value between 1 and 9998.")
                     time.sleep(1.5)
                     return("calendar",month,year)
-            elif selected==3:
+            elif selected=="3":
                 selected=0
                 while selected<1 or selected>how_many_days:
                     print("\nEnter day of "+str(list_months[month-1]).split(" - ")[0]+" of "+str(year)+" you want to create an event for.")
@@ -959,7 +974,7 @@ def calendar(month,year):
                         time.sleep(1.5)
                         return("calendar",month,year)
                 create_event(str(selected)+"/"+str(month)+"/"+str(year))
-            while selected==4:
+            while selected=="4" or (events_key==True and selected=="V"):
                 db=sqlite3.connect('dios_database.db')
                 cursor=db.cursor()
                 cursor.execute("""SELECT date FROM dates""")
@@ -971,6 +986,7 @@ def calendar(month,year):
                     dates=list(dict.fromkeys(dates))
                     date_selected=0
                     while int(date_selected)<1 or int(date_selected)>len(dates):
+                        date_selected=0
                         bar()
                         print("You have events on the following dates :\n")
                         ii=1
@@ -979,11 +995,9 @@ def calendar(month,year):
                             print((" "*(spaces-len(str(ii))))+str(ii)+". "+deformat_date(date[0]))
                             ii+=1
                         print("\nSelect date you want to see, edit or delete the events of.")
-                        date_selected=str(input("\n    "))
+                        date_selected=str(input("\n    ")).upper()
                         if date_selected.isnumeric() and int(date_selected)>0 and int(date_selected)<len(dates)+1:
                             return_value=show_events(dates[int(date_selected)-1][0])
-                            if return_value:
-                                return(return_value,month,year)
                         elif date_selected=="B":
                             return("calendar",month,year)
                         elif date_selected=="H":
@@ -999,6 +1013,13 @@ def calendar(month,year):
                     print("There are no events.\n")
                     getpass.getpass("   Press Enter")
                     return("calendar",month,year)
+        elif selected=="H" or selected=="B":
+            return("home",month,year)
+        elif selected=="S":
+            return("set",month,year)
+        elif selected=="E":
+            os.system('color')
+            exit()
 
 def create_note():
     title=""
@@ -1026,7 +1047,7 @@ def create_note():
     color=str(input("\n    ")).upper()
     if color.isnumeric():
         if int(color)>0 and int(color)<len(colors)+1:
-            color=colors[int(color)-1].upper()
+            color=uppercase(colors[int(color)-1])
             db=sqlite3.connect('dios_database.db')
             cursor=db.cursor()
             cursor.execute("""INSERT INTO notes (title, text, color) 
@@ -1036,9 +1057,11 @@ def create_note():
             db.commit()
             db.close()
     elif color=="H" or color=="B":
-        return("home",month,year)
+        return("home")
     elif color=="S":
-        return("set",month,year)
+        return("set")
+    elif events_key==True and color=="V":
+        return("events")
     elif color=="E":
         os.system('color')
         exit()
@@ -1137,6 +1160,8 @@ def read_note(note):
             return("home")
         elif selected=="S":
             return("set")
+        elif events_key==True and selected=="V":
+            return("events")
         elif selected=="E":
             os.system('color')
             exit()
@@ -1175,9 +1200,9 @@ def notes():
                         preview=preview[:8]+"..."
                     text[0]+=str(ii)+"."+" "*(16-len(str(ii)))
                     text[1]+=f"{changecolor(note[3])}█████████████"+f"{bcolors.RESET}{color}     "
-                    text[2]+=f"{changecolor(note[3])}█"+title+"█"*(11-len(title))+"█"+f"{bcolors.RESET}{color}     "
+                    text[2]+=f"{changecolor(note[3])}█"+title+"█"*(12-len(title))+f"{bcolors.RESET}{color}     "
                     text[3]+=f"{changecolor(note[3])}█████████████"+f"{bcolors.RESET}{color}     "
-                    text[4]+=f"{changecolor(note[3])}█"+"█"*(11-len(preview))+preview+"█"+f"{bcolors.RESET}{color}     "
+                    text[4]+=f"{changecolor(note[3])}█"+preview+"█"*(12-len(preview))+f"{bcolors.RESET}{color}     "
                     text[5]+=f"{changecolor(note[3])}█████████████"+f"{bcolors.RESET}{color}     "
                     text[6]+=f"{changecolor(note[3])}█████████████"+f"{bcolors.RESET}{color}     "
                     ii+=1
@@ -1204,6 +1229,8 @@ def notes():
             return("home")
         elif selected=="S":
             return("set")
+        elif events_key==True and selected=="V":
+            return("events")
         elif selected=="E":
             os.system('color')
             exit()
@@ -1213,7 +1240,7 @@ def notes():
 #HOME, BAR, LOOP vvvv
 
 def home(logo_color):
-    global query
+    global query,events_key
     query=""
     list_home=["title","dir","set","notes","chat","google","calendar"]
     #home page, with colored icons (all icons are 11 lines tall and 30 charactrs wide)
@@ -1257,12 +1284,14 @@ def home(logo_color):
             return("title")
         elif selected=="S":
             return("set")
+        elif events_key==True and selected=="V":
+            return("events")
         elif selected=="E":
             os.system('color')
             exit()
-
+events_key=False
 def bar(no_UI=False):
-    global currentpage,query
+    global currentpage,query,events_key
     os.system("cls")
     #BACKGROUND COLOR
     os.system('color '+list_settings[0][2]+'f')
@@ -1276,7 +1305,9 @@ def bar(no_UI=False):
     cursor.close()
     db.commit()
     db.close()
+    events_key=False
     if dates:
+        events_key=True
         s=""
         if len(dates)>1:
             s="s"
@@ -1284,7 +1315,7 @@ def bar(no_UI=False):
             notification_color=f"{bcolors.BRIGHT_BLUE}"
         else:
             notification_color=f"{bcolors.BRIGHT_RED}"
-        bartext+=" - ["+notification_color+str(len(dates))+f"{barcolor}] Event"+s+" Today"
+        bartext+=" - [V]iew your ("+notification_color+str(len(dates))+f"{barcolor}) Event"+s+" Today"
     if no_UI:
         bartext+=f"{bcolors.RESET}"
     else:
@@ -1292,7 +1323,7 @@ def bar(no_UI=False):
     print(bartext)
     
     #separator (COMMENT THIS LINE OUT IF YOU WANT TO RUN IN YOU IDE, OTHERWISE YOU'LL NEED TO OPEN IN TERMINAL)
-    print("\u2501"*os.get_terminal_size()[0]+f"{color}")
+    #print("\u2501"*os.get_terminal_size()[0]+f"{color}")
 
 #setting initial page
 currentpage="title"
@@ -1313,10 +1344,11 @@ while 1:
         currentpage=google_search()
     elif currentpage=="calendar":
         currentpage,month,year=calendar(month,year)
+    elif currentpage=="events":
+        currentpage=show_events(datetime.date.today().strftime("%d/%m/%Y"))
     elif currentpage=="notes":
         currentpage=notes()
 
-#notif évènements + mettre plusieurs évènements par jour
 #calculator
 #snake
 #tetris
