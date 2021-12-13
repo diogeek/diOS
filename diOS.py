@@ -1142,6 +1142,7 @@ def read_note(note):
             exit()
 
 def notes():
+    global color
     while 1:
         bar()
         db=sqlite3.connect('dios_database.db')
@@ -1157,28 +1158,28 @@ def notes():
             ii=1
             for line in notes_graph:
                 text=[
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
+                    "    ",
+                    "    ",
+                    "    ",
+                    "    ",
+                    "    ",
+                    "    ",
+                    "    ",
                     ]
                 for note in line:
                     title=note[1]
                     if len(title)>11:
                         title=title[:8]+"..."
-                    preview=note[2]
+                    preview=note[2].replace("\n","  ")
                     if len(preview)>1:
                         preview=preview[:8]+"..."
                     text[0]+=str(ii)+"."+" "*(16-len(str(ii)))
-                    text[1]+="█████████████     "
-                    text[2]+="█"+title+"█"*(11-len(title))+"█     "
-                    text[3]+="█████████████     "
-                    text[4]+="█"+"█"*(11-len(preview))+preview+"█     "
-                    text[5]+="█████████████     "
-                    text[6]+="████████████      "
+                    text[1]+=f"{changecolor(note[3])}█████████████"+f"{bcolors.RESET}{color}     "
+                    text[2]+=f"{changecolor(note[3])}█"+title+"█"*(11-len(title))+"█"+f"{bcolors.RESET}{color}     "
+                    text[3]+=f"{changecolor(note[3])}█████████████"+f"{bcolors.RESET}{color}     "
+                    text[4]+=f"{changecolor(note[3])}█"+"█"*(11-len(preview))+preview+"█"+f"{bcolors.RESET}{color}     "
+                    text[5]+=f"{changecolor(note[3])}█████████████"+f"{bcolors.RESET}{color}     "
+                    text[6]+=f"{changecolor(note[3])}█████████████"+f"{bcolors.RESET}{color}     "
                     ii+=1
                 for line in text:
                     print(line)
@@ -1291,9 +1292,9 @@ def bar(no_UI=False):
     print(bartext)
     
     #separator (COMMENT THIS LINE OUT IF YOU WANT TO RUN IN YOU IDE, OTHERWISE YOU'LL NEED TO OPEN IN TERMINAL)
-    #print("\u2501"*os.get_terminal_size()[0]+f"{color}")
+    print("\u2501"*os.get_terminal_size()[0]+f"{color}")
 
-#setting initial page (SET THIS ONE TO "home" IF YOU WANT TO RUN IN YOUR IDE, OTHERWISE YOU'LL NEED TO OPEN IN TERMINAL)
+#setting initial page
 currentpage="title"
 
 while 1:
