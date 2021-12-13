@@ -1101,6 +1101,20 @@ def edit_note(note):
     getpass.getpass("   Press Enter")
     return(title,text,changecolor(uppercase(color)))
 
+def delete_note(note_id,title):
+    import getpass
+    db=sqlite3.connect('dios_database.db')
+    cursor=db.cursor()
+    cursor.execute("""DELETE FROM notes WHERE id='"""+str(note_id)+"""'""")
+    cursor.close()
+    db.commit()
+    db.close()
+    bar(True)
+    print("Note '"+title+"' deleted.\n")
+    getpass.getpass("   Press Enter")
+    return("notes")
+    
+
 def read_note(note):
     from math import floor
     global color
@@ -1116,7 +1130,7 @@ def read_note(note):
         if selected=="1":
             title,text,note_color=edit_note(note)
         elif selected=="2":
-            delete_note(note[0])
+            return(delete_note(note[0],title))
         elif selected=="B":
             return("notes")
         elif selected=="H":
@@ -1139,11 +1153,43 @@ def notes():
         db.close()
         print("Your Notes :\n\n0. Create a Note\n")
         if notes:
+            notes_graph = [notes[x:x+3] for x in range(0, len(notes),3)]
+            ii=1
+            for line in notes_graph:
+                text=[
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ]
+                for note in line:
+                    title=note[1]
+                    if len(title)>11:
+                        title=title[:8]+"..."
+                    preview=note[2]
+                    if len(preview)>1:
+                        preview=preview[:8]+"..."
+                    text[0]+=str(ii)+"."+" "*(16-len(str(ii)))
+                    text[1]+="█████████████     "
+                    text[2]+="█"+title+"█"*(11-len(title))+"█     "
+                    text[3]+="█████████████     "
+                    text[4]+="█"+"█"*(11-len(preview))+preview+"█     "
+                    text[5]+="█████████████     "
+                    text[6]+="████████████      "
+                    ii+=1
+                for line in text:
+                    print(line)
+                print("")
+            """
             ii=1
             spaces=len(str(len(notes)))
             for note in notes:
                 print((" "*(spaces-len(str(ii))))+str(ii)+". "+note[1]+" - "+note[3])
                 ii+=1
+            """
             print("\nSelect a Note to read, edit or delete it.")
         else:
             print("You haven't wrote any Note yet.\n")
@@ -1245,7 +1291,7 @@ def bar(no_UI=False):
     print(bartext)
     
     #separator (COMMENT THIS LINE OUT IF YOU WANT TO RUN IN YOU IDE, OTHERWISE YOU'LL NEED TO OPEN IN TERMINAL)
-    print("\u2501"*os.get_terminal_size()[0]+f"{color}")
+    #print("\u2501"*os.get_terminal_size()[0]+f"{color}")
 
 #setting initial page (SET THIS ONE TO "home" IF YOU WANT TO RUN IN YOUR IDE, OTHERWISE YOU'LL NEED TO OPEN IN TERMINAL)
 currentpage="title"
