@@ -1044,44 +1044,49 @@ def create_note():
         else:
             break
     keyboard.remove_hotkey("esc")
-    bar()
-    print("Choose a Color for your Note :\n")
-    ii=1
+    color=0
     colors=["Purple","Blue","Cyan","Green","Yellow","Red","Gold","White","Light Gray","Dark Gray","Bright Purple","Bright Blue","Bright Cyan","Bright Green","Bright Yellow","Bright Red"]
-    spaces=len(str(len(colors)))
-    for color in colors:
-        print((" "*(spaces-len(str(ii))))+str(ii)+". "+color)
-        ii+=1
-    color=str(input("\n    ")).upper()
-    if color.isnumeric():
-        if int(color)>0 and int(color)<len(colors)+1:
-            color=uppercase(colors[int(color)-1])
-    elif color=="H" or color=="B":
-        return("home")
-    elif color=="S":
-        return("set")
-    elif events_key==True and color=="V":
-        return("events")
-    elif color=="E":
-        os.system('color')
-        exit()
-    
+    while not (int(color)>0 and int(color)<len(colors)+1):
+        bar()
+        print("Choose a Color for your Note :\n")
+        ii=1
+        spaces=len(str(len(colors)))
+        for color in colors:
+            print((" "*(spaces-len(str(ii))))+str(ii)+". "+color)
+            ii+=1
+        color=str(input("\n    ")).upper()
+        if color.isnumeric():
+            if int(color)>0 and int(color)<len(colors)+1:
+                break
+        elif color=="H" or color=="B":
+            return("home")
+        elif color=="S":
+            return("set")
+        elif events_key==True and color=="V":
+            return("events")
+        elif color=="E":
+            os.system('color')
+            exit()
+        else:
+            color=0
+    color=uppercase(colors[int(color)-1])
     lockedlist=["YES","NO"]
     locked=0
-    while not locked in [1,2]:
+    while not locked in ["1","2"]:
         bar(True)
         print("Lock this Note?\n\n1. YES\n2. NO")
-        locked=int(input("\n    "))
+        locked=(input("\n    "))
         password=""
-        if lockedlist[locked-1]=="YES":
-            import getpass
-            bar(True)
-            password=getpass.getpass("Enter a password for your Note.\n\n    ")
+        if locked.isnumeric() and locked in ["1","2"]:
+            if lockedlist[int(locked)-1]=="YES":
+                import getpass
+                bar(True)
+                password=getpass.getpass("Enter a password for your Note.\n\n    ")
     db=sqlite3.connect('dios_database.db')
     cursor=db.cursor()
     cursor.execute("""INSERT INTO notes (title, text, color, locked, password)
                VALUES 
-               ('"""+title+"""', '"""+text+"""', '"""+color+"""', '"""+lockedlist[locked-1]+"""', '"""+password+"""')""")
+               ('"""+title+"""', '"""+text+"""', '"""+color+"""', '"""+lockedlist[int(locked)-1]+"""', '"""+password+"""')""")
     cursor.close()
     db.commit()
     db.close()
@@ -1096,79 +1101,72 @@ def edit_note(note):
     color=note[3]
     locked=note[4]
     password=note[5]
-    trypass=""
-    if password:
-        while trypass!=password:
-            bar()
-            print("Enter the password of this Note.")
-            trypass=getpass.getpass("\n    ")
-    if not password or trypass==password:
+    bar(True)
+    print("Current title of the Note: '"+str(title)+"'.\n\nEnter the new title of the Note or leave blank to skip this step.")
+    new=str(input("\n    "))
+    if new:
+        title=new
+    bar(True)
+    print("Enter new text to write in the Note or leave blank to skip this step. Press Escape to proceed when finished.")
+    new=""
+    keyboard.add_hotkey("esc", lambda: keyboard.press("enter"), suppress =False)
+    userinput=""
+    while 1:
+        if not keyboard.is_pressed("esc"):
+            userinput=str(input("\n    "))
+            new+=(userinput)
+            if userinput:
+                new+="\n"
+        else:
+            break
+    keyboard.remove_hotkey("esc")
+    if new:
+        text=new
+    colors=["Purple","Blue","Cyan","Green","Yellow","Red","Gold","White","Light Gray","Dark Gray","Bright Purple","Bright Blue","Bright Cyan","Bright Green","Bright Yellow","Bright Red"]
+    spaces=len(str(len(colors)))
+    while 1:
         bar(True)
-        print("Current title of the Note: '"+str(title)+"'.\n\nEnter the new title of the Note or leave blank to skip this step.")
+        print("Current color of the Note: '"+str(color)+"'.\n\nChoose a new color or leave blank to skip this step.")
+        ii=1
+        for color in colors:
+            print((" "*(spaces-len(str(ii))))+str(ii)+". "+color)
+            ii+=1
         new=str(input("\n    "))
         if new:
-            title=new
+            if new.isnumeric():
+                if int(new)>0 and int(new)<len(colors)+1:
+                    break
+        else: break
+        import time
+        print("Please Enter a numeric value between 1 and "+str(len(colors)+1)+".")
+        time.sleep(1.5)
+    if new:
+        color=colors[int(new)-1]
+    lockedlist=["YES","NO"]
+    not_text=""
+    if locked=="NO":
+        not_text="not "
+    new=3
+    while not new in [1,2]:
         bar(True)
-        print("Enter new text to write in the Note or leave blank to skip this step. Press Escape to proceed when finished.")
-        new=""
-        keyboard.add_hotkey("esc", lambda: keyboard.press("enter"), suppress =False)
-        userinput=""
-        while 1:
-            if not keyboard.is_pressed("esc"):
-                userinput=str(input("\n    "))
-                new+=(userinput)
-                if userinput:
-                    new+="\n"
-            else:
-                break
-        keyboard.remove_hotkey("esc")
-        if new:
-            text=new
-        colors=["Purple","Blue","Cyan","Green","Yellow","Red","Gold","White","Light Gray","Dark Gray","Bright Purple","Bright Blue","Bright Cyan","Bright Green","Bright Yellow","Bright Red"]
-        spaces=len(str(len(colors)))
-        while 1:
-            bar(True)
-            print("Current color of the Note: '"+str(color)+"'.\n\nChoose a new color or leave blank to skip this step.")
-            ii=1
-            for color in colors:
-                print((" "*(spaces-len(str(ii))))+str(ii)+". "+color)
-                ii+=1
-            new=str(input("\n    "))
-            if new:
-                if new.isnumeric():
-                    if int(new)>0 and int(new)<len(colors)+1:
-                        break
-            else: break
-            import time
-            print("Please Enter a numeric value between 1 and "+str(len(colors)+1)+".")
-            time.sleep(1.5)
-        if new:
-            color=colors[int(new)-1]
-        lockedlist=["YES","NO"]
-        not_text=""
-        if locked=="NO":
-            not_text="not "
-        new=3
-        while not (new in [1,2]):
-            bar(True)
-            print("Note is currently "+not_text+"locked.\n\nLock it?\n\n1. YES\n2. NO")
-            new=int(input("\n    "))
-        locked=lockedlist[new-1]
-        password=""
-        if locked=="YES":
-            import getpass
-            bar(True)
-            password=getpass.getpass("Enter a password for your Note.\n\n    ")
-        cursor.execute("""UPDATE notes SET title='"""+title+"""', text='"""+text.replace("'","''")+"""', color='"""+uppercase(color)+"""', locked='"""+locked+"""', password='"""+password+"""' WHERE id="""+str(note_id))
-        cursor.close()
-        db.commit()
-        db.close()
+        print("Note is currently "+not_text+"locked.\n\nLock it?\n\n1. YES\n2. NO")
+        new=str(input("\n    "))
+        if new.isnumeric():
+            new=int(new)
+    locked=lockedlist[new-1]
+    password=""
+    if locked=="YES":
+        import getpass
         bar(True)
-        print("Note '"+title+"' edited.\n")
-        getpass.getpass("   Press Enter")
-        return(title,text,changecolor(uppercase(color)),locked,password)
-    else:
-        return(title,text,changecolor(uppercase(color)),locked,password)
+        password=getpass.getpass("Enter a password for your Note.\n\n    ")
+    cursor.execute("""UPDATE notes SET title='"""+title+"""', text='"""+text.replace("'","''")+"""', color='"""+uppercase(color)+"""', locked='"""+locked+"""', password='"""+password+"""' WHERE id="""+str(note_id))
+    cursor.close()
+    db.commit()
+    db.close()
+    bar(True)
+    print("Note '"+title+"' edited.\n")
+    getpass.getpass("   Press Enter")
+    return(title,text,changecolor(uppercase(color)),locked,password)
 
 def delete_note(note_id,title):
     selected=0
@@ -1271,7 +1269,7 @@ def notes():
                         preview=note[2].replace("\n","  ")
                         if len(preview)>1:
                             preview=preview[:8]+"..."
-                    text[0]+=str(ii)+"."+" "*(16-len(str(ii)))
+                    text[0]+=str(ii)+"."+" "*(17-len(str(ii)))
                     text[1]+=f"{changecolor(note[3])}█████████████"+f"{bcolors.RESET}{color}     "
                     text[2]+=f"{changecolor(note[3])}█"+title+"█"*(12-len(title))+f"{bcolors.RESET}{color}     "
                     text[3]+=f"{changecolor(note[3])}█████████████"+f"{bcolors.RESET}{color}     "
@@ -1392,7 +1390,7 @@ def bar(no_UI=False):
     print(bartext)
     
     #separator (COMMENT THIS LINE OUT IF YOU WANT TO RUN IN YOU IDE, OTHERWISE YOU'LL NEED TO OPEN IN TERMINAL)
-    print("\u2501"*os.get_terminal_size()[0]+f"{color}")
+    #print("\u2501"*os.get_terminal_size()[0]+f"{color}")
 
 #setting initial page
 currentpage="title"
