@@ -1159,7 +1159,7 @@ def edit_note(note):
         import getpass
         bar(True)
         password=getpass.getpass("Enter a password for your Note.\n\n    ")
-    cursor.execute("""UPDATE notes SET title='"""+title+"""', text='"""+text.replace("'","''")+"""', color='"""+uppercase(color)+"""', locked='"""+locked+"""', password='"""+password+"""' WHERE id="""+str(note_id))
+    cursor.execute("""UPDATE notes SET title='"""+title.replace("'","''")+"""', text='"""+text.replace("'","''")+"""', color='"""+uppercase(color)+"""', locked='"""+locked+"""', password='"""+password+"""' WHERE id="""+str(note_id))
     cursor.close()
     db.commit()
     db.close()
@@ -1390,7 +1390,7 @@ def bar(no_UI=False):
     print(bartext)
     
     #separator (COMMENT THIS LINE OUT IF YOU WANT TO RUN IN YOU IDE, OTHERWISE YOU'LL NEED TO OPEN IN TERMINAL)
-    #print("\u2501"*os.get_terminal_size()[0]+f"{color}")
+    print("\u2501"*os.get_terminal_size()[0]+f"{color}")
 
 #setting initial page
 currentpage="title"
