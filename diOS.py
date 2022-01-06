@@ -1,6 +1,39 @@
 print("let's ride")
 import os,datetime,webbrowser,sys,subprocess,platform,string,sqlite3
 
+#check if a module is installed
+def check_installed(pkg):
+    try:
+        __import__(pkg)
+        return(True)
+    except ModuleNotFoundError:
+        return(False)
+
+#install package
+def install(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+
+#creating a shortcut to this file on the desktop, if it doesn't exist
+if not check_installed('winshell'):
+    install('winshell')
+import winshell
+
+from win32com.client import Dispatch
+
+desktop = winshell.desktop()
+path=os.path.join(desktop, "diOS.lnk")
+target=os.path.join(os.path.dirname(os.path.abspath(__file__)), "diOS.py")
+wDir = desktop
+icon=os.path.join(os.path.dirname(os.path.abspath(__file__)), "diOS.ico")
+shell=Dispatch('WScript.shell')
+
+shortcut=shell.CreateShortCut(path)
+shortcut.Targetpath=target
+shortcut.WorkingDirectory=wDir
+shortcut.IconLocation=icon
+shortcut.save()
+
+#connect to the database (or create it if it doesn't exist)
 db=sqlite3.connect('dios_database.db')
 cursor=db.cursor()
 cursor.execute("""
@@ -30,13 +63,6 @@ def get_size_screen():
     user32=ctypes.windll.user32
     return(user32.GetSystemMetrics(0), user32.GetSystemMetrics(1))
 
-def check_installed(pkg):
-    try:
-        __import__(pkg)
-        return(True)
-    except ModuleNotFoundError:
-        return(False)
-
 #1 character=8 pixels wide, 16 pixels tall
 screen_width,screen_height=get_size_screen()
 cols=screen_width//8
@@ -49,10 +75,6 @@ for d in string.ascii_uppercase:
 
 #change terminal size (in rows and columns) before putting it in fullscreen mode
 os.system("mode con cols={cols} lines={rows}".format(cols=screen_width//8, rows=200))
-
-#install package, here for keyboard package
-def install(package):
-    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 
 #text colors
 class bcolors:
