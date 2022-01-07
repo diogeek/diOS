@@ -7,11 +7,13 @@ def check_installed(pkg):
 
 #install package
 def install(package):
+    import subprocess,sys
     subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 
 #creating a shortcut to this file on the desktop, if it doesn't exist
 if not check_installed('winshell'):
     install('winshell')
+    install('pypiwin32')
 import winshell,os
 
 from win32com.client import Dispatch
