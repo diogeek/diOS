@@ -4,3 +4,6 @@ O.png
 .google-cookie
 dios_database.db
 dios_settings.txt
+.dios_database
+.dios_settings
+*.pyc

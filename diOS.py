@@ -42,7 +42,7 @@ else:
     dios_location_path=''.join((shortcut.Targetpath).rsplit('\\', 1)[0])+'\\'
     
 #connect to the database (or create it if it doesn't exist)
-db=sqlite3.connect(dios_location_path+'dios_database.db')
+db=sqlite3.connect(dios_location_path+'.dios_database')
 cursor=db.cursor()
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS dates(
@@ -211,7 +211,7 @@ def changecolor(color):
 
 #function to save settings in text file
 def save():
-    settings_file=open(dios_location_path+'dios_settings.txt','w')
+    settings_file=open(dios_location_path+'.dios_settings','w')
     settings_file.write('background_color=0\n\
 barcolor='+str(list_settings[1][2])+'\n\
 color='+str(list_settings[2][2])+'\n\
@@ -253,8 +253,8 @@ if not check_installed('googlesearch'):
     install('google')
 
 #loading settings from file
-if os.path.isfile(dios_location_path+'dios_settings.txt'):
-    settings_file=open(dios_location_path+'dios_settings.txt','r')
+if os.path.isfile(dios_location_path+'.dios_settings'):
+    settings_file=open(dios_location_path+'.dios_settings','r')
     settings_lines=settings_file.readlines()
     for line in range(0,len(settings_lines)):
         #list_settings[line-{number} WHERE NUMBER IS NUMBER OF NON-SETTINGS LINES IN DIOS_SETTINGS
@@ -268,7 +268,7 @@ if os.path.isfile(dios_location_path+'dios_settings.txt'):
     date_format=list_settings[7][2]
     settings_file.close()
 else:
-    settings_file=open('dios_settings.txt','w')
+    settings_file=open('.dios_settings','w')
     settings_file.write('background_color=0\n\
 barcolor=WHITE\n\
 color=WHITE\n\
@@ -737,7 +737,7 @@ def deformat_date(date):
         return(year+"/"+month+"/"+day)
 
 def create_event(date):
-    db=sqlite3.connect(dios_location_path+'dios_database.db')
+    db=sqlite3.connect(dios_location_path+'.dios_database')
     cursor=db.cursor()
     event=""
     while event=="":
@@ -784,7 +784,7 @@ def create_event(date):
     getpass.getpass("   Press Enter")
 
 def list_events(date):
-    db=sqlite3.connect(dios_location_path+'dios_database.db')
+    db=sqlite3.connect(dios_location_path+'.dios_database')
     cursor=db.cursor()
     cursor.execute("""SELECT event,desc,id FROM dates WHERE date='"""+date+"""'""")
     events=cursor.fetchall()
@@ -856,7 +856,7 @@ def show_events(date):
 
 def edit_event(event_title,event_desc,event_id,date):
     import getpass
-    db=sqlite3.connect(dios_location_path+'dios_database.db')
+    db=sqlite3.connect(dios_location_path+'.dios_database')
     cursor=db.cursor()
     bar(True)
     print("Current title of the event: '"+str(event_title)+"'.\n\nEnter the new title of the event or leave blank to skip this step.")
@@ -884,7 +884,7 @@ def del_event(event,date):
         selected=int(input("\n    "))
     if selected==1:
         import getpass
-        db=sqlite3.connect(dios_location_path+'dios_database.db')
+        db=sqlite3.connect(dios_location_path+'.dios_database')
         cursor=db.cursor()
         cursor.execute("""SELECT id FROM dates WHERE date='"""+date+"""' AND event='"""+event.replace("'","''")+"""'""")
         id_event=cursor.fetchall()[0][0]
@@ -1013,7 +1013,7 @@ def calendar(month,year):
                         return("calendar",month,year)
                 create_event(str(selected)+"/"+str(month)+"/"+str(year))
             while selected=="4" or (events_key==True and selected=="V"):
-                db=sqlite3.connect(dios_location_path+'dios_database.db')
+                db=sqlite3.connect(dios_location_path+'.dios_database')
                 cursor=db.cursor()
                 cursor.execute("""SELECT date FROM dates""")
                 dates=cursor.fetchall()
@@ -1112,7 +1112,7 @@ def create_note():
                 import getpass
                 bar(True)
                 password=getpass.getpass("Enter a password for your Note.\n\n    ")
-    db=sqlite3.connect(dios_location_path+'dios_database.db')
+    db=sqlite3.connect(dios_location_path+'.dios_database')
     cursor=db.cursor()
     cursor.execute("""INSERT INTO notes (title, text, color, locked, password)
                VALUES 
@@ -1123,7 +1123,7 @@ def create_note():
 
 def edit_note(note):
     import getpass
-    db=sqlite3.connect(dios_location_path+'dios_database.db')
+    db=sqlite3.connect(dios_location_path+'.dios_database')
     cursor=db.cursor()
     note_id=note[0]
     title=note[1]
@@ -1206,7 +1206,7 @@ def delete_note(note_id,title):
         selected=int(input("\n    "))
     if selected==1:
         import getpass
-        db=sqlite3.connect(dios_location_path+'dios_database.db')
+        db=sqlite3.connect(dios_location_path+'.dios_database')
         cursor=db.cursor()
         cursor.execute("""DELETE FROM notes WHERE id='"""+str(note_id)+"""'""")
         cursor.close()
@@ -1265,7 +1265,7 @@ def notes():
     global color
     while 1:
         bar()
-        db=sqlite3.connect(dios_location_path+'dios_database.db')
+        db=sqlite3.connect(dios_location_path+'.dios_database')
         cursor=db.cursor()
         cursor.execute("""SELECT id,title,text,color,locked,password FROM notes""")
         notes=cursor.fetchall()
@@ -1395,7 +1395,7 @@ def bar(no_UI=False):
 
     #show info
     bartext=f"{bcolors.RESET}\u018A\u0131\u0298\u054F\n{barcolor}    "+deformat_date(datetime.date.today().strftime("%d/%m/%Y"))+" "+datetime.datetime.now().strftime("%H:%M")
-    db=sqlite3.connect(dios_location_path+'dios_database.db')
+    db=sqlite3.connect(dios_location_path+'.dios_database')
     cursor=db.cursor()
     cursor.execute("""SELECT id FROM dates WHERE date='"""+datetime.date.today().strftime("%d/%m/%Y")+"""'""")
     dates=cursor.fetchall()
