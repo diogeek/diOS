@@ -14,6 +14,7 @@ def install(package):
     subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 
 dios_location_path = os.getcwd()
+dios_absolute_path = os.getcwd()
 
 from win32com.client import Dispatch
 
@@ -40,7 +41,8 @@ else:
     shell = Dispatch("WScript.Shell")
     shortcut = shell.CreateShortCut("diOS.lnk")
     dios_location_path=''.join((shortcut.Targetpath).rsplit('\\', 1)[0])+'\\'
-    
+    dios_absolute_path=dios_location_path
+
 #connect to the database (or create it if it doesn't exist)
 db=sqlite3.connect(dios_location_path+'.dios_database')
 cursor=db.cursor()
@@ -288,9 +290,9 @@ keyboard.block_key('f11')
 keyboard.add_hotkey("alt + enter", lambda: None, suppress =True)
 
 #block multiple other commands (e.g force exit commands)
-keyboard.add_hotkey("alt + f4", lambda: None, suppress =True)
-keyboard.add_hotkey("alt + tab", lambda: None, suppress =True)
-keyboard.add_hotkey("ctrl + c", lambda: None, suppress =True)
+#keyboard.add_hotkey("left_alt + f4", lambda: None, suppress =True)
+#keyboard.add_hotkey("left_alt + tab", lambda: None, suppress =True)
+#keyboard.add_hotkey("left_ctrl + c", lambda: None, suppress =True)
 #pages (home, directories, settings)
 
 #INITIAL SETUP ^^^^
@@ -1332,6 +1334,11 @@ def notes():
             os.system('color')
             exit()
 
+def cmd():
+    os.system("cls")
+    os.system("cmd /k echo Type 'exit' to go back to diOS.")
+    return("home")
+
 #ALL APPLICATIONS ^^^^
 
 #HOME, BAR, LOOP vvvv
@@ -1342,7 +1349,6 @@ def home(logo_color):
     list_home=["title","dir","set","notes","chat","google","calendar"]
     #home page, with colored icons (all icons are 11 lines tall and 30 charactrs wide)
     while 1:
-
         bar()
         print(f"{bcolors.RESET}\n\n\n\n\
     {bcolors.RESET}{logo_color}       ▄▄  ▀███████▄ ▐██▄          {bcolors.RESET}{bcolors.BRIGHT_YELLOW}                                {bcolors.RESET}{bcolors.DARK_GRAY}               ▄███▄            {bcolors.RESET}{bcolors.YELLOW}                                \n\
@@ -1386,6 +1392,9 @@ def home(logo_color):
         elif selected=="E":
             os.system('color')
             exit()
+        elif selected=="CMD":
+            return("cmd")
+
 events_key=False
 def bar(no_UI=False):
     global currentpage,query,events_key
@@ -1429,7 +1438,7 @@ while 1:
     #show page
     if currentpage=="title":
         currentpage=title(changecolor(list_settings[8][2]))
-    elif currentpage=="home":
+    elif currentpage.startswith("home"):
         currentpage=home(changecolor(list_settings[8][2]))
     elif currentpage=="dir":
         currentpage=directories(path)
@@ -1445,6 +1454,8 @@ while 1:
         currentpage=show_events(datetime.date.today().strftime("%d/%m/%Y"))
     elif currentpage=="notes":
         currentpage=notes()
+    elif currentpage=="cmd":
+        currentpage=cmd()
 
 #calculator
 #snake
