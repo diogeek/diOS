@@ -13,8 +13,11 @@ def check_installed(pkg):
 def install(package):
     subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 
-dios_location_path = os.getcwd()
-dios_absolute_path = os.getcwd()
+dios_location_path,dios_absolute_path=os.getcwd(),os.getcwd()
+
+if not check_installed("win32com"):
+    try : install("pywin32")
+    except : install("pypiwin32")
 
 from win32com.client import Dispatch
 
