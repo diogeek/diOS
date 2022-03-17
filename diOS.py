@@ -29,7 +29,9 @@ if os.path.isfile(dios_location_path+"\dios.py"): #if you're running the diOS fr
 
     desktop = winshell.desktop()
     path=os.path.join(desktop, "diOS.lnk")
-    target=os.path.join(os.path.dirname(os.path.abspath(__file__)), "diOS.py")
+    target=os.path.join(os.path.dirname(os.path.abspath(__file__)), "diOS.exe")
+    if not os.path.exists(target):
+        target=os.path.join(os.path.dirname(os.path.abspath(__file__)), "diOS.py")
     wDir = desktop
     icon=os.path.join(os.path.dirname(os.path.abspath(__file__)), "diOS.ico")
     shell=Dispatch('WScript.shell')
