@@ -233,7 +233,7 @@ logo_color='+str(list_settings[8][2])+'')
 #initial settings setup
 
 def reset():
-    path="C:\\"
+    path=str(os.path.join("C:\\", os.environ["HOMEPATH"], "Desktop\\"))
     barcolor=bcolors.WHITE
     barbackcolor=bcolors.BACKGROUND_BLACK
     color=bcolors.WHITE
@@ -244,8 +244,8 @@ def reset():
         ["Info Bar Style",["Purple","Blue","Cyan","Green","Yellow","Red","Gold","White","Light Gray","Dark Gray","Black","Bright Purple","Bright Blue","Bright Cyan","Bright Green","Bright Yellow","Bright Red","Bright Black","Background Purple","Background Blue","Background Cyan","Background Green","Background Yellow","Background Red","Background White","Background Black","Background Bright Purple","Background Bright Blue","Background Bright Cyan","Background Bright Green","Background Bright Yellow","Background Bright Red","Background Bright White","Background Bright Black","Bold","Underline","Reversed"],"WHITE"],
         ["UI Style",["Purple","Blue","Cyan","Green","Yellow","Red","Gold","White","Light Gray","Dark Gray","Black","Bright Purple","Bright Blue","Bright Cyan","Bright Green","Bright Yellow","Bright Red","Bright Black","Background Purple","Background Blue","Background Cyan","Background Green","Background Yellow","Background Red","Background White","Background Black","Background Bright Purple","Background Bright Blue","Background Bright Cyan","Background Bright Green","Background Bright Yellow","Background Bright Red","Background Bright White","Background Bright Black","Bold","Underline","Reversed"],"WHITE"],
         ["Sorting Files",["By Name","By Type","By Creation Date","Non-Hidden Files First"],"BY_NAME"],
-        ["Show Hidden Files",["Yes","No"],"YES"],
-        ["Type of Files to Show in File System",["Files Only","Directories Only","Both"],"BOTH"],
+        ["Show Hidden Files in File Explorer",["Yes","No"],"YES"],
+        ["Type of Files to Show in File Explorer",["Files Only","Directories Only","Both"],"BOTH"],
         ["Google Search Language","en"],
         ["Date Format",["dd/mm/YYYY","mm/dd/YYYY","YYYY/mm/dd"],"DD/MM/YYYY"],
         ["DiOS Logo Color",["Purple","Blue","Cyan","Green","Yellow","Red","Gold","White","Light Gray","Dark Gray","Bright Purple","Bright Blue","Bright Cyan","Bright Green","Bright Yellow","Bright Red","Reversed"],"CYAN"],
@@ -433,7 +433,7 @@ def settings():
 
 #SETTINGS, TITLE SCREEN ^^^^
 
-#ALL APPLICATIONS vvvv
+#file explorer functions vvvv
 
 def sort_by_creation_date(dirpath):
     a = [s for s in os.listdir(dirpath)]
@@ -462,9 +462,13 @@ def non_hidden_first(liste):
     listefinal+=[f for f in liste if folder_is_hidden(path+f)]
     return(listefinal)
 
+#file explorer functions ^^^^
+
+#ALL APPLICATIONS vvvv
+
 def create_file():
     bar()
-    print(path+"‖\n"+"═"*len(path)+"╝")
+    print(f"{path}‖\n{'═'*len(path)}╝")
     ii=1
     for items in ["Create A File Here","Create A Directory Here"]:
         print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(items))
@@ -473,7 +477,7 @@ def create_file():
     if selected.isnumeric():
         if int(selected)==1:
             bar()
-            print(path+"‖\n"+"═"*len(path)+"╝")
+            print(f"{path}‖\n{'═'*len(path)}╝")
             print("Name the File. A name with no extension will result in a Text file (.txt)")
             try:
                 f=open(str(input(f"\n    ")),"w").close()
@@ -483,7 +487,7 @@ def create_file():
                 return(False)
         elif int(selected)==2:
             bar()
-            print(path+"‖\n"+"═"*len(path)+"╝")
+            print(f"{path}‖\n{'═'*len(path)}╝")
             print("Name the Directory:")
             try:
                 os.mkdir(path+str(input(f"\n    ")))
@@ -507,7 +511,7 @@ def directories(path):
     while 1:
         bar()
         #show path
-        print(path+"‖\n"+"═"*len(path)+"╝")
+        print(f"{path}‖\n{'═'*len(path)}╝")
         
         ii=1
         try:
@@ -1368,7 +1372,7 @@ def home(logo_color):
     {bcolors.RESET}{logo_color}    ▀█████ ▐████▄  ▀███████▀       {bcolors.RESET}{bcolors.BRIGHT_YELLOW}    █████████████████████▀      {bcolors.RESET}{bcolors.DARK_GRAY}        ▀██▀  ███████  ▀██▀     {bcolors.RESET}{bcolors.YELLOW}      ████████████████████▀     \n\
     {bcolors.RESET}{logo_color}      ▀▀██▌ ▐█████▄▄ ▀██▀▀         {bcolors.RESET}{bcolors.BRIGHT_YELLOW}                                {bcolors.RESET}{bcolors.DARK_GRAY}               ▀███▀            {bcolors.RESET}{bcolors.YELLOW}     ████████████████████▀      \n\
     \n\
-    {bcolors.RESET}{bcolors.WHITE}        1.TITLE SCREEN                     2.FILE SYSTEM                       3.SETTINGS                      4.NOTES\n\
+    {bcolors.RESET}{bcolors.WHITE}        1.TITLE SCREEN                    2.FILE EXPLORER                      3.SETTINGS                      4.NOTES\n\
     \n\
     {bcolors.RESET}{bcolors.BRIGHT_GREEN}                                  {bcolors.RESET}{bcolors.RED}         ██████████████              {bcolors.RESET}{bcolors.WHITE}                              \n\
     {bcolors.RESET}{bcolors.BRIGHT_GREEN}        ▄▄███████████▄▄           {bcolors.RESET}{bcolors.RED}       ██████████████████▄           {bcolors.RESET}{bcolors.WHITE}    ║║  ║║  ║║  ║║  ║║        \n\
@@ -1434,7 +1438,7 @@ def bar(no_UI=False):
     print(bartext)
     
     #separator (COMMENT THIS LINE OUT IF YOU WANT TO RUN IN YOU IDE, OTHERWISE YOU'LL NEED TO OPEN IN TERMINAL)
-    print("\u2501"*os.get_terminal_size()[0]+f"{color}")
+    #print("\u2501"*os.get_terminal_size()[0]+f"{color}")
 
 #setting initial page
 currentpage="title"
