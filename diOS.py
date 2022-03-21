@@ -219,15 +219,17 @@ def changecolor(color):
 #function to save settings in text file
 def save():
     settings_file=open(dios_location_path+'.dios_settings','w')
-    settings_file.write('background_color=0\n\
-barcolor='+str(list_settings[1][2])+'\n\
-color='+str(list_settings[2][2])+'\n\
-sorting='+str(list_settings[3][2])+'\n\
-show_hidden='+str(list_settings[4][2])+'\n\
-type_to_show='+str(list_settings[5][2])+'\n\
-lang_google='+str(list_settings[6][1])+'\n\
-date_format='+str(list_settings[7][2])+'\n\
-logo_color='+str(list_settings[8][2])+'')
+    settings_file.write(f'background_color=0\n\
+barcolor={str(list_settings[1][2])}\n\
+color={str(list_settings[2][2])}\n\
+sorting={str(list_settings[3][2])}\n\
+show_hidden={str(list_settings[4][2])}\n\
+type_to_show={str(list_settings[5][2])}\n\
+show_file_extensions={str(list_settings[6][2])}\n\
+lang_google={str(list_settings[7][1])}\n\
+date_format={str(list_settings[8][2])}\n\
+logo_color={str(list_settings[9][2])}\n\
+')
     settings_file.close()
     
 #initial settings setup
@@ -246,6 +248,7 @@ def reset():
         ["Sorting Files",["By Name","By Type","By Creation Date","Non-Hidden Files First"],"BY_NAME"],
         ["Show Hidden Files in File Explorer",["Yes","No"],"YES"],
         ["Type of Files to Show in File Explorer",["Files Only","Directories Only","Both"],"BOTH"],
+        ["Show File extensions in File Explorer",["Yes","No"],"YES"],
         ["Google Search Language","en"],
         ["Date Format",["dd/mm/YYYY","mm/dd/YYYY","YYYY/mm/dd"],"DD/MM/YYYY"],
         ["DiOS Logo Color",["Purple","Blue","Cyan","Green","Yellow","Red","Gold","White","Light Gray","Dark Gray","Bright Purple","Bright Blue","Bright Cyan","Bright Green","Bright Yellow","Bright Red","Reversed"],"CYAN"],
@@ -265,14 +268,14 @@ if os.path.isfile(dios_location_path+'.dios_settings'):
     settings_lines=settings_file.readlines()
     for line in range(0,len(settings_lines)):
         #list_settings[line-{number} WHERE NUMBER IS NUMBER OF NON-SETTINGS LINES IN DIOS_SETTINGS
-        if line!=6:
+        if line!=7: #google language line
             list_settings[line][2]=settings_lines[line].split("=",1)[-1].replace('\n','')
         else:
-            list_settings[6][1]=settings_lines[6].split("=",1)[-1].replace('\n','')
+            list_settings[7][1]=settings_lines[7].split("=",1)[-1].replace('\n','')
     os.system('color '+list_settings[0][2]+'f')
     barcolor=changecolor(list_settings[1][2])
     color=changecolor(list_settings[2][2])
-    date_format=list_settings[7][2]
+    date_format=list_settings[8][2]
     settings_file.close()
 else:
     settings_file=open('.dios_settings','w')
@@ -282,6 +285,7 @@ color=WHITE\n\
 sorting=BY_NAME\n\
 show_hidden=YES\n\
 type_to_show=BOTH\n\
+show_file_extensions=YES\n\
 lang_google=en\n\
 date_format=DD/MM/YYYY\n\
 logo_color=CYAN')
@@ -356,7 +360,7 @@ def settings():
                 spaces=len(str(len(list_settings)))
                 choice=int(selected)-1
                 #choice = which setting you're changing
-                if choice!=6:
+                if choice!=7: #google lang
                     for items in list_settings[choice][1]:
                         if (choice==2 or choice==3) and items=="Purple":
                             print("- TEXT COLORS\n")
@@ -384,8 +388,8 @@ def settings():
                             elif choice==2:
                                 print(f"{bcolors.RESET}")
                                 color=changecolor(list_settings[2][2])
-                            elif choice==7:
-                                date_format=list_settings[7][2]
+                            elif choice==8:
+                                date_format=list_settings[8][2]
                     elif selected=="H":
                         return("home")
                     elif selected=="B" or selected=="S":
@@ -507,6 +511,9 @@ def create_file():
         os.system('color')
         exit()
 
+def target(shortcut):
+    return str(shell.CreateShortCut(shortcut).TargetPath)
+
 def directories(path):
     while 1:
         bar()
@@ -550,7 +557,7 @@ def directories(path):
             print((" "*(spaces-1))+"0. Switch Drive\n")
             if list_settings[3][2]=="BY_TYPE":
                 print("- FILES:\n")
-                for items in liste:
+                for items in [str(file.rsplit(".")[0]) for file in liste]:
                     if items==" ":
                         print("\n- DIRECTORIES:\n")
                     else:
@@ -558,14 +565,14 @@ def directories(path):
                         ii+=1
             elif list_settings[3][2]=="NON-HIDDEN_FILES_FIRST":
                 print("- VISIBLE:\n")
-                for items in liste:
+                for items in [str(file.rsplit(".")[0]) for file in liste]:
                     if items==" ":
                         print("\n- HIDDEN:\n")
                     else:
                         print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(items))
                         ii+=1
             else:
-                for items in liste:
+                for items in [str(file.rsplit(".")[0]) for file in liste]:
                     print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(items))
                     ii+=1
         try:
@@ -603,6 +610,8 @@ def directories(path):
                 selected=liste[int(selected)-1]
                 if os.path.isdir(path+selected):
                     path+=selected+"\\"
+                elif selected.endswith(".lnk"):
+                    path=target(path+selected)
                 elif os.path.isfile(path+selected):
                     webbrowser.open(path+selected)
             elif int(selected)-1==len(liste):
@@ -1205,7 +1214,7 @@ def edit_note(note):
     db.commit()
     db.close()
     bar(True)
-    print("Note '"+title+"' edited.\n")
+    print(f"Note '{title}' edited.\n")
     getpass.getpass("   Press Enter")
     return(title,text,changecolor(uppercase(color)),locked,password)
 
@@ -1438,7 +1447,7 @@ def bar(no_UI=False):
     print(bartext)
     
     #separator (COMMENT THIS LINE OUT IF YOU WANT TO RUN IN YOU IDE, OTHERWISE YOU'LL NEED TO OPEN IN TERMINAL)
-    #print("\u2501"*os.get_terminal_size()[0]+f"{color}")
+    print("\u2501"*os.get_terminal_size()[0]+f"{color}")
 
 #setting initial page
 currentpage="title"
@@ -1446,9 +1455,9 @@ currentpage="title"
 while 1:
     #show page
     if currentpage=="title":
-        currentpage=title(changecolor(list_settings[8][2]))
+        currentpage=title(changecolor(list_settings[9][2]))
     elif currentpage.startswith("home"):
-        currentpage=home(changecolor(list_settings[8][2]))
+        currentpage=home(changecolor(list_settings[9][2]))
     elif currentpage=="dir":
         currentpage=directories(path)
     elif currentpage=="set":
