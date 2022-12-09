@@ -16,6 +16,8 @@ def show_cursor():
 
 hide_cursor()
 
+dictspecialchar={Key.enter:"\n",Key.space:" ",Key.tab:"\t"}
+
 def checkchar(key,text):
     try:
         if key==Key.backspace:
@@ -23,10 +25,8 @@ def checkchar(key,text):
                 return(text[:-1])
             else:
                 return("")
-        elif key==Key.enter:
-            return(text+"\n")
-        elif key==Key.space:
-            return(text+" ")
+        elif key in dictspecialchar.keys():
+            return text+dictspecialchar[key]
         else :
             try: return text+(str(key.char))
             except: return text
@@ -35,6 +35,7 @@ def checkchar(key,text):
         input()
 text=""
 def on_press(key):
+    global text
     try:
         text=checkchar(key,text)
         print(f"{SET_THIRD_ROW}{CLEAR_DOWN}{text}|",)

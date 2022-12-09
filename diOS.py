@@ -1,6 +1,11 @@
 print("let's ride")
 import os,datetime,webbrowser,sys,subprocess,platform,string,sqlite3,msvcrt,getpass,time
 
+import cProfile, pstats
+from io import StringIO
+pr = cProfile.Profile()
+pr.enable()
+
 #check if a module is installed
 def check_installed(pkg):
     try:
@@ -145,10 +150,12 @@ class bcolors:
     RESET='\u001b[0m'
 
 #escaping characters useful to un-print a line in cmd.
-SET_THIRD_ROW = "\033[3;0H"
 CLEAR_DOWN = "\x1b[0J"
 SAVE_POSITION = "\u001b[s"
 LOAD_POSITION = "\u001b[u"
+SET_POSITION_ZERO ="\033[0;0H"
+CURSOR_UP = "\033[1A"
+
 #functions for the cursor in cmd
 def hide_cursor():
     print('\033[?25l', end="")
@@ -240,15 +247,50 @@ def changecolor(color):
         return bcolors.BACKGROUND_BRIGHT_BLACK
 
 #function to handle choices in short menus
-keyboard_convertor={b'&':'1',b'\x82':'2',b'"':'3',b"'":'4',b'(':'5',b'-':'6',b'\x8a':'7',b'_':'8',b'\x87':'9',b'\x85':'0'}
+keyboard_convertor={b'&':'1',b'1':'1',b'\x82':'2',b'2':'2',b'"':'3',b'3':'3',b"'":'4',b'4':'4',b'(':'5',b'5':'5',b'-':'6',b'6':'6',b'\x8a':'7',b'7':'7',b'_':'8',b'8':'8',b'\x87':'9',b'9':'9',b'\x85':'0',b'0':'0'}
 
-def checknumber(key): #gets a key which is a number between 0 and 9 and if pressed on a french AZERTY keyboard without caps lock on, converts to the corresponding number
-    if key in keyboard_convertor: return keyboard_convertor[key]
-    else: return key.decode('utf-8').upper()
+main_keys=[b'H',b'h',b'B',b'b',b'S',b's',b'E',b'e',b'V',b'v',b'P',b'p',b'N',b'n']
 
-def filternumber(key):
+
+def filternumbers():
+    key=msvcrt.getch()
     if key in keyboard_convertor: return keyboard_convertor[key]
     else: return
+
+def filternumbersandmainkeys(limit):
+    key=msvcrt.getch()
+    limit=list(filter(lambda x: x is not None, limit))
+    if key in keyboard_convertor: return keyboard_convertor[key]
+    if key in [bytes(x, 'utf-8') for x in limit]+[bytes(x.lower(), 'utf-8') for x in limit]: return key.decode('utf-8').upper()
+    else: return ''
+
+def filterbykey(filteredkey):
+    key=msvcrt.getch()
+    key=key.decode('utf-8').upper()
+    try:
+        if key==filteredkey: return key
+    except: return
+
+def filterlargenumbersandmainkeys(limit):
+    selected=""
+    limit=list(filter(lambda x: x is not None, limit))
+    print(f"\t{SAVE_POSITION}[{CLEAR_DOWN}{selected}]")
+    while 1:
+        key=msvcrt.getch()
+        if key==b'\x08' and selected!="":
+            selected=selected[:-1]
+        elif key==b'\r' and selected!="":
+            return(selected)
+        elif key==b'\x1b':
+            return("esc")
+        elif key in keyboard_convertor:
+            selected+=keyboard_convertor[key]
+        if key in [bytes(x, 'utf-8') for x in limit]+[bytes(x.lower(), 'utf-8') for x in limit]: return key.decode('utf-8').upper()
+        print(f"{LOAD_POSITION}[{CLEAR_DOWN}{selected}]")
+        
+#text editing related functions
+
+dictspecialchar={Key.space:" ",Key.tab:"\t"}
 
 def checkchar(key,text,password=False):
     if key==Key.backspace:
@@ -258,11 +300,50 @@ def checkchar(key,text,password=False):
             return("")
     elif key==Key.enter and password==False:
         return(text+"\n")
-    elif key==Key.space:
-        return(text+" ")
+    elif key in dictspecialchar.keys():
+        return text+dictspecialchar[key]
     else :
         try: return text+(str(key.char))
         except: return text
+
+def enter_text(oneline=False):
+    text=""
+    print(SAVE_POSITION)
+    def on_press(key):
+        nonlocal text
+        try:
+            if key==Key.enter and oneline :
+                return False
+            text=checkchar(key,text)
+            print(f"{LOAD_POSITION}{CLEAR_DOWN}{text}|")
+        except Exception as e:
+            print(e)
+
+    def on_release(key):
+        if key == Key.esc:
+            return False
+
+    with Listener(on_press=on_press, on_release=on_release, suppress=True) as listener:
+        listener.join()
+    return text
+
+def enter_password():
+    password=''
+    def on_press(key):
+        nonlocal password
+        try:
+            password=checkchar(key,password,True)
+            print(f"{LOAD_POSITION}{CLEAR_DOWN}{'*'*len(password)}|")
+        except Exception as e:
+            input(e)
+
+    def on_release(key):
+        if key == Key.enter:
+            return False
+
+    with Listener(on_press=on_press, on_release=on_release, suppress=True) as listener:
+        listener.join()
+    return password
 
 #function to save settings in text file
 def save():
@@ -359,7 +440,7 @@ keyboard.add_hotkey("alt + enter", lambda: None, suppress =True)
 def title(logo_color):
     shift=40
     os.system('cls')
-    getpass.getpass(f"{bcolors.RESET}{bcolors.WHITE}"+"\n"*((rows//2)-16)+"\
+    print(f"{bcolors.RESET}{bcolors.WHITE}"+"\n"*((rows//2)-16)+"\
 "+" "*((cols//2)-shift)+"         ▄██  ███           "+f"{bcolors.RESET}{logo_color}▀███████████   ▄{bcolors.RESET}{bcolors.WHITE}                                    \n\
 "+" "*((cols//2)-shift)+"   ▄███████   ▀▀     "+f"{bcolors.RESET}{logo_color}▄████▄▄   ▀█████████  ███▄▄{bcolors.RESET}{bcolors.WHITE}                                \n\
 "+" "*((cols//2)-shift)+"  ▐█▌  ▐██  ███   "+f"{bcolors.RESET}{logo_color}▄███████████▄   ▀██████▄  █████▄{bcolors.RESET}{bcolors.WHITE}                              \n\
@@ -377,24 +458,24 @@ def title(logo_color):
 "+" "*((cols//2)-shift)+"                  "+f"{bcolors.RESET}{logo_color}▀███████  ███████▄▄  ▀█████████▀{bcolors.RESET}{bcolors.WHITE}    ▄█████████████████████    \n\
 "+" "*((cols//2)-shift)+"                    "+f"{bcolors.RESET}{logo_color}▀▀████   █████████▄▄  ▀████▀{bcolors.RESET}{bcolors.WHITE}      █████████████████████     \n\
 "+" "*((cols//2)-shift)+"                        "+f"{bcolors.RESET}{logo_color}▀▀▀  ▀███████████▄ {bcolors.RESET}{bcolors.WHITE}           ███████████████████▀      \n\
-"+"\n"*(rows-((rows//2)+1)-10)+"\
-"+" "*((cols//2)-7)+"PRESS ENTER")
+"+"\n"*(rows-((rows//2)+1)-10))
+    getpass.getpass(" "*((cols//2)-10)+"PRESS ENTER")
     return("home")
     
 
 def settings():
-    global barcolor,color,list_settings,query,lang_google,date_format
+    global barcolor,color,list_settings,query,lang_google,date_format,events_key
     query=""
+    bar()
+    ii=1
+    spaces=len(str(len(list_settings)))
+    print((" "*(spaces-1))+"0. Reset Settings\n")
+    for items in list_settings:
+        print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(items[0]))
+        ii+=1
+    print(("\n"+" "*(spaces-1))+str(len(list_settings)+1)+". Save Settings\n")
     while 1:
-        bar()
-        ii=1
-        spaces=len(str(len(list_settings)))
-        print((" "*(spaces-1))+"0. Reset Settings\n")
-        for items in list_settings:
-            print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(items[0]))
-            ii+=1
-        print(("\n"+" "*(spaces-1))+str(len(list_settings)+1)+". Save Settings\n")
-        selected=str(input(f"\n    ")).upper()
+        selected=filterlargenumbersandmainkeys([*['H','B','E'],('V' if events_key else None)])
         if selected.isnumeric():
             if selected=="0":
                 path,barcolor,color,list_settings,date_format=reset()
@@ -420,7 +501,7 @@ def settings():
                             print("\n- TEXT STYLE\n")
                         print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(items))
                         ii+=1
-                    selected=str(input(f"\n    ")).upper()
+                    selected=filterlargenumbersandmainkeys(['H','B','S','E'])
                     if selected.isnumeric():
                         if int(selected)-1<len(list_settings[choice][1]) and int(selected)>=0:
                             if choice>0:
@@ -471,9 +552,7 @@ def settings():
                 save()
         elif selected=="H" or selected=="B":
             return("home")
-        elif selected=="F":
-            return("dir")
-        elif events_key==True and selected=="V":
+        elif selected=="V":
             return("events")
         elif selected=="E":
             os.system('color')
@@ -521,7 +600,7 @@ def create_file():
     for items in ["Create A File Here","Create A Directory Here"]:
         print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(items))
         ii+=1
-    selected=str(input(f"\n    ")).upper()
+    selected=filterlargenumbersandmainkeys([*['H','B','S','E'],('V' if events_key else None)])
     if selected.isnumeric():
         if int(selected)==1:
             bar()
@@ -549,7 +628,7 @@ def create_file():
         return("set")
     elif selected=="B":
         return("dir")
-    elif events_key==True and selected=="V":
+    elif selected=="V":
         return("events")
     elif selected=="E":
         os.system('color')
@@ -622,7 +701,7 @@ def directories(path):
             liste.pop(liste.index(' '))
         except:None
         print(("\n"+" "*(spaces-len(str(ii))))+str(len(liste)+1)+". Create File or Directory\n")
-        selected=str(input(f"\n    ")).upper()
+        selected=filterlargenumbersandmainkeys([*['H','B','S','E'],('V' if events_key else None)])
         if selected.isnumeric():
             if selected=="0":
                 while 1:
@@ -632,7 +711,7 @@ def directories(path):
                     for drive in available_drives:
                         print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(drive))
                         ii+=1
-                    selected=str(input(f"\n    ")).upper()
+                    selected=filterlargenumbersandmainkeys([*['H','B','S','E'],('V' if events_key else None)])
                     if selected.isnumeric():
                         if int(selected)-1<len(available_drives) and int(selected)>0:
                             path=available_drives[int(selected)-1]+'\\'
@@ -646,6 +725,8 @@ def directories(path):
                             path=path.rsplit('\\',2)[0]+str("\\")
                         else:
                             return("home")
+                    elif selected=="V":
+                        return("events")
                     elif selected=="E":
                         os.system('color')
                         exit()
@@ -667,7 +748,7 @@ def directories(path):
             return("home")
         elif selected=="S":
             return("set")
-        elif events_key==True and selected=="V":
+        elif selected=="V":
             return("events")
         elif selected=="B":
             if path.count("\\")>1:
@@ -688,7 +769,7 @@ def chatrum():
         for items in list_chatrum:
             print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(items))
             ii+=1
-        selected=checknumber(msvcrt.getch())
+        selected=filternumbersandmainkeys([*['H','B','S','E'],('V' if events_key else None)])
         if selected.isnumeric():
             if int(selected)>1 and int(selected)<4:
                 if selected=="2":
@@ -709,7 +790,7 @@ It is recommended to put each of your client scripts on each half of your screen
             return("home")
         elif selected=="S":
             return("set")
-        elif events_key==True and selected=="V":
+        elif selected=="V":
             return("events")
         elif selected=="E":
             os.system('color')
@@ -744,7 +825,7 @@ def google_search():
             print("\nPage : "+str(google_page)+" - [P]revious Page - [N]ext Page\n")
         else:
             print("\n[N]ext Page\n")
-        selected=str(input("\n    ")).upper()
+        selected=filterlargenumbersandmainkeys([*['H','B','S','E','P','N'],('V' if events_key else None)])
         if selected.isnumeric():
             if int(selected)>0 and int(selected)<11:
                 webbrowser.open(liste[int(selected)-1])
@@ -759,7 +840,7 @@ def google_search():
             return("home")
         elif selected=="S":
             return("set")
-        elif events_key==True and selected=="V":
+        elif selected=="V":
             return("events")
         elif selected=="E":
             os.system('color')
@@ -804,29 +885,29 @@ def create_event(date):
     event=""
     while event=="":
         bar()
-        print("Enter the title of the event on "+deformat_date(date)+".\n")
-        event=str(input("\n    "))
+        print("Enter the name of the event on "+deformat_date(date)+".\n\t")
+        event=enter_text(oneline=True)
         if event.upper()=="B":
             return("calendar")
         elif event.upper()=="H":
             return("home")
         elif event.upper()=="S":
             return("set")
-        elif events_key==True and event.upper()=="V":
+        elif event.upper()=="V":
             return("events")
         elif event.upper()=="E":
             os.system('color')
             exit()
     bar()
-    print("Enter the description of the event. (Leave blank for no description)")
-    desc=str(input("\n    "))
+    print("Enter the description of the event. (Leave blank for no description)\n\t")
+    desc=enter_text(oneline=True)
     if desc.upper()=="B":
         return("calendar")
     elif desc.upper()=="H":
         return("home")
     elif desc.upper()=="S":
         return("set")
-    elif events_key==True and desc.upper()=="V":
+    elif desc.upper()=="V":
         return("events")
     elif desc.upper()=="E":
         os.system('color')
@@ -869,7 +950,7 @@ def list_events(date):
 def show_events(date):
     while 1:
         events,ids=list_events(date)
-        bar()
+        bar(no_events=True)
         if events:
             print("All events on "+deformat_date(date)+":\n")
             ii=1
@@ -878,38 +959,34 @@ def show_events(date):
                 print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(event))
                 ii+=1
             print("\nEnter number of an event to edit or delete it.")
-            event_choosed=str(input("\n    ")).upper()
-            if event_choosed.isnumeric():
-                if int(event_choosed)>0 and int(event_choosed)<len(events)+1:
-                    bar()
-                    print(events[int(event_choosed)-1])
-                    print("\n1. Edit Event\n2. Delete Event")
-                    selected=checknumber(msvcrt.getch())
+            event_choice=filterlargenumbersandmainkeys(['H','B','S','E'])
+            if event_choice.isnumeric():
+                if int(event_choice)>0 and int(event_choice)<len(events)+1:
+                    bar(no_events=True)
+                    print(events[int(event_choice)-1])
+                    print("\n1. Edit Event\n2. Delete Event\n")
+                    selected=filternumbersandmainkeys(['H','B','S','E'])
                     if selected.isnumeric():
                         if selected=="1":
-                            edit_event(events[int(event_choosed)-1].split(" - ")[0],events[int(event_choosed)-1].split(" - ")[1],ids[int(event_choosed)-1],date)
+                            edit_event(events[int(event_choice)-1].split(" - ")[0],events[int(event_choice)-1].split(" - ")[1],ids[int(event_choice)-1],date)
                         elif selected=="2":
-                            del_event(events[int(event_choosed)-1].split(" - ")[0],date)
+                            del_event(events[int(event_choice)-1].split(" - ")[0],date)
                     elif selected=="B":
-                        return("calendar")
+                        return("events")
                     elif selected=="H":
                         return("home")
                     elif selected=="S":
                         return("set")
-                    elif events_key==True and selected=="V":
-                        return("events")
                     elif selected=="E":
                         os.system('color')
                         exit()
-            elif event_choosed=="B":
+            elif event_choice=="B":
                 return("calendar")
-            elif event_choosed=="H":
+            elif event_choice=="H":
                 return("home")
-            elif event_choosed=="S":
+            elif event_choice=="S":
                 return("set")
-            elif events_key==True and event_choosed=="V":
-                return("events")
-            elif event_choosed=="E":
+            elif event_choice=="E":
                 os.system('color')
                 exit()
         else:
@@ -920,12 +997,12 @@ def edit_event(event_title,event_desc,event_id,date):
     cursor=db.cursor()
     bar(True)
     print("Current title of the event: '"+str(event_title)+"'.\n\nEnter the new title of the event or leave blank to skip this step.")
-    new=str(input("\n    "))
+    new=enter_text(oneline=True)
     if new:
         event_title=new
     bar(True)
     print("Current description of the event: '"+str(event_desc)+"'.\n\nEnter the new description of the event or leave blank to skip this step.")
-    new=str(input("\n    "))
+    new=enter_text(oneline=True)
     if new:
         event_desc=new
     cursor.execute("""UPDATE dates SET event='"""+event_title.replace("'","''")+"""', desc='"""+event_desc.replace("'","''")+"""' WHERE id="""+str(event_id))
@@ -938,11 +1015,10 @@ def edit_event(event_title,event_desc,event_id,date):
 
 def del_event(event,date):
     selected=0
-    while not selected in [1,2]:
-        bar()
-        print("Delete Event ?\n1. Yes\n2. No\n")
-        selected=int(input("\n    "))
-    if selected==1:
+    bar()
+    print("Delete Event ?\n1. Yes\n2. No\n")
+    selected=filternumbersandmainkeys([*['H','B','S','E'],('V' if events_key else None)])
+    if selected=="1":
         db=sqlite3.connect(dios_location_path+'.dios_database')
         cursor=db.cursor()
         cursor.execute("""SELECT id FROM dates WHERE date='"""+date+"""' AND event='"""+event.replace("'","''")+"""'""")
@@ -954,6 +1030,15 @@ def del_event(event,date):
         bar(True)
         print("Event '"+event+"' deleted.\n")
         getpass.getpass("   Press Enter")
+    elif selected=="H" or selected=="B":
+        return("home",month,year)
+    elif selected=="S":
+        return("set",month,year)
+    elif selected=="V":
+        return("events")
+    elif selected=="E":
+        os.system('color')
+        exit()
 
 def calendar(month,year):
     list_months=["January - Winter","February - Winter","March - ","April - Spring","May - Spring","June - ","July - Summer","August - Summer","September - ","October - Autumn","November - Autumn","December - "]
@@ -1028,86 +1113,112 @@ def calendar(month,year):
         for items in list_choices:
             print((" "*(2-len(str(ii))))+str(ii)+". "+str(items))
             ii+=1
-        selected=str(input(f"\n    ")).upper()
-        if selected.isnumeric() or (events_key==True and selected=="V"):
+        print("")
+        selected=filternumbersandmainkeys([*['H','B','S','E'],('V' if events_key else None)])
+        if selected.isnumeric() or selected=="V":
             if selected=="1":
                 selected=0
-                print("Enter Month Number:")
+                print("\nEnter Month Number:")
                 while 1:
-                    selected=str(input("\n    "))
+                    selected=filterlargenumbersandmainkeys(['H','B','S','E'])
                     if selected.isnumeric():
                         if (int(selected)<1 or int(selected)>12):
                             print("\nEnter a numeric value between 1 and 12.")
-                            time.sleep(1.5)
+                            time.sleep(1)
                             return("calendar",month,year)
                         return("calendar",int(selected),year)
-                    print("\nEnter a numeric value between 1 and 12.")
-                    time.sleep(1.5)
-                    return("calendar",month,year)
+                    elif selected=="H" or selected=="B":
+                        return("home",month,year)
+                    elif selected=="S":
+                        return("set",month,year)
+                    elif selected=="E":
+                        os.system('color')
+                        exit()
+                    elif selected=="esc" :
+                        return("calendar",month,year)
             elif selected=="2":
                 selected=0
                 print("Enter Year:")
                 while 1:
-                    selected=str(input("\n    "))
+                    bar(escape=True, change=True)
+                    selected=filterlargenumbersandmainkeys(['H','B','S','E'])
                     if selected.isnumeric():
                         if int(selected)<1 or int(selected)>9998:
                             print("\nEnter a numeric value between 1 and 9998.")
                             time.sleep(1.5)
                             return("calendar",month,year)
                         return("calendar",month,int(selected))
+                    elif selected=="H" or selected=="B":
+                        return("home",month,year)
+                    elif selected=="S":
+                        return("set",month,year)
+                    elif selected=="E":
+                        os.system('color')
+                        exit()
+                    elif selected=="esc" :
+                        return("calendar",month,year)
                     print("\nEnter a numeric value between 1 and 9998.")
                     time.sleep(1.5)
                     return("calendar",month,year)
             elif selected=="3":
                 selected=0
                 while selected<1 or selected>how_many_days:
-                    print("\nEnter day of "+str(list_months[month-1]).split(" - ")[0]+" of "+str(year)+" you want to create an event for.")
-                    selected=str(input("\n    "))
+                    bar(escape=True, change=True)
+                    print("Enter the day of "+str(list_months[month-1]).split(" - ")[0]+" of "+str(year)+" you want to create an event for.\n")
+                    selected=filterlargenumbersandmainkeys(['H','B','S','E'])
                     if selected.isnumeric() and int(selected)>0 and int(selected)<how_many_days+1:
                         break
-                    else :
-                        print("\nEnter a numeric value between 1 and "+str(how_many_days)+".")
-                        time.sleep(1.5)
+                    elif selected=="H" or selected=="B":
+                        return("home",month,year)
+                    elif selected=="S":
+                        return("set",month,year)
+                    elif selected=="E":
+                        os.system('color')
+                        exit()
+                    elif selected=="esc" :
                         return("calendar",month,year)
                 create_event(str(selected)+"/"+str(month)+"/"+str(year))
-            while selected=="4" or (events_key==True and selected=="V"):
-                db=sqlite3.connect(dios_location_path+'.dios_database')
-                cursor=db.cursor()
-                cursor.execute("""SELECT date FROM dates""")
-                dates=cursor.fetchall()
-                cursor.close()
-                db.commit()
-                db.close()
-                if dates:
-                    dates=list(dict.fromkeys(dates))
-                    date_selected=0
-                    while int(date_selected)<1 or int(date_selected)>len(dates):
+            try:
+                while selected=="4" or (events_key==True and selected=="V"):
+                    db=sqlite3.connect(dios_location_path+'.dios_database')
+                    cursor=db.cursor()
+                    cursor.execute("""SELECT date FROM dates""")
+                    dates=cursor.fetchall()
+                    cursor.close()
+                    db.commit()
+                    db.close()
+                    if dates:
+                        dates=list(dict.fromkeys(dates))
                         date_selected=0
+                        while int(date_selected)<1 or int(date_selected)>len(dates):
+                            date_selected=0
+                            bar()
+                            print("You have events on the following dates :\n")
+                            ii=1
+                            spaces=len(str(len(dates)))
+                            for date in dates:
+                                print((" "*(spaces-len(str(ii))))+str(ii)+". "+deformat_date(date[0]))
+                                ii+=1
+                            print("\nSelect date you want to see, edit or delete the events of.\n")
+                            date_selected=filterlargenumbersandmainkeys(['H','B','S','E'])
+                            if date_selected.isnumeric() and int(date_selected)>0 and int(date_selected)<len(dates)+1:
+                                return_value=show_events(dates[int(date_selected)-1][0])
+                            elif date_selected=="B":
+                                return("calendar",month,year)
+                            elif date_selected=="H":
+                                return("home",month,year)
+                            elif date_selected=="S":
+                                return("set",month,year)
+                            elif date_selected=="E":
+                                os.system('color')
+                                exit()
+                    else:
                         bar()
-                        print("You have events on the following dates :\n")
-                        ii=1
-                        spaces=len(str(len(dates)))
-                        for date in dates:
-                            print((" "*(spaces-len(str(ii))))+str(ii)+". "+deformat_date(date[0]))
-                            ii+=1
-                        print("\nSelect date you want to see, edit or delete the events of.")
-                        date_selected=str(input("\n    ")).upper()
-                        if date_selected.isnumeric() and int(date_selected)>0 and int(date_selected)<len(dates)+1:
-                            return_value=show_events(dates[int(date_selected)-1][0])
-                        elif date_selected=="B":
-                            return("calendar",month,year)
-                        elif date_selected=="H":
-                            return("home",month,year)
-                        elif date_selected=="S":
-                            return("set",month,year)
-                        elif date_selected=="E":
-                            os.system('color')
-                            exit()
-                else:
-                    bar()
-                    print("There are no events.\n")
-                    getpass.getpass("   Press Enter")
-                    return("calendar",month,year)
+                        print("There are no events.\n")
+                        getpass.getpass("   Press Enter")
+                        return("calendar",month,year)
+            except Exception as e:
+                input(e)
         elif selected=="H" or selected=="B":
             return("home",month,year)
         elif selected=="S":
@@ -1119,28 +1230,13 @@ def calendar(month,year):
 
 def create_note():
     title=""
-    text=""
     while not title:
         bar(True)
-        title=str(input("Enter the Title of the Note.\n\n    ")).replace("'","''")
+        print("Enter the Title of the Note.\n\t")
+        title=enter_text(oneline=True).replace("'","''")
     bar(True)
     print("Write your Note, and press Escape when Done.\n")
-  
-    print(SAVE_POSITION)
-    def on_press(key):
-        nonlocal text
-        try:
-            text=checkchar(key,text)
-            print(f"{LOAD_POSITION}{CLEAR_DOWN}{text}|",)
-        except Exception as e:
-            print(e)
-
-    def on_release(key):
-        if key == Key.esc:
-            return False
-
-    with Listener(on_press=on_press, on_release=on_release, suppress=True) as listener:
-        listener.join()
+    text=enter_text()
     
     color=0
     colors=["Purple","Blue","Cyan","Green","Yellow","Red","Gold","White","Light Gray","Dark Gray","Bright Purple","Bright Blue","Bright Cyan","Bright Green","Bright Yellow","Bright Red"]
@@ -1152,7 +1248,7 @@ def create_note():
         for color in colors:
             print((" "*(spaces-len(str(ii))))+str(ii)+". "+color)
             ii+=1
-        color=str(input("\n    ")).upper()
+        color=filterlargenumbersandmainkeys([*['H','B','S','E'],('V' if events_key else None)])
         if color.isnumeric():
             if int(color)>0 and int(color)<len(colors)+1:
                 break
@@ -1160,7 +1256,7 @@ def create_note():
             return("home")
         elif color=="S":
             return("set")
-        elif events_key==True and color=="V":
+        elif color=="V":
             return("events")
         elif color=="E":
             os.system('color')
@@ -1173,26 +1269,14 @@ def create_note():
     while not locked in ["1","2"]:
         bar(True)
         print("Lock this Note?\n\n1. YES\n2. NO")
-        locked=filternumber(msvcrt.getch())
+        locked=filternumbers()
         password=""
         if locked in ["1","2"]:
             if lockedlist[int(locked)-1]=="YES":
-                bar(True)
-                print("Enter a password for your Note.\n\n     "+SAVE_POSITION)
-                def on_press(key):
-                    nonlocal password
-                    try:
-                        password=checkchar(key,password,True)
-                        print(f"{LOAD_POSITION}{CLEAR_DOWN}{'*'*len(password)}|",)
-                    except Exception as e:
-                        input(e)
-
-                def on_release(key):
-                    if key == Key.enter:
-                        return False
-
-                with Listener(on_press=on_press, on_release=on_release,suppress=True) as listener:
-                    listener.join()
+                while password=="":
+                    bar(True)
+                    print("Enter a password for your Note.\n\n     "+SAVE_POSITION)
+                    password=enter_password()
                     
     db=sqlite3.connect(dios_location_path+'.dios_database')
     cursor=db.cursor()
@@ -1214,26 +1298,12 @@ def edit_note(note):
     password=note[5]
     bar(True)
     print("Current title of the Note: '"+str(title)+"'.\n\nEnter the new title of the Note or leave blank to skip this step.")
-    new=str(input("\n    "))
+    new=enter_text(oneline=True)
     if new:
         title=new
     bar(True)
     print("Enter new text to write in the Note or leave blank to skip this step. Press Escape to proceed when finished.\n\n     "+SAVE_POSITION)
-    new=""
-    def on_press(key):
-        nonlocal new
-        try:
-            new=checkchar(key,new)
-            print(f"{LOAD_POSITION}{CLEAR_DOWN}{new}|",)
-        except Exception as e:
-            print(e)
-
-    def on_release(key):
-        if key == Key.esc:
-            return False
-
-    with Listener(on_press=on_press, on_release=on_release, suppress=True) as listener:
-        listener.join()
+    new=enter_text()
         
     if new:
         text=new
@@ -1241,17 +1311,29 @@ def edit_note(note):
     spaces=len(str(len(colors)))
     new=""
     while 1:
-        bar(True)
+        bar()
         print("Current color of the Note: '"+str(color)+"'.\n\nChoose a new color or leave blank to skip this step.")
         ii=1
         for color in colors:
             print((" "*(spaces-len(str(ii))))+str(ii)+". "+color)
             ii+=1
-        new=str(input("\n    "))
+        new=filterlargenumbersandmainkeys([*['H','B','S','E'],('V' if events_key else None)])
         if new:
             if new.isnumeric():
                 if int(new)>0 and int(new)<len(colors)+1:
                     break
+            elif new=="B":
+                return("notes")
+            elif new=="H":
+                return("home")
+            elif new=="S":
+                return("set")
+            elif new=="V":
+                return("events")
+            elif new=="E":
+                os.system('color')
+                exit()
+                
         else: break
         
         print("Please Enter a numeric value between 1 and "+str(len(colors)+1)+".")
@@ -1266,26 +1348,14 @@ def edit_note(note):
     while not new in ["1","2"]:
         bar(True)
         print("Note is currently "+not_text+"locked.\n\nLock it?\n\n1. YES\n2. NO")
-        new=filternumber(msvcrt.getch())
+        new=filternumbers()
     locked=lockedlist[int(new)-1]
     password=""
     if locked=="YES":
         bar(True)
         print("Enter a password for your Note.\n\n     "+SAVE_POSITION)
-        def on_press(key):
-            nonlocal password
-            try:
-                password=checkchar(key,password,True)
-                print(f"{LOAD_POSITION}{CLEAR_DOWN}{'*'*len(password)}|",)
-            except Exception as e:
-                print(e)
-
-        def on_release(key):
-            if key == Key.enter:
-                return False
-
-        with Listener(on_press=on_press, on_release=on_release, suppress=True) as listener:
-            listener.join()
+        password=enter_password()
+        
     
     cursor.execute("""UPDATE notes SET title='"""+title.replace("'","''")+"""', text='"""+text.replace("'","''")+"""', color='"""+uppercase(color)+"""', locked='"""+locked+"""', password='"""+password+"""' WHERE id="""+str(note_id))
     cursor.close()
@@ -1301,7 +1371,7 @@ def delete_note(note_id,title):
     while not selected in ['1','2']:
         bar()
         print("Delete Note ?\n1. Yes\n2. No\n")
-        selected=filternumber(msvcrt.getch())
+        selected=filternumbers()
     if selected=='1':
         db=sqlite3.connect(dios_location_path+'.dios_database')
         cursor=db.cursor()
@@ -1318,47 +1388,34 @@ def delete_note(note_id,title):
     
 
 def read_note(note):
-    trypass=""
     if note[4]=="YES":
-        bar()
         trypass=""
-        print("Enter the password for this Note.\n\n     "+SAVE_POSITION)
-        def on_press(key):
-            nonlocal trypass
-            try:
-                trypass=checkchar(key,trypass,True)
-                print(f"{LOAD_POSITION}{CLEAR_DOWN}{'*'*len(trypass)}|",)
-            except Exception as e:
-                print(e)
-
-        def on_release(key):
-            if key == Key.enter:
-                return False
-
-        with Listener(on_press=on_press, on_release=on_release, suppress=True) as listener:
-            listener.join()
+        while trypass=="":
+            bar()
+            print("Enter the password for this Note.\n\n     "+SAVE_POSITION)
+            trypass=enter_password()
             
         if trypass!=note[5]:
             bar(True)
-            print("Wrong Password.\n")
-            getpass.getpass("Press Enter")
+            print("Wrong Password.\n\nPress [D] to force delete the note or Enter to proceed.")
+            selected=filterbykey("D")
+            if selected=="D":
+                delete_note(note[0],note[1])
             return("notes")
     if note[4]=="NO" or trypass==note[5]:
         from math import floor
         global color
-        title=note[1]
-        text=note[2].replace("''","'")
         note_color=changecolor(note[3])
         while 1:
             bar()
-            print(f"{note_color}████████████████████ "+title+f"{bcolors.RESET}{color}\n")
-            print(text)
+            print(f"{note_color}████████████████████ "+note[1]+f"{bcolors.RESET}{color}\n")
+            print(note[2].replace("''","'"))
             print("1. Edit Note\n2. Delete Note\n")
-            selected=checknumber(msvcrt.getch())
+            selected=filternumbersandmainkeys([*['H','B','S','E'],('V' if events_key else None)])
             if selected=="1":
                 title,text,note_color,locked,password=edit_note(note)
             elif selected=="2":
-                returnvalue=delete_note(note[0],title)
+                returnvalue=delete_note(note[0],note[1])
                 if returnvalue:
                     return(returnvalue)
             elif selected=="B":
@@ -1367,7 +1424,7 @@ def read_note(note):
                 return("home")
             elif selected=="S":
                 return("set")
-            elif events_key==True and selected=="V":
+            elif selected=="V":
                 return("events")
             elif selected=="E":
                 os.system('color')
@@ -1425,7 +1482,10 @@ def notes():
             print("\nSelect a Note to read, edit or delete it.")
         else:
             print("You haven't wrote any Note yet.\n")
-        selected=str(input("\n    ")).upper()
+        try:
+            selected=filterlargenumbersandmainkeys([*['H','B','S','E'],('V' if events_key else None)])
+        except Exception as e:
+            input(e)
         if selected=="0":
             returnvalue=create_note()
             if returnvalue:
@@ -1437,7 +1497,7 @@ def notes():
             return("home")
         elif selected=="S":
             return("set")
-        elif events_key==True and selected=="V":
+        elif selected=="V":
             return("events")
         elif selected=="E":
             os.system('color')
@@ -1452,67 +1512,89 @@ def cmd():
 
 #HOME, BAR, LOOP vvvv
 
-def home(logo_color):
+def home(logo_color,homepage):
     global query,events_key
     query=""
-    list_home=["title","dir","set","notes","chat","google","calendar"]
-    #home page, with colored icons (all icons are 11 lines tall and 30 charactrs wide)
-    while 1:
-        bar()
+    list_home=[["title","dir","set","notes","chat","google","calendar","cmd"],["starwars"]]
+    max_homepage=2
+    #home page, with colored icons (all icons are 11 lines tall and 30 characters wide)
+    bar(homepages=True)
+    if homepage==1:
         print(f"{bcolors.RESET}\n\n\n\n\
-    {bcolors.RESET}{logo_color}       ▄▄  ▀███████▄ ▐██▄          {bcolors.RESET}{bcolors.BRIGHT_YELLOW}                                {bcolors.RESET}{bcolors.DARK_GRAY}               ▄███▄            {bcolors.RESET}{bcolors.YELLOW}                                \n\
-    {bcolors.RESET}{logo_color}     ▄█████▄  ▀█████▌ ████▄        {bcolors.RESET}{bcolors.BRIGHT_YELLOW}    ▄█████████████████████      {bcolors.RESET}{bcolors.DARK_GRAY}        ▄██▄  ███████  ▄██▄     {bcolors.RESET}{bcolors.YELLOW}        ████████████████████▄   \n\
-    {bcolors.RESET}{logo_color}   ▄████████▀▀   ▀▀▀█ █████        {bcolors.RESET}{bcolors.BRIGHT_YELLOW}    █▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄      {bcolors.RESET}{bcolors.DARK_GRAY}       █████████████████████    {bcolors.RESET}{bcolors.YELLOW}       ████▀▀▀▀▀▀▀▀▀▀▀▀▀███ █   \n\
-    {bcolors.RESET}{logo_color}      ▄▄▄▄            ████  █      {bcolors.RESET}{bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.RESET}{bcolors.DARK_GRAY}        ▀█████▀▀   ▀▀█████▀     {bcolors.RESET}{bcolors.YELLOW}       █████████████████████    \n\
-    {bcolors.RESET}{logo_color}  ▄████▀               █▀  ███     {bcolors.RESET}{bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.RESET}{bcolors.DARK_GRAY}     ▄███████         ███████▄  {bcolors.RESET}{bcolors.YELLOW}       ███▀▀▀▀▀▀▀▀▀▀▀▀▀████     \n\
-    {bcolors.RESET}{logo_color}  ███▀  ▄                ▄████     {bcolors.RESET}{bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.RESET}{bcolors.DARK_GRAY}    ████████           ████████ {bcolors.RESET}{bcolors.YELLOW}       ████████████████████     \n\
-    {bcolors.RESET}{logo_color}  ██▀ ▄██              ▄████▀▀     {bcolors.RESET}{bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.RESET}{bcolors.DARK_GRAY}     ▀███████         ███████▀  {bcolors.RESET}{bcolors.YELLOW}       ███▀▀▀▀▀▀▀▀▀▀▀▀▀████     \n\
-    {bcolors.RESET}{logo_color}  █▀ ▄███▌            ▄█▀▀  ▄      {bcolors.RESET}{bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.RESET}{bcolors.DARK_GRAY}        ▄█████▄▄   ▄▄█████▄     {bcolors.RESET}{bcolors.YELLOW}       ████████████████████     \n\
-    {bcolors.RESET}{logo_color}    ▄████▌ █▄▄▄   ▄▄▄▄▄▄▄▄███      {bcolors.RESET}{bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.RESET}{bcolors.DARK_GRAY}       █████████████████████    {bcolors.RESET}{bcolors.YELLOW}       ██▀▀▀▀▀▀▀▀▀▀▀▀▀█████     \n\
-    {bcolors.RESET}{logo_color}    ▀█████ ▐████▄  ▀███████▀       {bcolors.RESET}{bcolors.BRIGHT_YELLOW}    █████████████████████▀      {bcolors.RESET}{bcolors.DARK_GRAY}        ▀██▀  ███████  ▀██▀     {bcolors.RESET}{bcolors.YELLOW}      ████████████████████▀     \n\
-    {bcolors.RESET}{logo_color}      ▀▀██▌ ▐█████▄▄ ▀██▀▀         {bcolors.RESET}{bcolors.BRIGHT_YELLOW}                                {bcolors.RESET}{bcolors.DARK_GRAY}               ▀███▀            {bcolors.RESET}{bcolors.YELLOW}     ████████████████████▀      \n\
+    {bcolors.RESET}{logo_color}       ▄▄  ▀███████▄ ▐██▄          {bcolors.RESET}{bcolors.BRIGHT_YELLOW}                                {bcolors.RESET}{bcolors.DARK_GRAY}               ▄███▄            {bcolors.RESET}{bcolors.YELLOW}                                 \n\
+    {bcolors.RESET}{logo_color}     ▄█████▄  ▀█████▌ ████▄        {bcolors.RESET}{bcolors.BRIGHT_YELLOW}    ▄█████████████████████      {bcolors.RESET}{bcolors.DARK_GRAY}        ▄██▄  ███████  ▄██▄     {bcolors.RESET}{bcolors.YELLOW}         ████████████████████▄   \n\
+    {bcolors.RESET}{logo_color}   ▄████████▀▀   ▀▀▀█ █████        {bcolors.RESET}{bcolors.BRIGHT_YELLOW}    █▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄      {bcolors.RESET}{bcolors.DARK_GRAY}       █████████████████████    {bcolors.RESET}{bcolors.YELLOW}        ████▀▀▀▀▀▀▀▀▀▀▀▀▀███ █   \n\
+    {bcolors.RESET}{logo_color}      ▄▄▄▄            ████  █      {bcolors.RESET}{bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.RESET}{bcolors.DARK_GRAY}        ▀█████▀▀   ▀▀█████▀     {bcolors.RESET}{bcolors.YELLOW}        █████████████████████    \n\
+    {bcolors.RESET}{logo_color}  ▄████▀               █▀  ███     {bcolors.RESET}{bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.RESET}{bcolors.DARK_GRAY}     ▄███████         ███████▄  {bcolors.RESET}{bcolors.YELLOW}        ███▀▀▀▀▀▀▀▀▀▀▀▀▀████     \n\
+    {bcolors.RESET}{logo_color}  ███▀  ▄                ▄████     {bcolors.RESET}{bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.RESET}{bcolors.DARK_GRAY}    ████████           ████████ {bcolors.RESET}{bcolors.YELLOW}        ████████████████████     \n\
+    {bcolors.RESET}{logo_color}  ██▀ ▄██              ▄████▀▀     {bcolors.RESET}{bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.RESET}{bcolors.DARK_GRAY}     ▀███████         ███████▀  {bcolors.RESET}{bcolors.YELLOW}        ███▀▀▀▀▀▀▀▀▀▀▀▀▀████     \n\
+    {bcolors.RESET}{logo_color}  █▀ ▄███▌            ▄█▀▀  ▄      {bcolors.RESET}{bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.RESET}{bcolors.DARK_GRAY}        ▄█████▄▄   ▄▄█████▄     {bcolors.RESET}{bcolors.YELLOW}        ████████████████████     \n\
+    {bcolors.RESET}{logo_color}    ▄████▌ █▄▄▄   ▄▄▄▄▄▄▄▄███      {bcolors.RESET}{bcolors.BRIGHT_YELLOW}    ██████████████████████      {bcolors.RESET}{bcolors.DARK_GRAY}       █████████████████████    {bcolors.RESET}{bcolors.YELLOW}        ██▀▀▀▀▀▀▀▀▀▀▀▀▀█████     \n\
+    {bcolors.RESET}{logo_color}    ▀█████ ▐████▄  ▀███████▀       {bcolors.RESET}{bcolors.BRIGHT_YELLOW}    █████████████████████▀      {bcolors.RESET}{bcolors.DARK_GRAY}        ▀██▀  ███████  ▀██▀     {bcolors.RESET}{bcolors.YELLOW}       ████████████████████▀     \n\
+    {bcolors.RESET}{logo_color}      ▀▀██▌ ▐█████▄▄ ▀██▀▀         {bcolors.RESET}{bcolors.BRIGHT_YELLOW}                                {bcolors.RESET}{bcolors.DARK_GRAY}               ▀███▀            {bcolors.RESET}{bcolors.YELLOW}      ████████████████████▀      \n\
     \n\
-    {bcolors.RESET}{bcolors.WHITE}        1.TITLE SCREEN                    2.FILE EXPLORER                      3.SETTINGS                      4.NOTES\n\
+    {bcolors.RESET}{bcolors.WHITE}        3.TITLE SCREEN                    2.FILE EXPLORER                      3.SETTINGS                       4.NOTES\n\
     \n\
-    {bcolors.RESET}{bcolors.BRIGHT_GREEN}                                  {bcolors.RESET}{bcolors.RED}         ██████████████              {bcolors.RESET}{bcolors.WHITE}                              \n\
-    {bcolors.RESET}{bcolors.BRIGHT_GREEN}        ▄▄███████████▄▄           {bcolors.RESET}{bcolors.RED}       ██████████████████▄           {bcolors.RESET}{bcolors.WHITE}    ║║  ║║  ║║  ║║  ║║        \n\
-    {bcolors.RESET}{bcolors.BRIGHT_GREEN}      ▄█████████▀███████▄         {bcolors.RESET}{bcolors.RED}     ███████▀      ▀██████           {bcolors.RESET}{bcolors.RED}  ██{bcolors.RESET}{bcolors.WHITE}║║{bcolors.RESET}{bcolors.RED}██{bcolors.RESET}{bcolors.WHITE}║║{bcolors.RESET}{bcolors.RED}██{bcolors.RESET}{bcolors.WHITE}║║{bcolors.RESET}{bcolors.RED}██{bcolors.RESET}{bcolors.WHITE}║║{bcolors.RESET}{bcolors.RED}██{bcolors.RESET}{bcolors.WHITE}║║{bcolors.RESET}{bcolors.RED}██      \n\
-    {bcolors.RESET}{bcolors.BRIGHT_GREEN}     ████████████ ███████▄        {bcolors.RESET}{bcolors.BRIGHT_YELLOW}    ██{bcolors.RESET}{bcolors.RED}████                          {bcolors.RESET}{bcolors.RED}   ██████████████████████      \n\
-    {bcolors.RESET}{bcolors.BRIGHT_GREEN}    █████████  ███ ███████        {bcolors.RESET}{bcolors.BRIGHT_YELLOW}   ██████       {bcolors.RESET}{bcolors.BRIGHT_BLUE}▄▄▄▄▄▄▄▄▄▄▄▄▄       {bcolors.RESET}{bcolors.WHITE}   ███████▀▀█▀▀█▀▀█▀▀█▀▀█      \n\
-    {bcolors.RESET}{bcolors.BRIGHT_GREEN}    ██████████████ ███████        {bcolors.RESET}{bcolors.BRIGHT_YELLOW}   █████        {bcolors.RESET}{bcolors.BRIGHT_BLUE}██████████████      {bcolors.RESET}{bcolors.WHITE}   ██████████████████████      \n\
-    {bcolors.RESET}{bcolors.BRIGHT_GREEN}    █████████  ██ ████████        {bcolors.RESET}{bcolors.BRIGHT_YELLOW}   ██████       {bcolors.RESET}{bcolors.BRIGHT_BLUE}▀████████████       {bcolors.RESET}{bcolors.WHITE}   █▀▀█▀▀█▀▀█▀▀█▀▀█▀▀█▀▀█      \n\
-    {bcolors.RESET}{bcolors.BRIGHT_GREEN}     ███████████▄████████▀        {bcolors.RESET}{bcolors.BRIGHT_YELLOW}    ████{bcolors.RESET}{bcolors.GREEN}██             {bcolors.RESET}{bcolors.BRIGHT_BLUE}██████       {bcolors.RESET}{bcolors.WHITE}   ██████████████████████      \n\
-    {bcolors.RESET}{bcolors.BRIGHT_GREEN}      █████████████████▀          {bcolors.RESET}{bcolors.BRIGHT_YELLOW}    ▀{bcolors.RESET}{bcolors.GREEN}███████▄      ▄█{bcolors.RESET}{bcolors.BRIGHT_BLUE}██████         {bcolors.RESET}{bcolors.WHITE}   █▀▀█▀▀█▀▀█▀▀█▀▀█▀▀████      \n\
-    {bcolors.RESET}{bcolors.BRIGHT_GREEN}     ████▀▀█████████▀▀            {bcolors.RESET}{bcolors.GREEN}       ██████████████████{bcolors.RESET}{bcolors.BRIGHT_BLUE}█          {bcolors.RESET}{bcolors.WHITE}   ██████████████████████      \n\
-    {bcolors.RESET}{bcolors.BRIGHT_GREEN}    ██▀▀                          {bcolors.RESET}{bcolors.GREEN}           ███████████              {bcolors.RESET}{bcolors.WHITE}   ██████████████████████      \n\
+    {bcolors.RESET}{bcolors.BRIGHT_GREEN}                                  {bcolors.RESET}{bcolors.RED}         ██████████████              {bcolors.RESET}{bcolors.WHITE}                              {bcolors.RESET}{bcolors.DARK_GRAY}                                \n\
+    {bcolors.RESET}{bcolors.BRIGHT_GREEN}        ▄▄███████████▄▄           {bcolors.RESET}{bcolors.RED}       ██████████████████▄           {bcolors.RESET}{bcolors.WHITE}    ║║  ║║  ║║  ║║  ║║        {bcolors.RESET}{bcolors.DARK_GRAY}   ████████████████████████     \n\
+    {bcolors.RESET}{bcolors.BRIGHT_GREEN}      ▄█████████▀███████▄         {bcolors.RESET}{bcolors.RED}     ███████▀      ▀██████           {bcolors.RESET}{bcolors.RED}  ██{bcolors.RESET}{bcolors.WHITE}║║{bcolors.RESET}{bcolors.RED}██{bcolors.RESET}{bcolors.WHITE}║║{bcolors.RESET}{bcolors.RED}██{bcolors.RESET}{bcolors.WHITE}║║{bcolors.RESET}{bcolors.RED}██{bcolors.RESET}{bcolors.WHITE}║║{bcolors.RESET}{bcolors.RED}██{bcolors.RESET}{bcolors.WHITE}║║{bcolors.RESET}{bcolors.RED}██      {bcolors.RESET}{bcolors.DARK_GRAY}   █{bcolors.RESET}{bcolors.BLACK}██████████████████████{bcolors.RESET}{bcolors.DARK_GRAY}█       \n\
+    {bcolors.RESET}{bcolors.BRIGHT_GREEN}     ████████████ ███████▄        {bcolors.RESET}{bcolors.BRIGHT_YELLOW}    ██{bcolors.RESET}{bcolors.RED}████                          {bcolors.RESET}{bcolors.RED}   ██████████████████████      {bcolors.RESET}{bcolors.DARK_GRAY}   █{bcolors.RESET}{bcolors.BLACK}█{bcolors.RESET}{bcolors.DARK_GRAY}█████{bcolors.RESET}{bcolors.BLACK}████████████████{bcolors.RESET}{bcolors.DARK_GRAY}█       \n\
+    {bcolors.RESET}{bcolors.BRIGHT_GREEN}    █████████  ███ ███████        {bcolors.RESET}{bcolors.BRIGHT_YELLOW}   ██████       {bcolors.RESET}{bcolors.BRIGHT_BLUE}▄▄▄▄▄▄▄▄▄▄▄▄▄       {bcolors.RESET}{bcolors.WHITE}   ███████▀▀█▀▀█▀▀█▀▀█▀▀█      {bcolors.RESET}{bcolors.DARK_GRAY}   █{bcolors.RESET}{bcolors.BLACK}██████████████████████{bcolors.RESET}{bcolors.DARK_GRAY}█     \n\
+    {bcolors.RESET}{bcolors.BRIGHT_GREEN}    ██████████████ ███████        {bcolors.RESET}{bcolors.BRIGHT_YELLOW}   █████        {bcolors.RESET}{bcolors.BRIGHT_BLUE}██████████████      {bcolors.RESET}{bcolors.WHITE}   ██████████████████████      {bcolors.RESET}{bcolors.DARK_GRAY}   █{bcolors.RESET}{bcolors.BLACK}██████████████████████{bcolors.RESET}{bcolors.DARK_GRAY}█     \n\
+    {bcolors.RESET}{bcolors.BRIGHT_GREEN}    █████████  ██ ████████        {bcolors.RESET}{bcolors.BRIGHT_YELLOW}   ██████       {bcolors.RESET}{bcolors.BRIGHT_BLUE}▀████████████       {bcolors.RESET}{bcolors.WHITE}   █▀▀█▀▀█▀▀█▀▀█▀▀█▀▀█▀▀█      {bcolors.RESET}{bcolors.DARK_GRAY}   █{bcolors.RESET}{bcolors.BLACK}██████████████████████{bcolors.RESET}{bcolors.DARK_GRAY}█     \n\
+    {bcolors.RESET}{bcolors.BRIGHT_GREEN}     ███████████▄████████▀        {bcolors.RESET}{bcolors.BRIGHT_YELLOW}    ████{bcolors.RESET}{bcolors.GREEN}██             {bcolors.RESET}{bcolors.BRIGHT_BLUE}██████       {bcolors.RESET}{bcolors.WHITE}   ██████████████████████      {bcolors.RESET}{bcolors.DARK_GRAY}   █{bcolors.RESET}{bcolors.BLACK}██████████████████████{bcolors.RESET}{bcolors.DARK_GRAY}█      \n\
+    {bcolors.RESET}{bcolors.BRIGHT_GREEN}      █████████████████▀          {bcolors.RESET}{bcolors.BRIGHT_YELLOW}    ▀{bcolors.RESET}{bcolors.GREEN}███████▄      ▄█{bcolors.RESET}{bcolors.BRIGHT_BLUE}██████         {bcolors.RESET}{bcolors.WHITE}   █▀▀█▀▀█▀▀█▀▀█▀▀█▀▀████      {bcolors.RESET}{bcolors.DARK_GRAY}   █{bcolors.RESET}{bcolors.BLACK}██████████████████████{bcolors.RESET}{bcolors.DARK_GRAY}█      \n\
+    {bcolors.RESET}{bcolors.BRIGHT_GREEN}     ████▀▀█████████▀▀            {bcolors.RESET}{bcolors.GREEN}       ██████████████████{bcolors.RESET}{bcolors.BRIGHT_BLUE}█          {bcolors.RESET}{bcolors.WHITE}   ██████████████████████      {bcolors.RESET}{bcolors.DARK_GRAY}   █{bcolors.RESET}{bcolors.BLACK}██████████████████████{bcolors.RESET}{bcolors.DARK_GRAY}█       \n\
+    {bcolors.RESET}{bcolors.BRIGHT_GREEN}    ██▀▀                          {bcolors.RESET}{bcolors.GREEN}           ███████████              {bcolors.RESET}{bcolors.WHITE}   ██████████████████████      {bcolors.RESET}{bcolors.DARK_GRAY}   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀       \n\
     \n\
-    {bcolors.RESET}{bcolors.WHITE}          5.CHATRUM                       6.GOOGLE SEARCH                      7.CALENDAR\n\
+    {bcolors.RESET}{bcolors.WHITE}          5.CHATRUM                       6.GOOGLE SEARCH                      7.CALENDAR                    8.COMMAND LINE\n\
     \n\
     ")
-        selected=checknumber(msvcrt.getch())
+    elif homepage==2:
+        print("WIP")
+    selected=filternumbersandmainkeys([*['H','B','S','E'],('P' if homepage>1 else None),('N' if homepage<max_homepage else None),('V' if events_key else None)])
+    try:
         if selected.isnumeric():
-            return(list_home[int(selected)-1])
+            if selected=="P":
+                return("home",homepage-1)
+            elif selected=="N":
+                return("home",homepage+1)
+            return(list_home[homepage-1][int(selected)-1], homepage)
         elif selected=="B":
-            return("title")
+            return("title", homepage)
         elif selected=="S":
-            return("set")
-        elif events_key==True and selected=="V":
-            return("events")
+            return("set", homepage)
+        elif selected=="V":
+            return("events", homepage)
         elif selected=="E":
             os.system('color')
             exit()
-        elif selected=="CMD":
-            return("cmd")
+            pr.disable()
+            s = StringIO()
+            sortby = 'cumulative'
+            ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
+            ps.print_stats()
+            print(s.getvalue())
+            input()
+        elif selected=="C":
+            return("cmd", homepage)
+    except Exception as e:
+        print(e)
+        input()
 
 events_key=False
-def bar(no_UI=False):
+def bar(no_UI=False, escape=False, homepages=False, no_events=False, change=False):
     global currentpage,query,events_key
-    os.system("cls")
-    #BACKGROUND COLOR
-    os.system('color '+list_settings[0][2]+'f')
+    if change==True:
+        bartext=(SAVE_POSITION+SET_POSITION_ZERO)
+    else:
+        os.system("cls")
+        #BACKGROUND COLOR
+        os.system('color '+list_settings[0][2]+'f')
+        bartext=""
 
     #show info
-    bartext=f"{bcolors.RESET}\u018A\u0131\u0298\u054F\n{barcolor}    "+deformat_date(datetime.date.today().strftime("%d/%m/%Y"))+" "+datetime.datetime.now().strftime("%H:%M")
+    bartext+=f"{bcolors.RESET}\u018A\u0131\u0298\u054F\n{barcolor}    "+deformat_date(datetime.date.today().strftime("%d/%m/%Y"))+" "+datetime.datetime.now().strftime("%H:%M")
     db=sqlite3.connect(dios_location_path+'.dios_database')
     cursor=db.cursor()
     cursor.execute("""SELECT id FROM dates WHERE date='"""+datetime.date.today().strftime("%d/%m/%Y")+"""'""")
@@ -1520,8 +1602,16 @@ def bar(no_UI=False):
     cursor.close()
     db.commit()
     db.close()
+    if no_UI:
+        bartext+=f"{bcolors.RESET}"
+    else:
+        bartext+=f" - [H]ome - [B]ack - [S]ettings - [E]xit diOS{bcolors.RESET}"
+    if escape:
+        bartext+=f" - [ESC] : Cancel{bcolors.RESET}"
+    if homepages:
+        bartext+=f" - [P]revious page - [N]ext page{bcolors.RESET}"
     events_key=False
-    if dates:
+    if dates and no_events==False:
         events_key=True
         s=""
         if len(dates)>1:
@@ -1531,24 +1621,23 @@ def bar(no_UI=False):
         else:
             notification_color=f"{bcolors.BRIGHT_RED}"
         bartext+=" - [V]iew your ("+notification_color+str(len(dates))+f"{barcolor}) Event"+s+" Today"
-    if no_UI:
-        bartext+=f"{bcolors.RESET}"
-    else:
-        bartext+=f" - [H]ome - [B]ack - [S]ettings - [E]xit diOS{bcolors.RESET}"
     print(bartext)
     
     #separator (COMMENT THIS LINE OUT IF YOU WANT TO RUN IN YOU IDE, OTHERWISE YOU'LL NEED TO OPEN IN TERMINAL)
     print("\u2501"*os.get_terminal_size()[0]+f"{color}")
+    if change==True: print(LOAD_POSITION)
 
 #setting initial page
 currentpage="title"
+homepage=1
+navigation_dict={"H":"home","S":"set","E":"exit","V":"events"}
 
 while 1:
     #show page
     if currentpage=="title":
         currentpage=title(changecolor(list_settings[9][2]))
     elif currentpage.startswith("home"):
-        currentpage=home(changecolor(list_settings[9][2]))
+        currentpage,homepage=home(changecolor(list_settings[9][2]),homepage)
     elif currentpage=="dir":
         currentpage=directories(path)
     elif currentpage=="set":
