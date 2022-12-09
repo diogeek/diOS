@@ -1,5 +1,5 @@
 print("let's ride")
-import os,datetime,webbrowser,sys,subprocess,platform,string,sqlite3
+import os,datetime,webbrowser,sys,subprocess,platform,string,sqlite3,msvcrt,getpass,time
 
 #check if a module is installed
 def check_installed(pkg):
@@ -19,7 +19,17 @@ if not check_installed("win32com"):
     try : install("pywin32")
     except : install("pypiwin32")
 
+if not check_installed("unidecode"):
+    install("Unidecode")
+
+if not check_installed("pynput"):
+    install("pynput")
+
+#installed modules import
 from win32com.client import Dispatch
+import unidecode
+from pynput.keyboard import Key, Listener
+
 
 if os.path.isfile(dios_location_path+"\dios.py"): #if you're running the diOS from the file and not from the shortcut
     #creating a shortcut to this file on the desktop, if it doesn't exist
@@ -134,6 +144,19 @@ class bcolors:
     #reset
     RESET='\u001b[0m'
 
+#escaping characters useful to un-print a line in cmd.
+SET_THIRD_ROW = "\033[3;0H"
+CLEAR_DOWN = "\x1b[0J"
+SAVE_POSITION = "\u001b[s"
+LOAD_POSITION = "\u001b[u"
+#functions for the cursor in cmd
+def hide_cursor():
+    print('\033[?25l', end="")
+def show_cursor():
+    print('\033[?25h', end="")
+
+hide_cursor()
+
 def uppercase(text):
     return(text.upper().replace(' ','_'))
 
@@ -215,6 +238,31 @@ def changecolor(color):
         return bcolors.BACKGROUND_BRIGHT_WHITE
     elif color=="BACKGROUND_BRIGHT_BLACK":
         return bcolors.BACKGROUND_BRIGHT_BLACK
+
+#function to handle choices in short menus
+keyboard_convertor={b'&':'1',b'\x82':'2',b'"':'3',b"'":'4',b'(':'5',b'-':'6',b'\x8a':'7',b'_':'8',b'\x87':'9',b'\x85':'0'}
+
+def checknumber(key): #gets a key which is a number between 0 and 9 and if pressed on a french AZERTY keyboard without caps lock on, converts to the corresponding number
+    if key in keyboard_convertor: return keyboard_convertor[key]
+    else: return key.decode('utf-8').upper()
+
+def filternumber(key):
+    if key in keyboard_convertor: return keyboard_convertor[key]
+    else: return
+
+def checkchar(key,text,password=False):
+    if key==Key.backspace:
+        if not text=="":
+            return(text[:-1])
+        else:
+            return("")
+    elif key==Key.enter and password==False:
+        return(text+"\n")
+    elif key==Key.space:
+        return(text+" ")
+    else :
+        try: return text+(str(key.char))
+        except: return text
 
 #function to save settings in text file
 def save():
@@ -310,7 +358,6 @@ keyboard.add_hotkey("alt + enter", lambda: None, suppress =True)
 
 def title(logo_color):
     shift=40
-    import getpass
     os.system('cls')
     getpass.getpass(f"{bcolors.RESET}{bcolors.WHITE}"+"\n"*((rows//2)-16)+"\
 "+" "*((cols//2)-shift)+"         ▄██  ███           "+f"{bcolors.RESET}{logo_color}▀███████████   ▄{bcolors.RESET}{bcolors.WHITE}                                    \n\
@@ -347,11 +394,10 @@ def settings():
             print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(items[0]))
             ii+=1
         print(("\n"+" "*(spaces-1))+str(len(list_settings)+1)+". Save Settings\n")
-        selected=str(input("\n    ")).upper()
+        selected=str(input(f"\n    ")).upper()
         if selected.isnumeric():
             if selected=="0":
                 path,barcolor,color,list_settings,date_format=reset()
-                save()
                 bar()
                 return("set")
             elif int(selected)-1<len(list_settings) and int(selected)>=0:
@@ -374,7 +420,7 @@ def settings():
                             print("\n- TEXT STYLE\n")
                         print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(items))
                         ii+=1
-                    selected=str(input("\n    ")).upper()
+                    selected=str(input(f"\n    ")).upper()
                     if selected.isnumeric():
                         if int(selected)-1<len(list_settings[choice][1]) and int(selected)>=0:
                             if choice>0:
@@ -415,11 +461,9 @@ def settings():
                         print("")
                         for i in [list_languages[i:i+20] for i in range(0,len(list_languages),20)]:
                             print(', '.join(i))
-                        import getpass
                         getpass.getpass("\nPress Enter")
                         return("set")
                     else:
-                        import time
                         print("Unrecognized Language.")
                         time.sleep(1.5)
                         return("set")
@@ -524,7 +568,6 @@ def directories(path):
         try:
             spaces=len(str(len(os.listdir(path))))
         except PermissionError:
-            import time
             print('Access to this Directory has been Denied.')
             time.sleep(1)
             path=path[:path.rfind('\\')]
@@ -645,7 +688,7 @@ def chatrum():
         for items in list_chatrum:
             print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(items))
             ii+=1
-        selected=str(input("\n    ")).upper()
+        selected=checknumber(msvcrt.getch())
         if selected.isnumeric():
             if int(selected)>1 and int(selected)<4:
                 if selected=="2":
@@ -660,7 +703,6 @@ All you have to do is either host or join a local Chatrum server and enter requi
  - Server.py : The server. It is only used by the Host and gives you the generated password you need to enter the room.\n - Client.py : The first client script. It sends the messages, and is only used for that.\n\
  - Client-recv.py : The second and last client script. It recieves and shows the messages on screen, and is only used for that.\n\n\
 It is recommended to put each of your client scripts on each half of your screen for a better chatting experience.\n\nEnjoy! \u263A\n")
-            import getpass
             getpass.getpass("Press Enter to go back to Homepage.")
             return("home")
         elif selected=="H" or selected=="B":
@@ -798,7 +840,6 @@ def create_event(date):
     cursor.close()
     db.commit()
     db.close()
-    import getpass
     bar(True)
     print("Event '"+event+"' succesfully created on "+date+".\n")
     getpass.getpass("   Press Enter")
@@ -843,7 +884,7 @@ def show_events(date):
                     bar()
                     print(events[int(event_choosed)-1])
                     print("\n1. Edit Event\n2. Delete Event")
-                    selected=str(input("\n    ")).upper()
+                    selected=checknumber(msvcrt.getch())
                     if selected.isnumeric():
                         if selected=="1":
                             edit_event(events[int(event_choosed)-1].split(" - ")[0],events[int(event_choosed)-1].split(" - ")[1],ids[int(event_choosed)-1],date)
@@ -875,7 +916,6 @@ def show_events(date):
             return("calendar")
 
 def edit_event(event_title,event_desc,event_id,date):
-    import getpass
     db=sqlite3.connect(dios_location_path+'.dios_database')
     cursor=db.cursor()
     bar(True)
@@ -903,7 +943,6 @@ def del_event(event,date):
         print("Delete Event ?\n1. Yes\n2. No\n")
         selected=int(input("\n    "))
     if selected==1:
-        import getpass
         db=sqlite3.connect(dios_location_path+'.dios_database')
         cursor=db.cursor()
         cursor.execute("""SELECT id FROM dates WHERE date='"""+date+"""' AND event='"""+event.replace("'","''")+"""'""")
@@ -989,9 +1028,8 @@ def calendar(month,year):
         for items in list_choices:
             print((" "*(2-len(str(ii))))+str(ii)+". "+str(items))
             ii+=1
-        selected=str(input("\n    ")).upper()
+        selected=str(input(f"\n    ")).upper()
         if selected.isnumeric() or (events_key==True and selected=="V"):
-            import time
             if selected=="1":
                 selected=0
                 print("Enter Month Number:")
@@ -1067,7 +1105,6 @@ def calendar(month,year):
                             exit()
                 else:
                     bar()
-                    import getpass
                     print("There are no events.\n")
                     getpass.getpass("   Press Enter")
                     return("calendar",month,year)
@@ -1079,21 +1116,32 @@ def calendar(month,year):
             os.system('color')
             exit()
 
+
 def create_note():
     title=""
+    text=""
     while not title:
         bar(True)
         title=str(input("Enter the Title of the Note.\n\n    ")).replace("'","''")
     bar(True)
     print("Write your Note, and press Escape when Done.\n")
-    text=""
-    keyboard.add_hotkey("esc", lambda: keyboard.press("enter"), suppress =False)
-    while 1:
-        if not keyboard.is_pressed("esc"):
-            text+=(str(input("\n    ")).replace("'","''")+"\n")
-        else:
-            break
-    keyboard.remove_hotkey("esc")
+  
+    print(SAVE_POSITION)
+    def on_press(key):
+        nonlocal text
+        try:
+            text=checkchar(key,text)
+            print(f"{LOAD_POSITION}{CLEAR_DOWN}{text}|",)
+        except Exception as e:
+            print(e)
+
+    def on_release(key):
+        if key == Key.esc:
+            return False
+
+    with Listener(on_press=on_press, on_release=on_release, suppress=True) as listener:
+        listener.join()
+    
     color=0
     colors=["Purple","Blue","Cyan","Green","Yellow","Red","Gold","White","Light Gray","Dark Gray","Bright Purple","Bright Blue","Bright Cyan","Bright Green","Bright Yellow","Bright Red"]
     while not (int(color)>0 and int(color)<len(colors)+1):
@@ -1125,13 +1173,27 @@ def create_note():
     while not locked in ["1","2"]:
         bar(True)
         print("Lock this Note?\n\n1. YES\n2. NO")
-        locked=(input("\n    "))
+        locked=filternumber(msvcrt.getch())
         password=""
-        if locked.isnumeric() and locked in ["1","2"]:
+        if locked in ["1","2"]:
             if lockedlist[int(locked)-1]=="YES":
-                import getpass
                 bar(True)
-                password=getpass.getpass("Enter a password for your Note.\n\n    ")
+                print("Enter a password for your Note.\n\n     "+SAVE_POSITION)
+                def on_press(key):
+                    nonlocal password
+                    try:
+                        password=checkchar(key,password,True)
+                        print(f"{LOAD_POSITION}{CLEAR_DOWN}{'*'*len(password)}|",)
+                    except Exception as e:
+                        input(e)
+
+                def on_release(key):
+                    if key == Key.enter:
+                        return False
+
+                with Listener(on_press=on_press, on_release=on_release,suppress=True) as listener:
+                    listener.join()
+                    
     db=sqlite3.connect(dios_location_path+'.dios_database')
     cursor=db.cursor()
     cursor.execute("""INSERT INTO notes (title, text, color, locked, password)
@@ -1142,7 +1204,6 @@ def create_note():
     db.close()
 
 def edit_note(note):
-    import getpass
     db=sqlite3.connect(dios_location_path+'.dios_database')
     cursor=db.cursor()
     note_id=note[0]
@@ -1157,23 +1218,28 @@ def edit_note(note):
     if new:
         title=new
     bar(True)
-    print("Enter new text to write in the Note or leave blank to skip this step. Press Escape to proceed when finished.")
+    print("Enter new text to write in the Note or leave blank to skip this step. Press Escape to proceed when finished.\n\n     "+SAVE_POSITION)
     new=""
-    keyboard.add_hotkey("esc", lambda: keyboard.press("enter"), suppress =False)
-    userinput=""
-    while 1:
-        if not keyboard.is_pressed("esc"):
-            userinput=str(input("\n    "))
-            new+=(userinput)
-            if userinput:
-                new+="\n"
-        else:
-            break
-    keyboard.remove_hotkey("esc")
+    def on_press(key):
+        nonlocal new
+        try:
+            new=checkchar(key,new)
+            print(f"{LOAD_POSITION}{CLEAR_DOWN}{new}|",)
+        except Exception as e:
+            print(e)
+
+    def on_release(key):
+        if key == Key.esc:
+            return False
+
+    with Listener(on_press=on_press, on_release=on_release, suppress=True) as listener:
+        listener.join()
+        
     if new:
         text=new
     colors=["Purple","Blue","Cyan","Green","Yellow","Red","Gold","White","Light Gray","Dark Gray","Bright Purple","Bright Blue","Bright Cyan","Bright Green","Bright Yellow","Bright Red"]
     spaces=len(str(len(colors)))
+    new=""
     while 1:
         bar(True)
         print("Current color of the Note: '"+str(color)+"'.\n\nChoose a new color or leave blank to skip this step.")
@@ -1187,7 +1253,7 @@ def edit_note(note):
                 if int(new)>0 and int(new)<len(colors)+1:
                     break
         else: break
-        import time
+        
         print("Please Enter a numeric value between 1 and "+str(len(colors)+1)+".")
         time.sleep(1.5)
     if new:
@@ -1197,18 +1263,30 @@ def edit_note(note):
     if locked=="NO":
         not_text="not "
     new=3
-    while not new in [1,2]:
+    while not new in ["1","2"]:
         bar(True)
         print("Note is currently "+not_text+"locked.\n\nLock it?\n\n1. YES\n2. NO")
-        new=str(input("\n    "))
-        if new.isnumeric():
-            new=int(new)
-    locked=lockedlist[new-1]
+        new=filternumber(msvcrt.getch())
+    locked=lockedlist[int(new)-1]
     password=""
     if locked=="YES":
-        import getpass
         bar(True)
-        password=getpass.getpass("Enter a password for your Note.\n\n    ")
+        print("Enter a password for your Note.\n\n     "+SAVE_POSITION)
+        def on_press(key):
+            nonlocal password
+            try:
+                password=checkchar(key,password,True)
+                print(f"{LOAD_POSITION}{CLEAR_DOWN}{'*'*len(password)}|",)
+            except Exception as e:
+                print(e)
+
+        def on_release(key):
+            if key == Key.enter:
+                return False
+
+        with Listener(on_press=on_press, on_release=on_release, suppress=True) as listener:
+            listener.join()
+    
     cursor.execute("""UPDATE notes SET title='"""+title.replace("'","''")+"""', text='"""+text.replace("'","''")+"""', color='"""+uppercase(color)+"""', locked='"""+locked+"""', password='"""+password+"""' WHERE id="""+str(note_id))
     cursor.close()
     db.commit()
@@ -1220,12 +1298,11 @@ def edit_note(note):
 
 def delete_note(note_id,title):
     selected=0
-    while not selected in [1,2]:
+    while not selected in ['1','2']:
         bar()
         print("Delete Note ?\n1. Yes\n2. No\n")
-        selected=int(input("\n    "))
-    if selected==1:
-        import getpass
+        selected=filternumber(msvcrt.getch())
+    if selected=='1':
         db=sqlite3.connect(dios_location_path+'.dios_database')
         cursor=db.cursor()
         cursor.execute("""DELETE FROM notes WHERE id='"""+str(note_id)+"""'""")
@@ -1243,10 +1320,24 @@ def delete_note(note_id,title):
 def read_note(note):
     trypass=""
     if note[4]=="YES":
-        import getpass
         bar()
-        print("Enter the password of this Note.")
-        trypass=getpass.getpass("\n    ")
+        trypass=""
+        print("Enter the password for this Note.\n\n     "+SAVE_POSITION)
+        def on_press(key):
+            nonlocal trypass
+            try:
+                trypass=checkchar(key,trypass,True)
+                print(f"{LOAD_POSITION}{CLEAR_DOWN}{'*'*len(trypass)}|",)
+            except Exception as e:
+                print(e)
+
+        def on_release(key):
+            if key == Key.enter:
+                return False
+
+        with Listener(on_press=on_press, on_release=on_release, suppress=True) as listener:
+            listener.join()
+            
         if trypass!=note[5]:
             bar(True)
             print("Wrong Password.\n")
@@ -1263,7 +1354,7 @@ def read_note(note):
             print(f"{note_color}████████████████████ "+title+f"{bcolors.RESET}{color}\n")
             print(text)
             print("1. Edit Note\n2. Delete Note\n")
-            selected=str(input("\n    ")).upper()
+            selected=checknumber(msvcrt.getch())
             if selected=="1":
                 title,text,note_color,locked,password=edit_note(note)
             elif selected=="2":
@@ -1398,7 +1489,7 @@ def home(logo_color):
     {bcolors.RESET}{bcolors.WHITE}          5.CHATRUM                       6.GOOGLE SEARCH                      7.CALENDAR\n\
     \n\
     ")
-        selected=str(input("\n    ")).upper()
+        selected=checknumber(msvcrt.getch())
         if selected.isnumeric():
             return(list_home[int(selected)-1])
         elif selected=="B":
