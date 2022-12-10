@@ -1,11 +1,6 @@
 print("let's ride")
 import os,datetime,webbrowser,sys,subprocess,platform,string,sqlite3,msvcrt,getpass,time
 
-import cProfile, pstats
-from io import StringIO
-pr = cProfile.Profile()
-pr.enable()
-
 #check if a module is installed
 def check_installed(pkg):
     try:
@@ -84,9 +79,7 @@ CREATE TABLE IF NOT EXISTS notes(
      password TEXT
 )
 """)
-cursor.close()
 db.commit()
-db.close()
 
 def get_size_screen():
     import ctypes
@@ -249,9 +242,6 @@ def changecolor(color):
 #function to handle choices in short menus
 keyboard_convertor={b'&':'1',b'1':'1',b'\x82':'2',b'2':'2',b'"':'3',b'3':'3',b"'":'4',b'4':'4',b'(':'5',b'5':'5',b'-':'6',b'6':'6',b'\x8a':'7',b'7':'7',b'_':'8',b'8':'8',b'\x87':'9',b'9':'9',b'\x85':'0',b'0':'0'}
 
-main_keys=[b'H',b'h',b'B',b'b',b'S',b's',b'E',b'e',b'V',b'v',b'P',b'p',b'N',b'n']
-
-
 def filternumbers():
     key=msvcrt.getch()
     if key in keyboard_convertor: return keyboard_convertor[key]
@@ -259,9 +249,8 @@ def filternumbers():
 
 def filternumbersandmainkeys(limit):
     key=msvcrt.getch()
-    limit=list(filter(lambda x: x is not None, limit))
     if key in keyboard_convertor: return keyboard_convertor[key]
-    if key in [bytes(x, 'utf-8') for x in limit]+[bytes(x.lower(), 'utf-8') for x in limit]: return key.decode('utf-8').upper()
+    if key in [bytes(x, 'utf-8') for x in limit if x is not None]+[bytes(x.lower(), 'utf-8') for x in limit if x is not None]: return key.decode('utf-8').upper()
     else: return ''
 
 def filterbykey(filteredkey):
@@ -274,7 +263,7 @@ def filterbykey(filteredkey):
 def filterlargenumbersandmainkeys(limit):
     selected=""
     limit=list(filter(lambda x: x is not None, limit))
-    print(f"\t{SAVE_POSITION}[{CLEAR_DOWN}{selected}]")
+    print(f"\t{SAVE_POSITION}[{CLEAR_DOWN}{selected}]{CURSOR_UP}")
     while 1:
         key=msvcrt.getch()
         if key==b'\x08' and selected!="":
@@ -286,7 +275,7 @@ def filterlargenumbersandmainkeys(limit):
         elif key in keyboard_convertor:
             selected+=keyboard_convertor[key]
         if key in [bytes(x, 'utf-8') for x in limit]+[bytes(x.lower(), 'utf-8') for x in limit]: return key.decode('utf-8').upper()
-        print(f"{LOAD_POSITION}[{CLEAR_DOWN}{selected}]")
+        print(f"{LOAD_POSITION}[{CLEAR_DOWN}{selected}]{CURSOR_UP}")
         
 #text editing related functions
 
@@ -466,97 +455,101 @@ def title(logo_color):
 def settings():
     global barcolor,color,list_settings,query,lang_google,date_format,events_key
     query=""
-    bar()
-    ii=1
-    spaces=len(str(len(list_settings)))
-    print((" "*(spaces-1))+"0. Reset Settings\n")
-    for items in list_settings:
-        print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(items[0]))
-        ii+=1
-    print(("\n"+" "*(spaces-1))+str(len(list_settings)+1)+". Save Settings\n")
-    while 1:
-        selected=filterlargenumbersandmainkeys([*['H','B','E'],('V' if events_key else None)])
-        if selected.isnumeric():
-            if selected=="0":
-                path,barcolor,color,list_settings,date_format=reset()
-                bar()
-                return("set")
-            elif int(selected)-1<len(list_settings) and int(selected)>=0:
-                bar()
-                ii=1
-                spaces=len(str(len(list_settings)))
-                choice=int(selected)-1
-                #choice = which setting you're changing
-                if choice!=7: #google lang
-                    for items in list_settings[choice][1]:
-                        if (choice==2 or choice==3) and items=="Purple":
-                            print("- TEXT COLORS\n")
-                        elif (choice==2 or choice==3) and items=="Bright Purple":
-                            print("\n- BRIGHT TEXT COLORS\n")
-                        elif (choice==2 or choice==3) and items=="Background Purple":
-                            print("\n- TEXT BACKGROUND COLORS\n")
-                        elif (choice==2 or choice==3) and items=="Background Bright Purple":
-                            print("\n- BRIGHT TEXT BACKGROUND COLORS\n")
-                        elif (choice==2 or choice==3) and items=="Bold":
-                            print("\n- TEXT STYLE\n")
-                        print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(items))
-                        ii+=1
-                    selected=filterlargenumbersandmainkeys(['H','B','S','E'])
-                    if selected.isnumeric():
-                        if int(selected)-1<len(list_settings[choice][1]) and int(selected)>=0:
-                            if choice>0:
-                                list_settings[choice][2]=uppercase(list_settings[choice][1][int(selected)-1])
-                            if choice==0:
-                                os.system('color '+str(int(selected)-1)+'f')
-                                list_settings[0][2]=hex(int(selected)-1).replace('0x','')
-                            elif choice==1:
-                                print(f"{bcolors.RESET}")
-                                barcolor=changecolor(list_settings[1][2])
-                            elif choice==2:
-                                print(f"{bcolors.RESET}")
-                                color=changecolor(list_settings[2][2])
-                            elif choice==8:
-                                date_format=list_settings[8][2]
-                    elif selected=="H":
-                        return("home")
-                    elif selected=="B" or selected=="S":
-                        return("set")
-                    elif selected=="E":
-                        os.system('color')
-                        exit()
-                else:
-                    list_languages=['as','ab','ae','of','ak','am','an','ar','as','av','ay','az','ba','be','bg','bh','bi','bm','bn','bo','br','bs','ca','ce','ch','co','cr','cs','cu','cv','cy','da','de','dv','dz','ee','el','en','eo','es','et','eu','fa','ff','fi','fj','fo','fr','fy','ga','gd','gl','gn','gu','gv','ha','he','hi','ho','hr','ht','hu','hy','hz','is','id','ie','ii','ik','io','is','it','iu','ja','jv','ka','kg','ki','kj','kk','kl','km','kn','ko','kr','ks','ku','kv','kw','ky','la','lb','lg','li','ln','lo','lt','lu','lv','mg','mh','mi','mk','ml','mn','mo','mr','ms','mt','my','na','nb','nd','ne','ng','nl','nn','no','nr','nv','ny','oc','oj','om','or','os','pa','pi','pl','ps','pt','qu','rc','rm','rn','ro','ru','rw','sa','sc','sd','se','sg','sh','si','sk','sl','sm','sn','so','sq','sr','ss','st','su','sv','sw','ta','te','tg','th','ti','tk','tl','tn','to','tr','ts','tt','tw','ty','ug','uk','ur','uz','ve','vi','vo','wa','wo','xh','yi','yo','za','zh','zu']
-                    print("Enter Google Search language (Type 'help' for list of languages):")
-                    selected=str(input("\n    ")).lower()
-                    if selected in list_languages:
-                        lang_google=selected
-                        return("set")
-                    elif selected=="H":
-                        return("home")
-                    elif selected=="B" or selected=="S":
-                        return("set")
-                    elif selected=="E":
-                        os.system('color')
-                        exit()
-                    elif selected=="help":
-                        print("")
-                        for i in [list_languages[i:i+20] for i in range(0,len(list_languages),20)]:
-                            print(', '.join(i))
-                        getpass.getpass("\nPress Enter")
-                        return("set")
+    while 1 :
+        bar()
+        ii=1
+        spaces=len(str(len(list_settings)))
+        print((" "*(spaces-1))+"0. Reset Settings\n")
+        for items in list_settings:
+            print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(items[0]))
+            ii+=1
+        print(("\n"+" "*(spaces-len(str(ii))))+str(len(list_settings)+1)+". Save Settings\n")
+        while 1:
+            selected=filterlargenumbersandmainkeys([*['H','B','E'],('V' if events_key else None)])
+            if selected.isnumeric():
+                if selected=="0":
+                    path,barcolor,color,list_settings,date_format=reset()
+                    bar()
+                    return("set")
+                elif int(selected)-1<len(list_settings) and int(selected)>=0:
+                    bar()
+                    ii=1
+                    spaces=len(str(len(list_settings)))
+                    choice=int(selected)-1
+                    #choice = which setting you're changing
+                    if choice!=7: #google lang
+                        for items in list_settings[choice][1]:
+                            if (choice==2 or choice==3) and items=="Purple":
+                                print("- TEXT COLORS\n")
+                            elif (choice==2 or choice==3) and items=="Bright Purple":
+                                print("\n- BRIGHT TEXT COLORS\n")
+                            elif (choice==2 or choice==3) and items=="Background Purple":
+                                print("\n- TEXT BACKGROUND COLORS\n")
+                            elif (choice==2 or choice==3) and items=="Background Bright Purple":
+                                print("\n- BRIGHT TEXT BACKGROUND COLORS\n")
+                            elif (choice==2 or choice==3) and items=="Bold":
+                                print("\n- TEXT STYLE\n")
+                            print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(items))
+                            ii+=1
+                        selected=filterlargenumbersandmainkeys(['H','B','S','E'])
+                        if selected.isnumeric():
+                            if int(selected)-1<len(list_settings[choice][1]) and int(selected)>=0:
+                                if choice>0:
+                                    list_settings[choice][2]=uppercase(list_settings[choice][1][int(selected)-1])
+                                if choice==0:
+                                    os.system('color '+str(int(selected)-1)+'f')
+                                    list_settings[0][2]=hex(int(selected)-1).replace('0x','')
+                                elif choice==1:
+                                    print(f"{bcolors.RESET}")
+                                    barcolor=changecolor(list_settings[1][2])
+                                elif choice==2:
+                                    print(f"{bcolors.RESET}")
+                                    color=changecolor(list_settings[2][2])
+                                elif choice==8:
+                                    date_format=list_settings[8][2]
+                        elif selected=="H":
+                            return("home")
+                        elif selected=="B" or selected=="S":
+                            return("set")
+                        elif selected=="E":
+                            os.system('color')
+                            exit()
                     else:
-                        print("Unrecognized Language.")
-                        time.sleep(1.5)
-                        return("set")
-            elif int(selected)-1==len(list_settings):
-                save()
-        elif selected=="H" or selected=="B":
-            return("home")
-        elif selected=="V":
-            return("events")
-        elif selected=="E":
-            os.system('color')
-            exit()
+                        list_languages=['as','ab','ae','of','ak','am','an','ar','as','av','ay','az','ba','be','bg','bh','bi','bm','bn','bo','br','bs','ca','ce','ch','co','cr','cs','cu','cv','cy','da','de','dv','dz','ee','el','en','eo','es','et','eu','fa','ff','fi','fj','fo','fr','fy','ga','gd','gl','gn','gu','gv','ha','he','hi','ho','hr','ht','hu','hy','hz','is','id','ie','ii','ik','io','is','it','iu','ja','jv','ka','kg','ki','kj','kk','kl','km','kn','ko','kr','ks','ku','kv','kw','ky','la','lb','lg','li','ln','lo','lt','lu','lv','mg','mh','mi','mk','ml','mn','mo','mr','ms','mt','my','na','nb','nd','ne','ng','nl','nn','no','nr','nv','ny','oc','oj','om','or','os','pa','pi','pl','ps','pt','qu','rc','rm','rn','ro','ru','rw','sa','sc','sd','se','sg','sh','si','sk','sl','sm','sn','so','sq','sr','ss','st','su','sv','sw','ta','te','tg','th','ti','tk','tl','tn','to','tr','ts','tt','tw','ty','ug','uk','ur','uz','ve','vi','vo','wa','wo','xh','yi','yo','za','zh','zu']
+                        print("Enter Google Search language (Type 'help' for list of languages):")
+                        selected=str(input("\n    ")).lower()
+                        if selected in list_languages:
+                            lang_google=selected
+                            return("set")
+                        elif selected=="H":
+                            return("home")
+                        elif selected=="B" or selected=="S":
+                            return("set")
+                        elif selected=="E":
+                            os.system('color')
+                            exit()
+                        elif selected=="help":
+                            print("")
+                            for i in [list_languages[i:i+20] for i in range(0,len(list_languages),20)]:
+                                print(', '.join(i))
+                            getpass.getpass("\nPress Enter")
+                            return("set")
+                        else:
+                            print("Unrecognized Language.")
+                            time.sleep(1.5)
+                            return("set")
+                elif int(selected)-1==len(list_settings):
+                    save()
+                    continue
+            elif selected=="H" or selected=="B":
+                return("home")
+            elif selected=="V":
+                return("events")
+            elif selected=="E":
+                os.system('color')
+                exit()
+            else: continue
+            break
 
 #SETTINGS, TITLE SCREEN ^^^^
 
@@ -654,7 +647,7 @@ def directories(path):
             
         #show hidden files or not
         if list_settings[4][2]=="YES":
-            liste=os.listdir(path)
+            liste=[x for x in os.listdir(path) if os.path.isdir(os.path.join(path, x))]+[x for x in os.listdir(path) if not os.path.isdir(os.path.join(path, x))]
         elif list_settings[4][2]=="NO":
             liste=listdir_nohidden(path)
         #sort files by setting
@@ -667,10 +660,12 @@ def directories(path):
         elif list_settings[3][2]=="NON-HIDDEN_FILES_FIRST" and list_settings[4][2]=="YES":
             liste=non_hidden_first(liste)
         #show only wanted type
+        for file in liste:
+            print(os.path.isfile(file.rsplit('.')[0]))#-------------------------------------------------------------------------ERREUR
         if list_settings[5][2]=="FILES_ONLY":
-            liste=list(filter(os.path.isfile, os.listdir(path)))
+            liste=list(filter(os.path.isfile, liste))
         elif list_settings[5][2]=="DIRECTORIES_ONLY":
-            liste=list(filter(os.path.isdir, os.listdir(path)))
+            liste=list(filter(os.path.isdir, liste))
         #show files
         if not liste or liste==[' ']:
             print("Files are protected or the Directory is empty.")
@@ -679,7 +674,7 @@ def directories(path):
             print((" "*(spaces-1))+"0. Switch Drive\n")
             if list_settings[3][2]=="BY_TYPE":
                 print("- FILES:\n")
-                for items in [str(file.rsplit(".")[0]) for file in liste]:
+                for items in liste:
                     if items==" ":
                         print("\n- DIRECTORIES:\n")
                     else:
@@ -687,77 +682,80 @@ def directories(path):
                         ii+=1
             elif list_settings[3][2]=="NON-HIDDEN_FILES_FIRST":
                 print("- VISIBLE:\n")
-                for items in [str(file.rsplit(".")[0]) for file in liste]:
+                for items in liste:
                     if items==" ":
                         print("\n- HIDDEN:\n")
                     else:
                         print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(items))
                         ii+=1
             else:
-                for items in [str(file.rsplit(".")[0]) for file in liste]:
+                for items in liste:
                     print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(items))
                     ii+=1
         try:
             liste.pop(liste.index(' '))
         except:None
         print(("\n"+" "*(spaces-len(str(ii))))+str(len(liste)+1)+". Create File or Directory\n")
-        selected=filterlargenumbersandmainkeys([*['H','B','S','E'],('V' if events_key else None)])
-        if selected.isnumeric():
-            if selected=="0":
-                while 1:
-                    bar()
-                    ii=1
-                    spaces=len(str(len(available_drives)))
-                    for drive in available_drives:
-                        print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(drive))
-                        ii+=1
-                    selected=filterlargenumbersandmainkeys([*['H','B','S','E'],('V' if events_key else None)])
-                    if selected.isnumeric():
-                        if int(selected)-1<len(available_drives) and int(selected)>0:
-                            path=available_drives[int(selected)-1]+'\\'
-                            break
-                    elif selected=="H":
-                        return("home")
-                    elif selected=="S":
-                        return("set")
-                    elif selected=="B":
-                        if path.count("\\")>1:
-                            path=path.rsplit('\\',2)[0]+str("\\")
-                        else:
+        while 1:
+            selected=filterlargenumbersandmainkeys([*['H','B','S','E'],('V' if events_key else None)])
+            if selected.isnumeric():
+                if selected=="0":
+                    while 1:
+                        bar()
+                        ii=1
+                        spaces=len(str(len(available_drives)))
+                        for drive in available_drives:
+                            print((" "*(spaces-len(str(ii))))+str(ii)+". "+str(drive))
+                            ii+=1
+                        selected=filterlargenumbersandmainkeys([*['H','B','S','E'],('V' if events_key else None)])
+                        if selected.isnumeric():
+                            if int(selected)-1<len(available_drives) and int(selected)>0:
+                                path=available_drives[int(selected)-1]+'\\'
+                                break
+                        elif selected=="H":
                             return("home")
-                    elif selected=="V":
-                        return("events")
-                    elif selected=="E":
-                        os.system('color')
-                        exit()
-            elif int(selected)-1<len(liste) and int(selected)>0:
-                selected=liste[int(selected)-1]
-                if os.path.isdir(path+selected):
-                    path+=selected+"\\"
-                elif selected.endswith(".lnk"):
-                    path=target(path+selected)
-                elif os.path.isfile(path+selected):
-                    webbrowser.open(path+selected)
-            elif int(selected)-1==len(liste):
-                while 1:
-                    if not create_file():
-                        create_file()
-                    else :
-                        break
-        elif selected=="H":
-            return("home")
-        elif selected=="S":
-            return("set")
-        elif selected=="V":
-            return("events")
-        elif selected=="B":
-            if path.count("\\")>1:
-                path=path.rsplit('\\',2)[0]+str("\\")
-            else:
+                        elif selected=="S":
+                            return("set")
+                        elif selected=="B":
+                            if path.count("\\")>1:
+                                path=path.rsplit('\\',2)[0]+str("\\")
+                            else:
+                                return("home")
+                        elif selected=="V":
+                            return("events")
+                        elif selected=="E":
+                            os.system('color')
+                            exit()
+                elif int(selected)-1<len(liste) and int(selected)>0:
+                    selected=liste[int(selected)-1]
+                    if os.path.isdir(path+selected):
+                        path+=selected+"\\"
+                    elif selected.endswith(".lnk"):
+                        path=target(path+selected)
+                    elif os.path.isfile(path+selected):
+                        webbrowser.open(path+selected)
+                elif int(selected)-1==len(liste):
+                    while 1:
+                        if not create_file():
+                            create_file()
+                        else :
+                            break
+            elif selected=="H":
                 return("home")
-        elif selected=="E":
-            os.system('color')
-            exit()
+            elif selected=="S":
+                return("set")
+            elif selected=="V":
+                return("events")
+            elif selected=="B":
+                if path.count("\\")>1:
+                    path=path.rsplit('\\',2)[0]+str("\\")
+                else:
+                    return("home")
+            elif selected=="E":
+                os.system('color')
+                exit()
+            else: continue
+            break
 
 list_chatrum=["What Is Chatrum ?","Host a Local Chatrum Server","Join a Local Chatrum Server"]
        
@@ -814,7 +812,7 @@ def google_search():
     while 1:
         global google_page,query,lang_google
         while query=="":
-            bar(True)
+            bar(UI=False)
             print("Search Google:")
             query =str(input("\n    "))
             google_page=1
@@ -879,9 +877,7 @@ def deformat_date(date):
     elif date_format=="YYYY/MM/DD":
         return(year+"/"+month+"/"+day)
 
-def create_event(date):
-    db=sqlite3.connect(dios_location_path+'.dios_database')
-    cursor=db.cursor()
+def create_event(date,cursor):
     event=""
     while event=="":
         bar()
@@ -918,21 +914,14 @@ def create_event(date):
                        VALUES 
                        ('"""+date+"""', '"""+event.replace("'","''")+"""', '"""+desc.replace("'","''")+"""') """
     cursor.execute(insert_query)
-    cursor.close()
     db.commit()
-    db.close()
-    bar(True)
+    bar(UI=False)
     print("Event '"+event+"' succesfully created on "+date+".\n")
     getpass.getpass("   Press Enter")
 
-def list_events(date):
-    db=sqlite3.connect(dios_location_path+'.dios_database')
-    cursor=db.cursor()
+def list_events(date,cursor):
     cursor.execute("""SELECT event,desc,id FROM dates WHERE date='"""+date+"""'""")
     events=cursor.fetchall()
-    cursor.close()
-    db.commit()
-    db.close()
     if events:
         events_final=[]
         ids=[]
@@ -992,42 +981,34 @@ def show_events(date):
         else:
             return("calendar")
 
-def edit_event(event_title,event_desc,event_id,date):
-    db=sqlite3.connect(dios_location_path+'.dios_database')
-    cursor=db.cursor()
-    bar(True)
+def edit_event(event_title,event_desc,event_id,date,cursor):
+    bar(UI=False)
     print("Current title of the event: '"+str(event_title)+"'.\n\nEnter the new title of the event or leave blank to skip this step.")
     new=enter_text(oneline=True)
     if new:
         event_title=new
-    bar(True)
+    bar(UI=False)
     print("Current description of the event: '"+str(event_desc)+"'.\n\nEnter the new description of the event or leave blank to skip this step.")
     new=enter_text(oneline=True)
     if new:
         event_desc=new
     cursor.execute("""UPDATE dates SET event='"""+event_title.replace("'","''")+"""', desc='"""+event_desc.replace("'","''")+"""' WHERE id="""+str(event_id))
-    cursor.close()
     db.commit()
-    db.close()
-    bar(True)
+    bar(UI=False)
     print("Event '"+event_title+"' edited.\n")
     getpass.getpass("   Press Enter")
 
-def del_event(event,date):
+def del_event(event,date,cursor):
     selected=0
     bar()
     print("Delete Event ?\n1. Yes\n2. No\n")
     selected=filternumbersandmainkeys([*['H','B','S','E'],('V' if events_key else None)])
     if selected=="1":
-        db=sqlite3.connect(dios_location_path+'.dios_database')
-        cursor=db.cursor()
         cursor.execute("""SELECT id FROM dates WHERE date='"""+date+"""' AND event='"""+event.replace("'","''")+"""'""")
         id_event=cursor.fetchall()[0][0]
         cursor.execute("""DELETE FROM dates WHERE id='"""+str(id_event)+"""'""")
-        cursor.close()
         db.commit()
-        db.close()
-        bar(True)
+        bar(UI=False)
         print("Event '"+event+"' deleted.\n")
         getpass.getpass("   Press Enter")
     elif selected=="H" or selected=="B":
@@ -1040,7 +1021,7 @@ def del_event(event,date):
         os.system('color')
         exit()
 
-def calendar(month,year):
+def calendar(month,year,cursor):
     list_months=["January - Winter","February - Winter","March - ","April - Spring","May - Spring","June - ","July - Summer","August - Summer","September - ","October - Autumn","November - Autumn","December - "]
     list_weekdays=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]
     day=int(datetime.date.today().strftime("%d"))
@@ -1180,13 +1161,9 @@ def calendar(month,year):
                 create_event(str(selected)+"/"+str(month)+"/"+str(year))
             try:
                 while selected=="4" or (events_key==True and selected=="V"):
-                    db=sqlite3.connect(dios_location_path+'.dios_database')
-                    cursor=db.cursor()
                     cursor.execute("""SELECT date FROM dates""")
                     dates=cursor.fetchall()
-                    cursor.close()
                     db.commit()
-                    db.close()
                     if dates:
                         dates=list(dict.fromkeys(dates))
                         date_selected=0
@@ -1231,10 +1208,10 @@ def calendar(month,year):
 def create_note():
     title=""
     while not title:
-        bar(True)
+        bar(UI=False)
         print("Enter the Title of the Note.\n\t")
         title=enter_text(oneline=True).replace("'","''")
-    bar(True)
+    bar(UI=False)
     print("Write your Note, and press Escape when Done.\n")
     text=enter_text()
     
@@ -1267,46 +1244,41 @@ def create_note():
     lockedlist=["YES","NO"]
     locked=0
     while not locked in ["1","2"]:
-        bar(True)
+        bar(UI=False)
         print("Lock this Note?\n\n1. YES\n2. NO")
         locked=filternumbers()
         password=""
         if locked in ["1","2"]:
             if lockedlist[int(locked)-1]=="YES":
                 while password=="":
-                    bar(True)
+                    bar(UI=False)
                     print("Enter a password for your Note.\n\n     "+SAVE_POSITION)
                     password=enter_password()
                     
-    db=sqlite3.connect(dios_location_path+'.dios_database')
-    cursor=db.cursor()
-    cursor.execute("""INSERT INTO notes (title, text, color, locked, password)
+    
+    cursor.execute(f"""INSERT INTO notes (title, text, color, locked, password)
                VALUES 
-               ('"""+title+"""', '"""+text+"""', '"""+color+"""', '"""+lockedlist[int(locked)-1]+"""', '"""+password+"""')""")
-    cursor.close()
+               ('{title}', '{text}', '{color}', '{lockedlist[int(locked)-1]}', '{password}')""")
     db.commit()
-    db.close()
 
-def edit_note(note):
-    db=sqlite3.connect(dios_location_path+'.dios_database')
-    cursor=db.cursor()
+def edit_note(note,cursor):
     note_id=note[0]
     title=note[1]
     text=note[2]
     color=note[3]
     locked=note[4]
     password=note[5]
-    bar(True)
+    bar(UI=False)
     print("Current title of the Note: '"+str(title)+"'.\n\nEnter the new title of the Note or leave blank to skip this step.")
+    title=(enter_text() or title)
+    """
     new=enter_text(oneline=True)
     if new:
-        title=new
-    bar(True)
+        title=new"""
+    bar(UI=False)
     print("Enter new text to write in the Note or leave blank to skip this step. Press Escape to proceed when finished.\n\n     "+SAVE_POSITION)
-    new=enter_text()
-        
-    if new:
-        text=new
+    text=(enter_text() or text)
+    #text=new if new:=enter_text() else text
     colors=["Purple","Blue","Cyan","Green","Yellow","Red","Gold","White","Light Gray","Dark Gray","Bright Purple","Bright Blue","Bright Cyan","Bright Green","Bright Yellow","Bright Red"]
     spaces=len(str(len(colors)))
     new=""
@@ -1346,40 +1318,34 @@ def edit_note(note):
         not_text="not "
     new=3
     while not new in ["1","2"]:
-        bar(True)
+        bar(UI=False)
         print("Note is currently "+not_text+"locked.\n\nLock it?\n\n1. YES\n2. NO")
         new=filternumbers()
     locked=lockedlist[int(new)-1]
     password=""
     if locked=="YES":
-        bar(True)
+        bar(UI=False)
         print("Enter a password for your Note.\n\n     "+SAVE_POSITION)
         password=enter_password()
         
     
     cursor.execute("""UPDATE notes SET title='"""+title.replace("'","''")+"""', text='"""+text.replace("'","''")+"""', color='"""+uppercase(color)+"""', locked='"""+locked+"""', password='"""+password+"""' WHERE id="""+str(note_id))
-    cursor.close()
     db.commit()
-    db.close()
-    bar(True)
+    bar(UI=False)
     print(f"Note '{title}' edited.\n")
     getpass.getpass("   Press Enter")
     return(title,text,changecolor(uppercase(color)),locked,password)
 
-def delete_note(note_id,title):
+def delete_note(note_id,title,cursor):
     selected=0
     while not selected in ['1','2']:
         bar()
         print("Delete Note ?\n1. Yes\n2. No\n")
         selected=filternumbers()
     if selected=='1':
-        db=sqlite3.connect(dios_location_path+'.dios_database')
-        cursor=db.cursor()
         cursor.execute("""DELETE FROM notes WHERE id='"""+str(note_id)+"""'""")
-        cursor.close()
         db.commit()
-        db.close()
-        bar(True)
+        bar(UI=False)
         print("Note '"+title+"' deleted.\n")
         getpass.getpass("   Press Enter")
         return("notes")
@@ -1387,7 +1353,7 @@ def delete_note(note_id,title):
         return(None)
     
 
-def read_note(note):
+def read_note(note,cursor):
     if note[4]=="YES":
         trypass=""
         while trypass=="":
@@ -1396,11 +1362,11 @@ def read_note(note):
             trypass=enter_password()
             
         if trypass!=note[5]:
-            bar(True)
+            bar(UI=False)
             print("Wrong Password.\n\nPress [D] to force delete the note or Enter to proceed.")
             selected=filterbykey("D")
             if selected=="D":
-                delete_note(note[0],note[1])
+                delete_note(note[0],note[1],cursor)
             return("notes")
     if note[4]=="NO" or trypass==note[5]:
         from math import floor
@@ -1552,13 +1518,9 @@ def home(logo_color,homepage):
     ")
     elif homepage==2:
         print("WIP")
-    selected=filternumbersandmainkeys([*['H','B','S','E'],('P' if homepage>1 else None),('N' if homepage<max_homepage else None),('V' if events_key else None)])
-    try:
+    while 1:
+        selected=filternumbersandmainkeys([*['H','B','S','E'],('P' if homepage>1 else None),('N' if homepage<max_homepage else None),('V' if events_key else None)])
         if selected.isnumeric():
-            if selected=="P":
-                return("home",homepage-1)
-            elif selected=="N":
-                return("home",homepage+1)
             return(list_home[homepage-1][int(selected)-1], homepage)
         elif selected=="B":
             return("title", homepage)
@@ -1569,21 +1531,15 @@ def home(logo_color,homepage):
         elif selected=="E":
             os.system('color')
             exit()
-            pr.disable()
-            s = StringIO()
-            sortby = 'cumulative'
-            ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
-            ps.print_stats()
-            print(s.getvalue())
-            input()
         elif selected=="C":
             return("cmd", homepage)
-    except Exception as e:
-        print(e)
-        input()
+        elif selected=="P":
+            return("home",homepage-1)
+        elif selected=="N":
+            return("home",homepage+1)
 
 events_key=False
-def bar(no_UI=False, escape=False, homepages=False, no_events=False, change=False):
+def bar(UI=True, escape=False, homepages=False, no_events=False, change=False):
     global currentpage,query,events_key
     if change==True:
         bartext=(SAVE_POSITION+SET_POSITION_ZERO)
@@ -1602,29 +1558,24 @@ def bar(no_UI=False, escape=False, homepages=False, no_events=False, change=Fals
     cursor.close()
     db.commit()
     db.close()
-    if no_UI:
-        bartext+=f"{bcolors.RESET}"
-    else:
-        bartext+=f" - [H]ome - [B]ack - [S]ettings - [E]xit diOS{bcolors.RESET}"
-    if escape:
-        bartext+=f" - [ESC] : Cancel{bcolors.RESET}"
-    if homepages:
-        bartext+=f" - [P]revious page - [N]ext page{bcolors.RESET}"
-    events_key=False
-    if dates and no_events==False:
-        events_key=True
-        s=""
-        if len(dates)>1:
-            s="s"
-        if "RED" in list_settings[1][2].upper():
-            notification_color=f"{bcolors.BRIGHT_BLUE}"
-        else:
-            notification_color=f"{bcolors.BRIGHT_RED}"
-        bartext+=" - [V]iew your ("+notification_color+str(len(dates))+f"{barcolor}) Event"+s+" Today"
-    print(bartext)
+    if UI:
+        bartext+=f" - [H]ome - [B]ack - [S]ettings - [E]xit diOS"
+        if escape:
+            bartext+=f" - [ESC] : Cancel"
+        if homepages:
+            bartext+=f" - [P]revious page - [N]ext page"
+        events_key=False
+        if dates and no_events==False:
+            events_key=True
+            if "RED" in list_settings[1][2].upper():
+                notification_color=f"{bcolors.BRIGHT_BLUE}"
+            else:
+                notification_color=f"{bcolors.BRIGHT_RED}"
+            bartext+=" - [V]iew your ("+notification_color+str(len(dates))+f"{barcolor}) Event{'s' if len(dates)>1 else ''} Today"
+    print(bartext+bcolors.RESET)
     
     #separator (COMMENT THIS LINE OUT IF YOU WANT TO RUN IN YOU IDE, OTHERWISE YOU'LL NEED TO OPEN IN TERMINAL)
-    print("\u2501"*os.get_terminal_size()[0]+f"{color}")
+    #print("\u2501"*os.get_terminal_size()[0]+f"{color}")
     if change==True: print(LOAD_POSITION)
 
 #setting initial page
@@ -1658,3 +1609,6 @@ while 1:
 #calculator
 #snake
 #tetris
+# a la place de la fin pour return sur chaque page, mettre 'if selected in navigation_dict : return(navigation_dict[selected],homepage)'
+# au lieu de fouiller le fichier texte moi-même, utiliser configparser.configParser
+# erreur voir dans directories, le filtre fait tout disparaite pourquoi ? exctensions ?
