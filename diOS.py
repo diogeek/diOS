@@ -309,7 +309,7 @@ def enter_text(oneline=False):
             print(e)
 
     def on_release(key):
-        if key == Key.esc:
+        if key == Key.esc and text:
             return False
 
     with Listener(on_press=on_press, on_release=on_release, suppress=True) as listener:
@@ -327,7 +327,7 @@ def enter_password():
             input(e)
 
     def on_release(key):
-        if key == Key.enter:
+        if key == Key.enter and password:
             return False
 
     with Listener(on_press=on_press, on_release=on_release, suppress=True) as listener:
@@ -507,13 +507,9 @@ def settings():
                                     color=changecolor(list_settings[2][2])
                                 elif choice==8:
                                     date_format=list_settings[8][2]
-                        elif selected=="H":
-                            return("home")
-                        elif selected=="B" or selected=="S":
+                        elif selected=="B"
                             return("set")
-                        elif selected=="E":
-                            os.system('color')
-                            exit()
+                        elif selected in navigation_dict : return(navigation_dict[selected])
                     else:
                         list_languages=['as','ab','ae','of','ak','am','an','ar','as','av','ay','az','ba','be','bg','bh','bi','bm','bn','bo','br','bs','ca','ce','ch','co','cr','cs','cu','cv','cy','da','de','dv','dz','ee','el','en','eo','es','et','eu','fa','ff','fi','fj','fo','fr','fy','ga','gd','gl','gn','gu','gv','ha','he','hi','ho','hr','ht','hu','hy','hz','is','id','ie','ii','ik','io','is','it','iu','ja','jv','ka','kg','ki','kj','kk','kl','km','kn','ko','kr','ks','ku','kv','kw','ky','la','lb','lg','li','ln','lo','lt','lu','lv','mg','mh','mi','mk','ml','mn','mo','mr','ms','mt','my','na','nb','nd','ne','ng','nl','nn','no','nr','nv','ny','oc','oj','om','or','os','pa','pi','pl','ps','pt','qu','rc','rm','rn','ro','ru','rw','sa','sc','sd','se','sg','sh','si','sk','sl','sm','sn','so','sq','sr','ss','st','su','sv','sw','ta','te','tg','th','ti','tk','tl','tn','to','tr','ts','tt','tw','ty','ug','uk','ur','uz','ve','vi','vo','wa','wo','xh','yi','yo','za','zh','zu']
                         print("Enter Google Search language (Type 'help' for list of languages):")
@@ -521,13 +517,9 @@ def settings():
                         if selected in list_languages:
                             lang_google=selected
                             return("set")
-                        elif selected=="H":
-                            return("home")
-                        elif selected=="B" or selected=="S":
+                        elif selected=="B":
                             return("set")
-                        elif selected=="E":
-                            os.system('color')
-                            exit()
+                        elif selected in navigation_dict : return(navigation_dict[selected])
                         elif selected=="help":
                             print("")
                             for i in [list_languages[i:i+20] for i in range(0,len(list_languages),20)]:
@@ -541,13 +533,9 @@ def settings():
                 elif int(selected)-1==len(list_settings):
                     save()
                     continue
-            elif selected=="H" or selected=="B":
+            elif selected=="B":
                 return("home")
-            elif selected=="V":
-                return("events")
-            elif selected=="E":
-                os.system('color')
-                exit()
+            elif selected in navigation_dict : return(navigation_dict[selected])
             else: continue
             break
 
@@ -560,15 +548,20 @@ def sort_by_creation_date(dirpath):
     a.sort(key=lambda s: os.path.getmtime(os.path.join(dirpath, s)))
     return a
 
-def folder_is_hidden(filepath):
+def is_hidden(filepath):
     import stat
     try:
         return bool(os.stat(filepath).st_file_attributes & stat.FILE_ATTRIBUTE_HIDDEN)
     except FileNotFoundError:
         return(None)
 
-def listdir_nohidden(path):
-    return([f for f in os.listdir(path) if not folder_is_hidden(path+f)])
+def create_list(path, show_hidden_files):
+    liste=[]
+    if not "DIRECTORIES_ONLY" in list_settings[5][2]: #if list_settings[5][2]=="FILES_ONLY":
+        liste+=([x for x in os.listdir(path) if os.path.isfile(os.path.join(path, x))] if show_hidden_files=="YES" else [x for x in os.listdir(path) if os.path.isfile(os.path.join(path, x)) and not is_hidden(os.path.join(path, x))])
+    if not "FILES_ONLY" in list_settings[5][2]: #elif list_settings[5][2]=="DIRECTORIES_ONLY":
+        liste+=([x for x in os.listdir(path) if os.path.isdir(os.path.join(path, x))] if show_hidden_files=="YES" else [x for x in os.listdir(path) if os.path.isdir(os.path.join(path, x)) and not is_hidden(os.path.join(path, x))])
+    return liste#return([f for f in os.listdir(path) if not is_hidden(path+f)])
 
 def sort_by_type(liste):
     listefinal=[f for f in liste if os.path.isfile(path+f)]
@@ -577,9 +570,9 @@ def sort_by_type(liste):
     return(listefinal)
     
 def non_hidden_first(liste):
-    listefinal=[f for f in liste if folder_is_hidden(path+f)==False]
+    listefinal=[f for f in liste if is_hidden(path+f)==False]
     listefinal.append(" ")
-    listefinal+=[f for f in liste if folder_is_hidden(path+f)]
+    listefinal+=[f for f in liste if is_hidden(path+f)]
     return(listefinal)
 
 #file explorer functions ^^^^
@@ -615,17 +608,9 @@ def create_file():
             except:
                 print('Error creating Directory. Please try again')
                 return(False)
-    elif selected=="H":
-        return("home")
-    elif selected=="S":
-        return("set")
     elif selected=="B":
         return("dir")
-    elif selected=="V":
-        return("events")
-    elif selected=="E":
-        os.system('color')
-        exit()
+    elif selected in navigation_dict : return(navigation_dict[selected])
 
 def target(shortcut):
     return str(shell.CreateShortCut(shortcut).TargetPath)
@@ -645,11 +630,8 @@ def directories(path):
             path=path[:path.rfind('\\')]
             return('dir')
             
-        #show hidden files or not
-        if list_settings[4][2]=="YES":
-            liste=[x for x in os.listdir(path) if os.path.isdir(os.path.join(path, x))]+[x for x in os.listdir(path) if not os.path.isdir(os.path.join(path, x))]
-        elif list_settings[4][2]=="NO":
-            liste=listdir_nohidden(path)
+        #creating list, deciding on showing hidden files or not, and if there are only directories, files or both.
+        liste=create_list(path, list_settings[5][2])
         #sort files by setting
         if list_settings[3][2]=="BY_NAME":
             liste.sort()
@@ -659,13 +641,6 @@ def directories(path):
             liste=sort_by_type(liste)
         elif list_settings[3][2]=="NON-HIDDEN_FILES_FIRST" and list_settings[4][2]=="YES":
             liste=non_hidden_first(liste)
-        #show only wanted type
-        for file in liste:
-            print(os.path.isfile(file.rsplit('.')[0]))#-------------------------------------------------------------------------ERREUR
-        if list_settings[5][2]=="FILES_ONLY":
-            liste=list(filter(os.path.isfile, liste))
-        elif list_settings[5][2]=="DIRECTORIES_ONLY":
-            liste=list(filter(os.path.isdir, liste))
         #show files
         if not liste or liste==[' ']:
             print("Files are protected or the Directory is empty.")
@@ -712,20 +687,12 @@ def directories(path):
                             if int(selected)-1<len(available_drives) and int(selected)>0:
                                 path=available_drives[int(selected)-1]+'\\'
                                 break
-                        elif selected=="H":
-                            return("home")
-                        elif selected=="S":
-                            return("set")
                         elif selected=="B":
                             if path.count("\\")>1:
                                 path=path.rsplit('\\',2)[0]+str("\\")
                             else:
                                 return("home")
-                        elif selected=="V":
-                            return("events")
-                        elif selected=="E":
-                            os.system('color')
-                            exit()
+                        elif selected in navigation_dict : return(navigation_dict[selected])
                 elif int(selected)-1<len(liste) and int(selected)>0:
                     selected=liste[int(selected)-1]
                     if os.path.isdir(path+selected):
@@ -740,20 +707,12 @@ def directories(path):
                             create_file()
                         else :
                             break
-            elif selected=="H":
-                return("home")
-            elif selected=="S":
-                return("set")
-            elif selected=="V":
-                return("events")
             elif selected=="B":
                 if path.count("\\")>1:
                     path=path.rsplit('\\',2)[0]+str("\\")
                 else:
                     return("home")
-            elif selected=="E":
-                os.system('color')
-                exit()
+            elif selected in navigation_dict : return(navigation_dict[selected])
             else: continue
             break
 
@@ -784,15 +743,9 @@ All you have to do is either host or join a local Chatrum server and enter requi
 It is recommended to put each of your client scripts on each half of your screen for a better chatting experience.\n\nEnjoy! \u263A\n")
             getpass.getpass("Press Enter to go back to Homepage.")
             return("home")
-        elif selected=="H" or selected=="B":
+        elif selected=="B":
             return("home")
-        elif selected=="S":
-            return("set")
-        elif selected=="V":
-            return("events")
-        elif selected=="E":
-            os.system('color')
-            exit()
+        elif selected in navigation_dict : return(navigation_dict[selected])
 
 def show_results(query,page,lang_google):
     import googlesearch
@@ -834,15 +787,9 @@ def google_search():
         elif selected=="N":
             google_page+=1
             return("google")
-        elif selected=="H" or selected=="B":
+        elif selected=="B":
             return("home")
-        elif selected=="S":
-            return("set")
-        elif selected=="V":
-            return("events")
-        elif selected=="E":
-            os.system('color')
-            exit()
+        elif selected in navigation_dict : return(navigation_dict[selected])
 
 month=int(datetime.date.today().strftime("%m/%Y").split("/")[0])
 year=int(datetime.date.today().strftime("%m/%Y").split("/")[1])
@@ -885,29 +832,13 @@ def create_event(date,cursor):
         event=enter_text(oneline=True)
         if event.upper()=="B":
             return("calendar")
-        elif event.upper()=="H":
-            return("home")
-        elif event.upper()=="S":
-            return("set")
-        elif event.upper()=="V":
-            return("events")
-        elif event.upper()=="E":
-            os.system('color')
-            exit()
+        elif event_upper() in navigation_dict : return(navigation_dict[selected])
     bar()
     print("Enter the description of the event. (Leave blank for no description)\n\t")
     desc=enter_text(oneline=True)
     if desc.upper()=="B":
         return("calendar")
-    elif desc.upper()=="H":
-        return("home")
-    elif desc.upper()=="S":
-        return("set")
-    elif desc.upper()=="V":
-        return("events")
-    elif desc.upper()=="E":
-        os.system('color')
-        exit()
+    elif desc.upper() in navigation_dict : return(navigation_dict[selected])
     if len(date.split('/')[0])==1:
         date="0"+date
     insert_query = """INSERT INTO dates (date, event, desc) 
@@ -962,22 +893,10 @@ def show_events(date):
                             del_event(events[int(event_choice)-1].split(" - ")[0],date)
                     elif selected=="B":
                         return("events")
-                    elif selected=="H":
-                        return("home")
-                    elif selected=="S":
-                        return("set")
-                    elif selected=="E":
-                        os.system('color')
-                        exit()
+                    elif selected in navigation_dict : return(navigation_dict[selected])
             elif event_choice=="B":
                 return("calendar")
-            elif event_choice=="H":
-                return("home")
-            elif event_choice=="S":
-                return("set")
-            elif event_choice=="E":
-                os.system('color')
-                exit()
+            elif event_choice in navigation_dict : return(navigation_dict[selected])
         else:
             return("calendar")
 
@@ -1011,15 +930,9 @@ def del_event(event,date,cursor):
         bar(UI=False)
         print("Event '"+event+"' deleted.\n")
         getpass.getpass("   Press Enter")
-    elif selected=="H" or selected=="B":
+    elif selected=="B":
         return("home",month,year)
-    elif selected=="S":
-        return("set",month,year)
-    elif selected=="V":
-        return("events")
-    elif selected=="E":
-        os.system('color')
-        exit()
+    elif selected in navigation_dict : return(navigation_dict[selected])
 
 def calendar(month,year,cursor):
     list_months=["January - Winter","February - Winter","March - ","April - Spring","May - Spring","June - ","July - Summer","August - Summer","September - ","October - Autumn","November - Autumn","December - "]
@@ -1108,13 +1021,9 @@ def calendar(month,year,cursor):
                             time.sleep(1)
                             return("calendar",month,year)
                         return("calendar",int(selected),year)
-                    elif selected=="H" or selected=="B":
+                    elif selected=="B":
                         return("home",month,year)
-                    elif selected=="S":
-                        return("set",month,year)
-                    elif selected=="E":
-                        os.system('color')
-                        exit()
+                    elif selected in navigation_dict : return(navigation_dict[selected])
                     elif selected=="esc" :
                         return("calendar",month,year)
             elif selected=="2":
@@ -1129,13 +1038,9 @@ def calendar(month,year,cursor):
                             time.sleep(1.5)
                             return("calendar",month,year)
                         return("calendar",month,int(selected))
-                    elif selected=="H" or selected=="B":
+                    elif selected=="B":
                         return("home",month,year)
-                    elif selected=="S":
-                        return("set",month,year)
-                    elif selected=="E":
-                        os.system('color')
-                        exit()
+                    elif selected in navigation_dict : return(navigation_dict[selected])
                     elif selected=="esc" :
                         return("calendar",month,year)
                     print("\nEnter a numeric value between 1 and 9998.")
@@ -1149,13 +1054,9 @@ def calendar(month,year,cursor):
                     selected=filterlargenumbersandmainkeys(['H','B','S','E'])
                     if selected.isnumeric() and int(selected)>0 and int(selected)<how_many_days+1:
                         break
-                    elif selected=="H" or selected=="B":
+                    elif selected=="B":
                         return("home",month,year)
-                    elif selected=="S":
-                        return("set",month,year)
-                    elif selected=="E":
-                        os.system('color')
-                        exit()
+                    elif selected in navigation_dict : return(navigation_dict[selected])
                     elif selected=="esc" :
                         return("calendar",month,year)
                 create_event(str(selected)+"/"+str(month)+"/"+str(year))
@@ -1196,13 +1097,8 @@ def calendar(month,year,cursor):
                         return("calendar",month,year)
             except Exception as e:
                 input(e)
-        elif selected=="H" or selected=="B":
-            return("home",month,year)
-        elif selected=="S":
-            return("set",month,year)
-        elif selected=="E":
-            os.system('color')
-            exit()
+        elif selected=="B":
+        elif selected in navigation_dict : return(navigation_dict[selected])
 
 
 def create_note():
@@ -1229,32 +1125,20 @@ def create_note():
         if color.isnumeric():
             if int(color)>0 and int(color)<len(colors)+1:
                 break
-        elif color=="H" or color=="B":
-            return("home")
-        elif color=="S":
-            return("set")
-        elif color=="V":
-            return("events")
-        elif color=="E":
-            os.system('color')
-            exit()
-        else:
-            color=0
+        elif color=="B": return("home")
+        elif color in navigation_dict : return(navigation_dict[selected])
+        else: color=0
     color=uppercase(colors[int(color)-1])
-    lockedlist=["YES","NO"]
     locked=0
-    while not locked in ["1","2"]:
+    while not locked in ("1","2"):
         bar(UI=False)
         print("Lock this Note?\n\n1. YES\n2. NO")
         locked=filternumbers()
-        password=""
         if locked in ["1","2"]:
-            if lockedlist[int(locked)-1]=="YES":
-                while password=="":
-                    bar(UI=False)
-                    print("Enter a password for your Note.\n\n     "+SAVE_POSITION)
-                    password=enter_password()
-                    
+            if ["YES","NO"][int(locked)-1]=="YES":
+                bar(UI=False)
+                print("Enter a password for your Note.\n\n     "+SAVE_POSITION)
+                password=enter_password()
     
     cursor.execute(f"""INSERT INTO notes (title, text, color, locked, password)
                VALUES 
@@ -1269,7 +1153,7 @@ def edit_note(note,cursor):
     locked=note[4]
     password=note[5]
     bar(UI=False)
-    print("Current title of the Note: '"+str(title)+"'.\n\nEnter the new title of the Note or leave blank to skip this step.")
+    print(f"Current title of the Note: '{str(title)}'.\n\nEnter the new title of the Note or leave blank to skip this step.")
     title=(enter_text() or title)
     """
     new=enter_text(oneline=True)
@@ -1281,10 +1165,9 @@ def edit_note(note,cursor):
     #text=new if new:=enter_text() else text
     colors=["Purple","Blue","Cyan","Green","Yellow","Red","Gold","White","Light Gray","Dark Gray","Bright Purple","Bright Blue","Bright Cyan","Bright Green","Bright Yellow","Bright Red"]
     spaces=len(str(len(colors)))
-    new=""
     while 1:
         bar()
-        print("Current color of the Note: '"+str(color)+"'.\n\nChoose a new color or leave blank to skip this step.")
+        print(f"Current color of the Note: '{str(color)}'.\n\nChoose a new color or leave blank to skip this step.")
         ii=1
         for color in colors:
             print((" "*(spaces-len(str(ii))))+str(ii)+". "+color)
@@ -1292,37 +1175,22 @@ def edit_note(note,cursor):
         new=filterlargenumbersandmainkeys([*['H','B','S','E'],('V' if events_key else None)])
         if new:
             if new.isnumeric():
-                if int(new)>0 and int(new)<len(colors)+1:
-                    break
+                if int(new)>0 and int(new)<len(colors)+1: break
             elif new=="B":
                 return("notes")
-            elif new=="H":
-                return("home")
-            elif new=="S":
-                return("set")
-            elif new=="V":
-                return("events")
-            elif new=="E":
-                os.system('color')
-                exit()
+            elif new in navigation_dict : return(navigation_dict[selected])
                 
         else: break
         
         print("Please Enter a numeric value between 1 and "+str(len(colors)+1)+".")
         time.sleep(1.5)
-    if new:
-        color=colors[int(new)-1]
-    lockedlist=["YES","NO"]
-    not_text=""
-    if locked=="NO":
-        not_text="not "
+    color=(colors[int(new)-1] or color)
     new=3
     while not new in ["1","2"]:
         bar(UI=False)
-        print("Note is currently "+not_text+"locked.\n\nLock it?\n\n1. YES\n2. NO")
+        print("Note is currently {'not ' if locked=='NO' else ''}locked.\n\nLock it?\n\n1. YES\n2. NO")
         new=filternumbers()
-    locked=lockedlist[int(new)-1]
-    password=""
+    locked=['YES','NO'][int(new)-1]
     if locked=="YES":
         bar(UI=False)
         print("Enter a password for your Note.\n\n     "+SAVE_POSITION)
@@ -1365,11 +1233,9 @@ def read_note(note,cursor):
             bar(UI=False)
             print("Wrong Password.\n\nPress [D] to force delete the note or Enter to proceed.")
             selected=filterbykey("D")
-            if selected=="D":
-                delete_note(note[0],note[1],cursor)
+            if selected=="D": delete_note(note[0],note[1],cursor)
             return("notes")
     if note[4]=="NO" or trypass==note[5]:
-        from math import floor
         global color
         note_color=changecolor(note[3])
         while 1:
@@ -1378,23 +1244,12 @@ def read_note(note,cursor):
             print(note[2].replace("''","'"))
             print("1. Edit Note\n2. Delete Note\n")
             selected=filternumbersandmainkeys([*['H','B','S','E'],('V' if events_key else None)])
-            if selected=="1":
-                title,text,note_color,locked,password=edit_note(note)
+            if selected=="1": title,text,note_color,locked,password=edit_note(note,cursor)
             elif selected=="2":
-                returnvalue=delete_note(note[0],note[1])
-                if returnvalue:
-                    return(returnvalue)
-            elif selected=="B":
-                return("notes")
-            elif selected=="H":
-                return("home")
-            elif selected=="S":
-                return("set")
-            elif selected=="V":
-                return("events")
-            elif selected=="E":
-                os.system('color')
-                exit()
+                returnvalue=delete_note(note[0],note[1],cursor)
+                if returnvalue: return(returnvalue)
+            elif selected=="B": return("notes")
+            elif selected in navigation_dict : return(navigation_dict[selected])
 def notes():
     global color
     while 1:
@@ -1423,16 +1278,14 @@ def notes():
                     ]
                 for note in line:
                     title=note[1]
-                    if len(title)>11:
-                        title=title[:8]+"..."
+                    if len(title)>11: title=title[:8]+"..."
                     if note[4]=="YES":
                         locked="locked"
                         preview="///////////"
                     else:
                         locked="unlocked"
                         preview=note[2].replace("\n","  ")
-                        if len(preview)>1:
-                            preview=preview[:8]+"..."
+                        if len(preview)>1: preview=preview[:8]+"..."
                     text[0]+=str(ii)+"."+" "*(17-len(str(ii)))
                     text[1]+=f"{changecolor(note[3])}█████████████"+f"{bcolors.RESET}{color}     "
                     text[2]+=f"{changecolor(note[3])}█"+title+"█"*(12-len(title))+f"{bcolors.RESET}{color}     "
@@ -1442,32 +1295,18 @@ def notes():
                     text[6]+=f"{changecolor(note[3])}█"+locked+"█"*(12-len(locked))+f"{bcolors.RESET}{color}     "
                     text[7]+=f"{changecolor(note[3])}█████████████"+f"{bcolors.RESET}{color}     "
                     ii+=1
-                for line in text:
-                    print(line)
+                for line in text: print(line)
                 print("")
             print("\nSelect a Note to read, edit or delete it.")
-        else:
-            print("You haven't wrote any Note yet.\n")
-        try:
-            selected=filterlargenumbersandmainkeys([*['H','B','S','E'],('V' if events_key else None)])
-        except Exception as e:
-            input(e)
+        else: print("You haven't wrote any Note yet.\n")
+        selected=filterlargenumbersandmainkeys([*['H','B','S','E'],('V' if events_key else None)])
         if selected=="0":
             returnvalue=create_note()
-            if returnvalue:
-                return(returnvalue)
+            if returnvalue: return(returnvalue)
         elif selected.isnumeric():
-            if int(selected)>0 and int(selected)<len(notes)+1:
-                return(read_note(notes[int(selected)-1]))
-        elif selected=="H" or selected=="B":
-            return("home")
-        elif selected=="S":
-            return("set")
-        elif selected=="V":
-            return("events")
-        elif selected=="E":
-            os.system('color')
-            exit()
+            if int(selected)>0 and int(selected)<len(notes)+1: return(read_note(notes[int(selected)-1],cursor))
+        elif selected=="B": return("home")
+        elif selected in navigation_dict : return(navigation_dict[selected])
 
 def cmd():
     os.system("cls")
@@ -1519,24 +1358,13 @@ def home(logo_color,homepage):
     elif homepage==2:
         print("WIP")
     while 1:
-        selected=filternumbersandmainkeys([*['H','B','S','E'],('P' if homepage>1 else None),('N' if homepage<max_homepage else None),('V' if events_key else None)])
+        selected=filternumbersandmainkeys([*['B','S','E'],('P' if homepage>1 else None),('N' if homepage<max_homepage else None),('V' if events_key else None)])
         if selected.isnumeric():
             return(list_home[homepage-1][int(selected)-1], homepage)
-        elif selected=="B":
-            return("title", homepage)
-        elif selected=="S":
-            return("set", homepage)
-        elif selected=="V":
-            return("events", homepage)
-        elif selected=="E":
-            os.system('color')
-            exit()
-        elif selected=="C":
-            return("cmd", homepage)
-        elif selected=="P":
-            return("home",homepage-1)
-        elif selected=="N":
-            return("home",homepage+1)
+        elif selected in navigation_dict : return(navigation_dict[selected],homepage)
+        elif selected=="B": return("title", homepage)
+        elif selected=="P": return("home",homepage-1)
+        elif selected=="N": return("home",homepage+1)
 
 events_key=False
 def bar(UI=True, escape=False, homepages=False, no_events=False, change=False):
@@ -1560,22 +1388,17 @@ def bar(UI=True, escape=False, homepages=False, no_events=False, change=False):
     db.close()
     if UI:
         bartext+=f" - [H]ome - [B]ack - [S]ettings - [E]xit diOS"
-        if escape:
-            bartext+=f" - [ESC] : Cancel"
-        if homepages:
-            bartext+=f" - [P]revious page - [N]ext page"
+        if escape: bartext+=f" - [ESC] : Cancel"
+        if homepages: bartext+=f" - [P]revious page - [N]ext page"
         events_key=False
         if dates and no_events==False:
             events_key=True
-            if "RED" in list_settings[1][2].upper():
-                notification_color=f"{bcolors.BRIGHT_BLUE}"
-            else:
-                notification_color=f"{bcolors.BRIGHT_RED}"
+            if "RED" in list_settings[1][2].upper(): notification_color=f"{bcolors.BRIGHT_BLUE}"
+            else: notification_color=f"{bcolors.BRIGHT_RED}"
             bartext+=" - [V]iew your ("+notification_color+str(len(dates))+f"{barcolor}) Event{'s' if len(dates)>1 else ''} Today"
     print(bartext+bcolors.RESET)
     
-    #separator (COMMENT THIS LINE OUT IF YOU WANT TO RUN IN YOU IDE, OTHERWISE YOU'LL NEED TO OPEN IN TERMINAL)
-    #print("\u2501"*os.get_terminal_size()[0]+f"{color}")
+    print("\u2501"*os.get_terminal_size()[0]+f"{color}") #separator (COMMENT THIS LINE OUT IF YOU WANT TO RUN IN YOU IDE, OTHERWISE YOU'LL NEED TO OPEN IN TERMINAL)
     if change==True: print(LOAD_POSITION)
 
 #setting initial page
@@ -1585,30 +1408,23 @@ navigation_dict={"H":"home","S":"set","E":"exit","V":"events"}
 
 while 1:
     #show page
-    if currentpage=="title":
-        currentpage=title(changecolor(list_settings[9][2]))
-    elif currentpage.startswith("home"):
-        currentpage,homepage=home(changecolor(list_settings[9][2]),homepage)
-    elif currentpage=="dir":
-        currentpage=directories(path)
-    elif currentpage=="set":
-        currentpage=settings()
-    elif currentpage=="chat":
-        currentpage=chatrum()
-    elif currentpage=="google":
-        currentpage=google_search()
-    elif currentpage=="calendar":
-        currentpage,month,year=calendar(month,year)
-    elif currentpage=="events":
-        currentpage=show_events(datetime.date.today().strftime("%d/%m/%Y"))
-    elif currentpage=="notes":
-        currentpage=notes()
-    elif currentpage=="cmd":
-        currentpage=cmd()
+    if currentpage=="title": currentpage=title(changecolor(list_settings[9][2]))
+    elif currentpage.startswith("home"): currentpage,homepage=home(changecolor(list_settings[9][2]),homepage)
+    elif currentpage=="dir": currentpage=directories(path)
+    elif currentpage=="set": currentpage=settings()
+    elif currentpage=="chat": currentpage=chatrum()
+    elif currentpage=="google": currentpage=google_search()
+    elif currentpage=="calendar": currentpage,month,year=calendar(month,year)
+    elif currentpage=="events": currentpage=show_events(datetime.date.today().strftime("%d/%m/%Y"))
+    elif currentpage=="notes": currentpage=notes()
+    elif currentpage=="cmd": currentpage=cmd()
+    elif currentpage=="exit":
+        os.system('color')
+        exit()
 
 #calculator
 #snake
 #tetris
-# a la place de la fin pour return sur chaque page, mettre 'if selected in navigation_dict : return(navigation_dict[selected],homepage)'
-# au lieu de fouiller le fichier texte moi-même, utiliser configparser.configParser
-# erreur voir dans directories, le filtre fait tout disparaite pourquoi ? exctensions ?
+# a la place de la fin pour return sur chaque page, mettre 'if selected in navigation_dict : return(navigation_dict[selected])'
+# configparser
+# systeme de pages de CGT
