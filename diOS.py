@@ -1,6 +1,3 @@
-print("let's ride")
-import os,datetime,webbrowser,sys,subprocess,platform,string,sqlite3,msvcrt,getpass,time
-
 #check if a module is installed
 def check_installed(pkg):
     try:
@@ -13,24 +10,43 @@ def check_installed(pkg):
 def install(package):
     subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 
+def get_size_screen():
+    import ctypes
+    user32=ctypes.windll.user32
+    return(user32.GetSystemMetrics(0), user32.GetSystemMetrics(1))
+
+#1 character=8 pixels wide, 16 pixels tall
+screen_width,screen_height=get_size_screen()
+cols=screen_width//8
+rows=screen_height//16
+
+import os
+
+#change terminal size (in rows and columns) before putting it in fullscreen mode
+os.system("mode con cols={cols} lines={rows}".format(cols=cols, rows=200))
+
+if not check_installed("pynput"):
+    install("pynput")
+
+from pynput.keyboard import Key, Listener, Controller
+Controller().tap(Key.f11) #fullscreen (it's ugly but it does the job)
+
+print("let's ride")
+
+import datetime,webbrowser,sys,subprocess,platform,string,sqlite3,msvcrt,getpass,time
+
 dios_location_path,dios_absolute_path=os.getcwd(),os.getcwd()
 
 if not check_installed("win32com"):
     try : install("pywin32")
     except : install("pypiwin32")
 
-if not check_installed("unidecode"):
-    install("Unidecode")
+if not check_installed('googlesearch'):
+    install('google')
 
-if not check_installed("pynput"):
-    install("pynput")
-
-#installed modules import
 from win32com.client import Dispatch
-import unidecode
-from pynput.keyboard import Key, Listener
 
-
+shell=Dispatch('WScript.shell')
 if os.path.isfile(dios_location_path+"\dios.py"): #if you're running the diOS from the file and not from the shortcut
     #creating a shortcut to this file on the desktop, if it doesn't exist
     if not check_installed('winshell'):
@@ -42,18 +58,15 @@ if os.path.isfile(dios_location_path+"\dios.py"): #if you're running the diOS fr
     target=os.path.join(os.path.dirname(os.path.abspath(__file__)), "diOS.exe")
     if not os.path.exists(target):
         target=os.path.join(os.path.dirname(os.path.abspath(__file__)), "diOS.py")
-    wDir = desktop
     icon=os.path.join(os.path.dirname(os.path.abspath(__file__)), "diOS.ico")
-    shell=Dispatch('WScript.shell')
 
     shortcut=shell.CreateShortCut(path)
     shortcut.Targetpath=target
-    shortcut.WorkingDirectory=wDir
+    shortcut.WorkingDirectory=desktop
     shortcut.IconLocation=icon
     shortcut.save()
     dios_location_path=''
 else:
-    shell = Dispatch("WScript.Shell")
     shortcut = shell.CreateShortCut("diOS.lnk")
     dios_location_path=''.join((shortcut.Targetpath).rsplit('\\', 1)[0])+'\\'
     dios_absolute_path=dios_location_path
@@ -81,23 +94,10 @@ CREATE TABLE IF NOT EXISTS notes(
 """)
 db.commit()
 
-def get_size_screen():
-    import ctypes
-    user32=ctypes.windll.user32
-    return(user32.GetSystemMetrics(0), user32.GetSystemMetrics(1))
-
-#1 character=8 pixels wide, 16 pixels tall
-screen_width,screen_height=get_size_screen()
-cols=screen_width//8
-rows=screen_height//16
-
 available_drives=[]
 for d in string.ascii_uppercase:
     if os.path.exists('{}:'.format(d)):
         available_drives.append('{}:'.format(d))
-
-#change terminal size (in rows and columns) before putting it in fullscreen mode
-os.system("mode con cols={cols} lines={rows}".format(cols=screen_width//8, rows=200))
 
 #text colors
 class bcolors:
@@ -375,11 +375,6 @@ def reset():
 
 path,barcolor,color,list_settings,date_format=reset()
 
-if not check_installed('keyboard'):
-    install('keyboard')
-if not check_installed('googlesearch'):
-    install('google')
-
 #loading settings from file
 if os.path.isfile(dios_location_path+'.dios_settings'):
     settings_file=open(dios_location_path+'.dios_settings','r')
@@ -409,46 +404,38 @@ date_format=DD/MM/YYYY\n\
 logo_color=CYAN')
     settings_file.close()
 
-#fullscreen (it's ugly but it does the job), plus blocks the fullscreen key combinations
-import keyboard
-keyboard.press('f11')
-keyboard.release('f11')
-keyboard.block_key('f11')
-keyboard.add_hotkey("alt + enter", lambda: None, suppress =True)
-
-#block multiple other commands (e.g force exit commands)
-#keyboard.add_hotkey("left_alt + f4", lambda: None, suppress =True)
-#keyboard.add_hotkey("left_alt + tab", lambda: None, suppress =True)
-#keyboard.add_hotkey("left_ctrl + c", lambda: None, suppress =True)
-#pages (home, directories, settings)
-
 #INITIAL SETUP ^^^^
 
 #SETTINGS, TITLE SCREEN vvvv
 
 def title(logo_color):
+    from pynput import mouse
+    mouse.Controller().scroll(0,100)
+    import shutil
     shift=40
     os.system('cls')
-    print(f"{bcolors.RESET}{bcolors.WHITE}"+"\n"*((rows//2)-16)+"\
-"+" "*((cols//2)-shift)+"         ▄██  ███           "+f"{bcolors.RESET}{logo_color}▀███████████   ▄{bcolors.RESET}{bcolors.WHITE}                                    \n\
-"+" "*((cols//2)-shift)+"   ▄███████   ▀▀     "+f"{bcolors.RESET}{logo_color}▄████▄▄   ▀█████████  ███▄▄{bcolors.RESET}{bcolors.WHITE}                                \n\
-"+" "*((cols//2)-shift)+"  ▐█▌  ▐██  ███   "+f"{bcolors.RESET}{logo_color}▄███████████▄   ▀██████▄  █████▄{bcolors.RESET}{bcolors.WHITE}                              \n\
-"+" "*((cols//2)-shift)+"  ██   ██▌ ███   "+f"{bcolors.RESET}{logo_color}████████████▀▀▀▀   ▀▀████  ███████ {bcolors.RESET}{bcolors.WHITE}                            \n\
-"+" "*((cols//2)-shift)+" ▐█▌  ▐██ ▐██   "+f"{bcolors.RESET}{logo_color}██▀    ▄▄▄               ▀  ██████  ▄{bcolors.RESET}{bcolors.WHITE}                           \n\
-"+" "*((cols//2)-shift)+"  ▀█████▌ ██   "+f"{bcolors.RESET}{logo_color}    ▄▄███▀                   ████▀  ▄██{bcolors.RESET}{bcolors.WHITE}     ▄███████████████████ \n\
-"+" "*((cols//2)-shift)+"              "+f"{bcolors.RESET}{logo_color} ▄███████                      ██▀  ▄████{bcolors.RESET}{bcolors.WHITE}   ████████████████████ \n\
-"+" "*((cols//2)-shift)+"              "+f"{bcolors.RESET}{logo_color}███████▀                           ██████{bcolors.RESET}{bcolors.WHITE}  ████████▀              \n\
-"+" "*((cols//2)-shift)+"              "+f"{bcolors.RESET}{logo_color}██████  ▄                        ████████{bcolors.RESET}{bcolors.WHITE} ▄███████                \n\
-"+" "*((cols//2)-shift)+"              "+f"{bcolors.RESET}{logo_color}████▀  ██                       ████████▀{bcolors.RESET}{bcolors.WHITE} ████████▄▄▄▄▄▄▄▄▄▄▄▄    \n\
-"+" "*((cols//2)-shift)+"              "+f"{bcolors.RESET}{logo_color}███▀ ▄████                     ████▀▀   {bcolors.RESET}{bcolors.WHITE}  █████████████████████   \n\
-"+" "*((cols//2)-shift)+"               "+f"{bcolors.RESET}{logo_color}█▀  ██████                         ▄▄█{bcolors.RESET}{bcolors.WHITE}    ▀███████████████████▌  \n\
-"+" "*((cols//2)-shift)+"                "+f"{bcolors.RESET}{logo_color}  ███████  ▄              ▄█████████{bcolors.RESET}{bcolors.WHITE}                   ██████▌  \n\
-"+" "*((cols//2)-shift)+"                 "+f"{bcolors.RESET}{logo_color}▀███████  ▀██▄▄▄▄    ▄████████████{bcolors.RESET}{bcolors.WHITE}                  ▄███████   \n\
-"+" "*((cols//2)-shift)+"                  "+f"{bcolors.RESET}{logo_color}▀███████  ███████▄▄  ▀█████████▀{bcolors.RESET}{bcolors.WHITE}    ▄█████████████████████    \n\
-"+" "*((cols//2)-shift)+"                    "+f"{bcolors.RESET}{logo_color}▀▀████   █████████▄▄  ▀████▀{bcolors.RESET}{bcolors.WHITE}      █████████████████████     \n\
-"+" "*((cols//2)-shift)+"                        "+f"{bcolors.RESET}{logo_color}▀▀▀  ▀███████████▄ {bcolors.RESET}{bcolors.WHITE}           ███████████████████▀      \n\
-"+"\n"*(rows-((rows//2)+1)-10))
-    getpass.getpass(" "*((cols//2)-10)+"PRESS ENTER")
+    columns=shutil.get_terminal_size().columns
+    print(f"{bcolors.RESET}{bcolors.WHITE}"+"\n"*((rows//2)-16)) #size of logo without escape characters : 92 characters large
+    for line in [
+f"                                     ▄██  ███           {bcolors.RESET}{logo_color}▀███████████   ▄{bcolors.RESET}{bcolors.WHITE}                                    ",
+f"                               ▄███████   ▀▀     {bcolors.RESET}{logo_color}▄████▄▄   ▀█████████  ███▄▄{bcolors.RESET}{bcolors.WHITE}                                ",
+f"                              ▐█▌  ▐██  ███   {bcolors.RESET}{logo_color}▄███████████▄   ▀██████▄  █████▄{bcolors.RESET}{bcolors.WHITE}                              ",
+f"                              ██   ██▌ ███   {bcolors.RESET}{logo_color}████████████▀▀▀▀   ▀▀████  ███████ {bcolors.RESET}{bcolors.WHITE}                            ",
+f"                             ▐█▌  ▐██ ▐██   {bcolors.RESET}{logo_color}██▀    ▄▄▄               ▀  ██████  ▄{bcolors.RESET}{bcolors.WHITE}                           ",
+f"                              ▀█████▌ ██   {bcolors.RESET}{logo_color}    ▄▄███▀                   ████▀  ▄██{bcolors.RESET}{bcolors.WHITE}     ▄███████████████████ ",
+f"                                          {bcolors.RESET}{logo_color} ▄███████                      ██▀  ▄████{bcolors.RESET}{bcolors.WHITE}   ████████████████████  ",
+f"                                          {bcolors.RESET}{logo_color}███████▀                           ██████{bcolors.RESET}{bcolors.WHITE}  ████████▀              ",
+f"                                          {bcolors.RESET}{logo_color}██████  ▄                        ████████{bcolors.RESET}{bcolors.WHITE} ▄███████                ",
+f"                                          {bcolors.RESET}{logo_color}████▀  ██                       ████████▀{bcolors.RESET}{bcolors.WHITE} ████████▄▄▄▄▄▄▄▄▄▄▄▄    ",
+f"                                          {bcolors.RESET}{logo_color}███▀ ▄████                     ████▀▀   {bcolors.RESET}{bcolors.WHITE}  █████████████████████   ",
+f"                                           {bcolors.RESET}{logo_color}█▀  ██████                         ▄▄█{bcolors.RESET}{bcolors.WHITE}    ▀███████████████████▌  ",
+f"                                            {bcolors.RESET}{logo_color}  ███████  ▄              ▄█████████{bcolors.RESET}{bcolors.WHITE}                   ██████▌  ",
+f"                                             {bcolors.RESET}{logo_color}▀███████  ▀██▄▄▄▄    ▄████████████{bcolors.RESET}{bcolors.WHITE}                  ▄███████   ",
+f"                                              {bcolors.RESET}{logo_color}▀███████  ███████▄▄  ▀█████████▀{bcolors.RESET}{bcolors.WHITE}    ▄█████████████████████    ",
+f"                                                {bcolors.RESET}{logo_color}▀▀████   █████████▄▄  ▀████▀{bcolors.RESET}{bcolors.WHITE}      █████████████████████     ",
+f"                                                    {bcolors.RESET}{logo_color}▀▀▀  ▀███████████▄ {bcolors.RESET}{bcolors.WHITE}           ███████████████████▀      "]:
+        print(line.center(columns))
+    getpass.getpass("\n\n\n"+"PRESS ENTER".center(columns))
     return("home")
     
 
@@ -507,7 +494,7 @@ def settings():
                                     color=changecolor(list_settings[2][2])
                                 elif choice==8:
                                     date_format=list_settings[8][2]
-                        elif selected=="B"
+                        elif selected=="B":
                             return("set")
                         elif selected in navigation_dict : return(navigation_dict[selected])
                     else:
@@ -751,10 +738,13 @@ def show_results(query,page,lang_google):
     import googlesearch
     ii=1
     liste=[]
-    for results in googlesearch.search(query, tld='com', lang=lang_google, tbs="0", safe='off', num=10, start=(page-1)*10-1, stop=10, pause=2.0, country='', extra_params=None, user_agent=None, verify_ssl=True):
-        print((" "*(2-len(str(ii))))+str(ii)+". "+str(results))
-        ii+=1
-        liste.append(results)
+    try:
+        for results in googlesearch.search(query, tld='com', lang=lang_google, tbs="0", safe='off', num=10, start=(page-1)*10-1, stop=10, pause=2.0, country='', extra_params=None, user_agent=None, verify_ssl=True):
+            print((" "*(2-len(str(ii))))+str(ii)+". "+str(results))
+            ii+=1
+            liste.append(results)
+    except Exception as e:
+        return([f"Search was not successful. Error :'{e}'"])
     return(liste)
 
 google_page=1
@@ -1098,6 +1088,7 @@ def calendar(month,year,cursor):
             except Exception as e:
                 input(e)
         elif selected=="B":
+            return("home",month,year)
         elif selected in navigation_dict : return(navigation_dict[selected])
 
 
@@ -1313,6 +1304,13 @@ def cmd():
     os.system("cmd /k echo Type 'exit' to go back to diOS.")
     return("home")
 
+def starwars():
+    os.system("cls")
+    print("\nPress escape and type 'exit' to go back to diOS.")
+    time.sleep(1)
+    os.system("cmd /k telnet towel.blinkenlights.nl")
+    return("home")
+
 #ALL APPLICATIONS ^^^^
 
 #HOME, BAR, LOOP vvvv
@@ -1338,7 +1336,7 @@ def home(logo_color,homepage):
     {bcolors.RESET}{logo_color}    ▀█████ ▐████▄  ▀███████▀       {bcolors.RESET}{bcolors.BRIGHT_YELLOW}    █████████████████████▀      {bcolors.RESET}{bcolors.DARK_GRAY}        ▀██▀  ███████  ▀██▀     {bcolors.RESET}{bcolors.YELLOW}       ████████████████████▀     \n\
     {bcolors.RESET}{logo_color}      ▀▀██▌ ▐█████▄▄ ▀██▀▀         {bcolors.RESET}{bcolors.BRIGHT_YELLOW}                                {bcolors.RESET}{bcolors.DARK_GRAY}               ▀███▀            {bcolors.RESET}{bcolors.YELLOW}      ████████████████████▀      \n\
     \n\
-    {bcolors.RESET}{bcolors.WHITE}        3.TITLE SCREEN                    2.FILE EXPLORER                      3.SETTINGS                       4.NOTES\n\
+    {bcolors.RESET}{bcolors.WHITE}        1.TITLE SCREEN                    2.FILE EXPLORER                      3.SETTINGS                       4.NOTES\n\
     \n\
     {bcolors.RESET}{bcolors.BRIGHT_GREEN}                                  {bcolors.RESET}{bcolors.RED}         ██████████████              {bcolors.RESET}{bcolors.WHITE}                              {bcolors.RESET}{bcolors.DARK_GRAY}                                \n\
     {bcolors.RESET}{bcolors.BRIGHT_GREEN}        ▄▄███████████▄▄           {bcolors.RESET}{bcolors.RED}       ██████████████████▄           {bcolors.RESET}{bcolors.WHITE}    ║║  ║║  ║║  ║║  ║║        {bcolors.RESET}{bcolors.DARK_GRAY}   ████████████████████████     \n\
@@ -1356,11 +1354,27 @@ def home(logo_color,homepage):
     \n\
     ")
     elif homepage==2:
-        print("WIP")
+        print(f"{bcolors.RESET}\n\n\n\n\
+    {bcolors.RESET}{bcolors.WHITE}      ████████████  ███    ███████{bcolors.RESET}        \n\
+    {bcolors.RESET}{bcolors.WHITE}     ██       ██   ██ ██   ██    ██{bcolors.RESET}       \n\
+    {bcolors.RESET}{bcolors.WHITE}      ██████  ██  ██   ██  ███████{bcolors.RESET}        \n\
+    {bcolors.RESET}{bcolors.WHITE}           ██ ██ █████████ ██    ██{bcolors.RESET}       \n\
+    {bcolors.RESET}{bcolors.WHITE} ███████████  ██ ██     ██ ██     ██████{bcolors.RESET}  \n\
+    {bcolors.RESET}{bcolors.WHITE}                                          {bcolors.RESET}\n\
+    {bcolors.RESET}{bcolors.WHITE} ██  ██  ██   ███    ███████    ████████{bcolors.RESET}  \n\
+    {bcolors.RESET}{bcolors.WHITE} ██  ██  ██  ██ ██   ██    ██  ██    {bcolors.RESET}     \n\
+    {bcolors.RESET}{bcolors.WHITE} ██ ████ ██ ██   ██  ███████    ██████{bcolors.RESET}    \n\
+    {bcolors.RESET}{bcolors.WHITE}  ███  ███ █████████ ██    ██        ██{bcolors.RESET}   \n\
+    {bcolors.RESET}{bcolors.WHITE}   ██  ██  ██     ██ ██     ██████████{bcolors.RESET}    \n\
+    \n\
+    {bcolors.RESET}{bcolors.WHITE}             1.STAR WARS \n\
+    \n\
+    ")
     while 1:
-        selected=filternumbersandmainkeys([*['B','S','E'],('P' if homepage>1 else None),('N' if homepage<max_homepage else None),('V' if events_key else None)])
+        selected=filternumbersandmainkeys([*['H','B','S','E'],('P' if homepage>1 else None),('N' if homepage<max_homepage else None),('V' if events_key else None)])
         if selected.isnumeric():
             return(list_home[homepage-1][int(selected)-1], homepage)
+        elif selected=="H": return("home",1)
         elif selected in navigation_dict : return(navigation_dict[selected],homepage)
         elif selected=="B": return("title", homepage)
         elif selected=="P": return("home",homepage-1)
@@ -1407,17 +1421,19 @@ homepage=1
 navigation_dict={"H":"home","S":"set","E":"exit","V":"events"}
 
 while 1:
-    #show page
+    #page 1
     if currentpage=="title": currentpage=title(changecolor(list_settings[9][2]))
     elif currentpage.startswith("home"): currentpage,homepage=home(changecolor(list_settings[9][2]),homepage)
     elif currentpage=="dir": currentpage=directories(path)
     elif currentpage=="set": currentpage=settings()
     elif currentpage=="chat": currentpage=chatrum()
     elif currentpage=="google": currentpage=google_search()
-    elif currentpage=="calendar": currentpage,month,year=calendar(month,year)
+    elif currentpage=="calendar": currentpage,month,year=calendar(month,year,cursor)
     elif currentpage=="events": currentpage=show_events(datetime.date.today().strftime("%d/%m/%Y"))
     elif currentpage=="notes": currentpage=notes()
     elif currentpage=="cmd": currentpage=cmd()
+    #page 2
+    elif currentpage=="starwars": currentpage=starwars()
     elif currentpage=="exit":
         os.system('color')
         exit()
@@ -1425,6 +1441,7 @@ while 1:
 #calculator
 #snake
 #tetris
-# a la place de la fin pour return sur chaque page, mettre 'if selected in navigation_dict : return(navigation_dict[selected])'
 # configparser
-# systeme de pages de CGT
+# systeme de pages comme le programme créé pour la CGT
+# recentrer le titre en prenant les charactères ansi en compte
+# animation de chargement du logo comme en mode aperture science en surprintant
