@@ -17,19 +17,21 @@ def get_size_screen():
 
 #1 character=8 pixels wide, 16 pixels tall
 screen_width,screen_height=get_size_screen()
-cols=screen_width//8
+columnslogo=screen_width//8
 rows=screen_height//16
 
 import os
 
 #change terminal size (in rows and columns) before putting it in fullscreen mode
-os.system("mode con cols={cols} lines={rows}".format(cols=cols, rows=200))
+os.system("mode con cols={cols} lines={rows}".format(cols=columnslogo, rows=200))
 
 if not check_installed("pynput"):
     install("pynput")
 
 from pynput.keyboard import Key, Listener, Controller
-Controller().tap(Key.f11) #fullscreen (it's ugly but it does the job)
+keyboard=Controller()
+keyboard.tap(Key.f11) #fullscreen (it's ugly but it does the job)
+
 
 print("let's ride")
 
@@ -160,84 +162,10 @@ hide_cursor()
 def uppercase(text):
     return(text.upper().replace(' ','_'))
 
-def changecolor(color):
-    #text
-    if color=="PURPLE":
-        return bcolors.PURPLE
-    elif color=="BLUE":
-        return bcolors.BLUE
-    elif color=="CYAN":
-        return bcolors.CYAN
-    elif color=="GREEN":
-        return bcolors.GREEN
-    elif color=="YELLOW":
-        return bcolors.YELLOW
-    elif color=="RED":
-        return bcolors.RED
-    elif color=="GOLD":
-        return bcolors.GOLD
-    elif color=="WHITE":
-        return bcolors.WHITE
-    elif color=="LIGHT_GRAY":
-        return bcolors.LIGHT_GRAY
-    elif color=="DARK_GRAY":
-        return bcolors.DARK_GRAY
-    elif color=="BLACK":
-        return bcolors.BLACK
-    elif color=="BRIGHT_PURPLE":
-        return bcolors.BRIGHT_PURPLE
-    elif color=="BRIGHT_BLUE":
-        return bcolors.BRIGHT_BLUE
-    elif color=="BRIGHT_CYAN":
-        return bcolors.BRIGHT_CYAN
-    elif color=="BRIGHT_GREEN":
-        return bcolors.BRIGHT_GREEN
-    elif color=="BRIGHT_YELLOW":
-        return bcolors.BRIGHT_YELLOW
-    elif color=="BRIGHT_RED":
-        return bcolors.BRIGHT_RED
-    elif color=="BRIGHT_BLACK":
-        return bcolors.BRIGHT_BLACK
-    elif color=="BOLD":
-        return bcolors.BOLD
-    elif color=="UNDERLINE":
-        return bcolors.UNDERLINE
-    elif color=="REVERSED":
-        return bcolors.REVERSED
+colordict={"PURPLE":bcolors.PURPLE,"BLUE":bcolors.BLUE,"CYAN":bcolors.CYAN,"GREEN":bcolors.GREEN,"YELLOW":bcolors.YELLOW,"RED":bcolors.RED,"GOLD":bcolors.GOLD,"WHITE":bcolors.WHITE,"LIGHT_GRAY":bcolors.LIGHT_GRAY,"DARK_GRAY":bcolors.DARK_GRAY,"BLACK":bcolors.BLACK,"BRIGHT_PURPLE":bcolors.BRIGHT_PURPLE,"BRIGHT_BLUE":bcolors.BRIGHT_BLUE,"BRIGHT_CYAN":bcolors.BRIGHT_CYAN,"BRIGHT_GREEN":bcolors.BRIGHT_GREEN,"BRIGHT_YELLOW":bcolors.BRIGHT_YELLOW,"BRIGHT_RED":bcolors.BRIGHT_RED,"BOLD":bcolors.BOLD,"UNDERLINE":bcolors.UNDERLINE,"REVERSED":bcolors.REVERSED,"BACKGROUND_PURPLE":bcolors.BACKGROUND_PURPLE,"BACKGROUND_BLUE":bcolors.BACKGROUND_BLUE,"BACKGROUND_CYAN":bcolors.BACKGROUND_CYAN,"BACKGROUND_GREEN":bcolors.BACKGROUND_GREEN,"BACKGROUND_YELLOW":bcolors.BACKGROUND_YELLOW,"BACKGROUND_RED":bcolors.BACKGROUND_RED,"BACKGROUND_WHITE":bcolors.BACKGROUND_WHITE,"BACKGROUND_BLACK":bcolors.BACKGROUND_BLACK,"BACKGROUND_BRIGHT_PURPLE":bcolors.BACKGROUND_BRIGHT_PURPLE,"BACKGROUND_BRIGHT_BLUE":bcolors.BACKGROUND_BRIGHT_BLUE,"BACKGROUND_BRIGHT_CYAN":bcolors.BACKGROUND_BRIGHT_CYAN,"BACKGROUND_BRIGHT_GREEN":bcolors.BACKGROUND_BRIGHT_GREEN,"BACKGROUND_BRIGHT_YELLOW":bcolors.BACKGROUND_BRIGHT_YELLOW,"BACKGROUND_BRIGHT_RED":bcolors.BACKGROUND_BRIGHT_RED,"BACKGROUND_BRIGHT_WHITE":bcolors.BACKGROUND_BRIGHT_WHITE,"BACKGROUND_BRIGHT_BLACK":bcolors.BACKGROUND_BRIGHT_BLACK}
 
-    #text background
-    elif color=="BACKGROUND_PURPLE":
-        return bcolors.BACKGROUND_PURPLE
-    elif color=="BACKGROUND_BLUE":
-        return bcolors.BACKGROUND_BLUE
-    elif color=="BACKGROUND_CYAN":
-        return bcolors.BACKGROUND_CYAN
-    elif color=="BACKGROUND_GREEN":
-        return bcolors.BACKGROUND_GREEN
-    elif color=="BACKGROUND_YELLOW":
-        return bcolors.BACKGROUND_YELLOW
-    elif color=="BACKGROUND_RED":
-        return bcolors.BACKGROUND_RED
-    elif color=="BACKGROUND_WHITE":
-        return bcolors.BACKGROUND_WHITE
-    elif color=="BACKGROUND_BLACK":
-        return bcolors.BACKGROUND_BLACK
-    elif color=="BACKGROUND_BRIGHT_PURPLE":
-        return bcolors.BACKGROUND_BRIGHT_PURPLE
-    elif color=="BACKGROUND_BRIGHT_BLUE":
-        return bcolors.BACKGROUND_BRIGHT_BLUE
-    elif color=="BACKGROUND_BRIGHT_CYAN":
-        return bcolors.BACKGROUND_BRIGHT_CYAN
-    elif color=="BACKGROUND_BRIGHT_GREEN":
-        return bcolors.BACKGROUND_BRIGHT_GREEN
-    elif color=="BACKGROUND_BRIGHT_YELLOW":
-        return bcolors.BACKGROUND_BRIGHT_YELLOW
-    elif color=="BACKGROUND_BRIGHT_RED":
-        return bcolors.BACKGROUND_BRIGHT_RED
-    elif color=="BACKGROUND_BRIGHT_WHITE":
-        return bcolors.BACKGROUND_BRIGHT_WHITE
-    elif color=="BACKGROUND_BRIGHT_BLACK":
-        return bcolors.BACKGROUND_BRIGHT_BLACK
+def changecolor(color):
+    return(colordict[color])
 
 #function to handle choices in short menus
 keyboard_convertor={b'&':'1',b'1':'1',b'\x82':'2',b'2':'2',b'"':'3',b'3':'3',b"'":'4',b'4':'4',b'(':'5',b'5':'5',b'-':'6',b'6':'6',b'\x8a':'7',b'7':'7',b'_':'8',b'8':'8',b'\x87':'9',b'9':'9',b'\x85':'0',b'0':'0'}
@@ -406,35 +334,34 @@ logo_color=CYAN')
 
 #INITIAL SETUP ^^^^
 
+from shutil import get_terminal_size
+columns=get_terminal_size().columns
+
 #SETTINGS, TITLE SCREEN vvvv
 
 def title(logo_color):
-    from pynput import mouse
-    mouse.Controller().scroll(0,100)
-    import shutil
-    shift=40
+    global columnslogo
     os.system('cls')
-    columns=shutil.get_terminal_size().columns
     print(f"{bcolors.RESET}{bcolors.WHITE}"+"\n"*((rows//2)-16)) #size of logo without escape characters : 92 characters large
     for line in [
-f"                                     ▄██  ███           {bcolors.RESET}{logo_color}▀███████████   ▄{bcolors.RESET}{bcolors.WHITE}                                    ",
-f"                               ▄███████   ▀▀     {bcolors.RESET}{logo_color}▄████▄▄   ▀█████████  ███▄▄{bcolors.RESET}{bcolors.WHITE}                                ",
-f"                              ▐█▌  ▐██  ███   {bcolors.RESET}{logo_color}▄███████████▄   ▀██████▄  █████▄{bcolors.RESET}{bcolors.WHITE}                              ",
-f"                              ██   ██▌ ███   {bcolors.RESET}{logo_color}████████████▀▀▀▀   ▀▀████  ███████ {bcolors.RESET}{bcolors.WHITE}                            ",
-f"                             ▐█▌  ▐██ ▐██   {bcolors.RESET}{logo_color}██▀    ▄▄▄               ▀  ██████  ▄{bcolors.RESET}{bcolors.WHITE}                           ",
-f"                              ▀█████▌ ██   {bcolors.RESET}{logo_color}    ▄▄███▀                   ████▀  ▄██{bcolors.RESET}{bcolors.WHITE}     ▄███████████████████ ",
-f"                                          {bcolors.RESET}{logo_color} ▄███████                      ██▀  ▄████{bcolors.RESET}{bcolors.WHITE}   ████████████████████  ",
-f"                                          {bcolors.RESET}{logo_color}███████▀                           ██████{bcolors.RESET}{bcolors.WHITE}  ████████▀              ",
-f"                                          {bcolors.RESET}{logo_color}██████  ▄                        ████████{bcolors.RESET}{bcolors.WHITE} ▄███████                ",
-f"                                          {bcolors.RESET}{logo_color}████▀  ██                       ████████▀{bcolors.RESET}{bcolors.WHITE} ████████▄▄▄▄▄▄▄▄▄▄▄▄    ",
-f"                                          {bcolors.RESET}{logo_color}███▀ ▄████                     ████▀▀   {bcolors.RESET}{bcolors.WHITE}  █████████████████████   ",
-f"                                           {bcolors.RESET}{logo_color}█▀  ██████                         ▄▄█{bcolors.RESET}{bcolors.WHITE}    ▀███████████████████▌  ",
-f"                                            {bcolors.RESET}{logo_color}  ███████  ▄              ▄█████████{bcolors.RESET}{bcolors.WHITE}                   ██████▌  ",
-f"                                             {bcolors.RESET}{logo_color}▀███████  ▀██▄▄▄▄    ▄████████████{bcolors.RESET}{bcolors.WHITE}                  ▄███████   ",
-f"                                              {bcolors.RESET}{logo_color}▀███████  ███████▄▄  ▀█████████▀{bcolors.RESET}{bcolors.WHITE}    ▄█████████████████████    ",
-f"                                                {bcolors.RESET}{logo_color}▀▀████   █████████▄▄  ▀████▀{bcolors.RESET}{bcolors.WHITE}      █████████████████████     ",
-f"                                                    {bcolors.RESET}{logo_color}▀▀▀  ▀███████████▄ {bcolors.RESET}{bcolors.WHITE}           ███████████████████▀      "]:
-        print(line.center(columns))
+f"        ▄██  ███           {bcolors.RESET}{logo_color}▀███████████   ▄{bcolors.RESET}{bcolors.WHITE}                                    ",
+f"  ▄███████   ▀▀     {bcolors.RESET}{logo_color}▄████▄▄   ▀█████████  ███▄▄{bcolors.RESET}{bcolors.WHITE}                                ",
+f" ▐█▌  ▐██  ███   {bcolors.RESET}{logo_color}▄███████████▄   ▀██████▄  █████▄{bcolors.RESET}{bcolors.WHITE}                              ",
+f" ██   ██▌ ███   {bcolors.RESET}{logo_color}████████████▀▀▀▀   ▀▀████  ███████ {bcolors.RESET}{bcolors.WHITE}                            ",
+f"▐█▌  ▐██ ▐██   {bcolors.RESET}{logo_color}██▀    ▄▄▄               ▀  ██████  ▄{bcolors.RESET}{bcolors.WHITE}                           ",
+f" ▀█████▌ ██   {bcolors.RESET}{logo_color}    ▄▄███▀                   ████▀  ▄██{bcolors.RESET}{bcolors.WHITE}     ▄███████████████████ ",
+f"             {bcolors.RESET}{logo_color} ▄███████                      ██▀  ▄████{bcolors.RESET}{bcolors.WHITE}   ████████████████████  ",
+f"             {bcolors.RESET}{logo_color}███████▀                           ██████{bcolors.RESET}{bcolors.WHITE}  ████████▀              ",
+f"             {bcolors.RESET}{logo_color}██████  ▄                        ████████{bcolors.RESET}{bcolors.WHITE} ▄███████                ",
+f"             {bcolors.RESET}{logo_color}████▀  ██                       ████████▀{bcolors.RESET}{bcolors.WHITE} ████████▄▄▄▄▄▄▄▄▄▄▄▄    ",
+f"             {bcolors.RESET}{logo_color}███▀ ▄████                     ████▀▀   {bcolors.RESET}{bcolors.WHITE}  █████████████████████   ",
+f"              {bcolors.RESET}{logo_color}█▀  ██████                         ▄▄█{bcolors.RESET}{bcolors.WHITE}    ▀███████████████████▌  ",
+f"               {bcolors.RESET}{logo_color}  ███████  ▄              ▄█████████{bcolors.RESET}{bcolors.WHITE}                   ██████▌  ",
+f"                {bcolors.RESET}{logo_color}▀███████  ▀██▄▄▄▄    ▄████████████{bcolors.RESET}{bcolors.WHITE}                  ▄███████   ",
+f"                 {bcolors.RESET}{logo_color}▀███████  ███████▄▄  ▀█████████▀{bcolors.RESET}{bcolors.WHITE}    ▄█████████████████████    ",
+f"                   {bcolors.RESET}{logo_color}▀▀████   █████████▄▄  ▀████▀{bcolors.RESET}{bcolors.WHITE}      █████████████████████     ",
+f"                       {bcolors.RESET}{logo_color}▀▀▀  ▀███████████▄ {bcolors.RESET}{bcolors.WHITE}           ███████████████████▀      "]:
+        print(line.center(columnslogo))
     getpass.getpass("\n\n\n"+"PRESS ENTER".center(columns))
     return("home")
     
@@ -630,7 +557,7 @@ def directories(path):
             liste=non_hidden_first(liste)
         #show files
         if not liste or liste==[' ']:
-            print("Files are protected or the Directory is empty.")
+            print("Files are protected, the directory is empty or your settings return no results here.")
             liste=[]
         else:
             print((" "*(spaces-1))+"0. Switch Drive\n")
@@ -1410,7 +1337,7 @@ def bar(UI=True, escape=False, homepages=False, no_events=False, change=False):
             if "RED" in list_settings[1][2].upper(): notification_color=f"{bcolors.BRIGHT_BLUE}"
             else: notification_color=f"{bcolors.BRIGHT_RED}"
             bartext+=" - [V]iew your ("+notification_color+str(len(dates))+f"{barcolor}) Event{'s' if len(dates)>1 else ''} Today"
-    print(bartext+bcolors.RESET)
+    print(bartext.center(columns)+bcolors.RESET)
     
     print("\u2501"*os.get_terminal_size()[0]+f"{color}") #separator (COMMENT THIS LINE OUT IF YOU WANT TO RUN IN YOU IDE, OTHERWISE YOU'LL NEED TO OPEN IN TERMINAL)
     if change==True: print(LOAD_POSITION)
